@@ -1,0 +1,46 @@
+/**
+ * Country dial codes for the phone input.
+ * Top-pinned: US, UK, CA, AU.
+ * Add more as needed — Wayfinder doesn't care about this list, it's UX-only.
+ */
+
+export const countryCodes = [
+  { code: 'US', dial: '+1',  name: 'United States',  maxDigits: 10, pinned: true },
+  { code: 'GB', dial: '+44', name: 'United Kingdom', maxDigits: 11, pinned: true },
+  { code: 'CA', dial: '+1',  name: 'Canada',         maxDigits: 10, pinned: true },
+  { code: 'AU', dial: '+61', name: 'Australia',      maxDigits: 9,  pinned: true },
+  { code: 'IE', dial: '+353', name: 'Ireland',       maxDigits: 9  },
+  { code: 'NZ', dial: '+64', name: 'New Zealand',    maxDigits: 9  },
+  { code: 'DE', dial: '+49', name: 'Germany',        maxDigits: 11 },
+  { code: 'FR', dial: '+33', name: 'France',         maxDigits: 9  },
+  { code: 'NL', dial: '+31', name: 'Netherlands',    maxDigits: 9  },
+  { code: 'ES', dial: '+34', name: 'Spain',          maxDigits: 9  },
+  { code: 'IT', dial: '+39', name: 'Italy',          maxDigits: 10 },
+  { code: 'PT', dial: '+351', name: 'Portugal',      maxDigits: 9  },
+  { code: 'CH', dial: '+41', name: 'Switzerland',    maxDigits: 9  },
+  { code: 'AT', dial: '+43', name: 'Austria',        maxDigits: 11 },
+  { code: 'BE', dial: '+32', name: 'Belgium',        maxDigits: 9  },
+  { code: 'SE', dial: '+46', name: 'Sweden',         maxDigits: 9  },
+  { code: 'NO', dial: '+47', name: 'Norway',         maxDigits: 8  },
+  { code: 'DK', dial: '+45', name: 'Denmark',        maxDigits: 8  },
+  { code: 'FI', dial: '+358', name: 'Finland',       maxDigits: 10 },
+  { code: 'PL', dial: '+48', name: 'Poland',         maxDigits: 9  },
+  { code: 'CZ', dial: '+420', name: 'Czechia',       maxDigits: 9  },
+  { code: 'AE', dial: '+971', name: 'UAE',           maxDigits: 9  },
+  { code: 'SA', dial: '+966', name: 'Saudi Arabia',  maxDigits: 9  },
+  { code: 'IL', dial: '+972', name: 'Israel',        maxDigits: 9  },
+  { code: 'TR', dial: '+90', name: 'Turkey',         maxDigits: 10 },
+  { code: 'ZA', dial: '+27', name: 'South Africa',   maxDigits: 9  },
+  { code: 'NG', dial: '+234', name: 'Nigeria',       maxDigits: 10 },
+  { code: 'KE', dial: '+254', name: 'Kenya',         maxDigits: 9  },
+  { code: 'IN', dial: '+91', name: 'India',          maxDigits: 10 },
+  { code: 'SG', dial: '+65', name: 'Singapore',      maxDigits: 8  },
+  { code: 'HK', dial: '+852', name: 'Hong Kong',     maxDigits: 8  },
+  { code: 'JP', dial: '+81', name: 'Japan',          maxDigits: 10 },
+  { code: 'KR', dial: '+82', name: 'South Korea',    maxDigits: 10 },
+  { code: 'MX', dial: '+52', name: 'Mexico',         maxDigits: 10 },
+  { code: 'BR', dial: '+55', name: 'Brazil',         maxDigits: 11 },
+  { code: 'AR', dial: '+54', name: 'Argentina',      maxDigits: 10 },
+  { code: 'CL', dial: '+56', name: 'Chile',          maxDigits: 9  },
+  { code: 'CO', dial: '+57', name: 'Colombia',       maxDigits: 10 },
+]
