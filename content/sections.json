@@ -11,7 +11,7 @@
   "heroFilm": {
     "video": null,
     "frames": [
-      { "src": "/images/panel-brothers.jpg" }
+      { "src": "/images/panel-hero.jpg" }
     ]
   },
   "truth": {
@@ -23,15 +23,13 @@
       "[ Paragraph 3 ]"
     ],
     "turn": "[ Turn line — italic, the pivot ]",
-    "image": "/images/panel-window.jpg",
+    "image": "/images/panel-truth.jpg",
     "imageAlign": "right"
   },
   "code": {
     "eyebrow": "II",
     "heading": "The Code",
     "intro": "[ Intro — what we hold (optional) ]",
-    "image": "/images/panel-iron.jpg",
-    "imageAlign": "left",
     "principles": [
       { "roman": "I", "text": "Integrity." },
       { "roman": "II", "text": "Loyalty." },
@@ -41,7 +39,7 @@
   "become": {
     "eyebrow": "III",
     "heading": "What You Become",
-    "image": "/images/panel-running.jpg",
+    "image": "/images/panel-become.jpg",
     "imageAlign": "full",
     "blocks": [
       {
@@ -63,7 +61,7 @@
     "heading": "[ Heading — 2–4 words ]",
     "for_": "[ Apply if… line ]",
     "not": "[ Do not apply if… line ]",
-    "image": "/images/panel-library.jpg",
+    "image": "/images/panel-considered.jpg",
     "imageAlign": "right"
   },
   "application": {
@@ -72,7 +70,7 @@
     "sub": "[ Sub ]",
     "submitButton": "[ Submit button ]",
     "submittingButton": "Submitting…",
-    "image": "/images/panel-journal.jpg",
+    "image": "/images/panel-application.jpg",
     "imageAlign": "full"
   },
   "founder": {
@@ -86,7 +84,7 @@
     ],
     "signature": "[ — Founder name, year ]",
     "templated": true,
-    "image": "/images/panel-cold.jpg",
+    "image": "/images/panel-founder.jpg",
     "imageAlign": "full"
   },
   "evidence": {
@@ -103,8 +101,6 @@
   "faq": {
     "eyebrow": "VI",
     "heading": "[ Heading — e.g. Questions a serious man asks ]",
-    "image": "/images/panel-sauna.jpg",
-    "imageAlign": "left",
     "items": [
       { "q": "[ Q1 ]", "a": "[ A1 ]" },
       { "q": "[ Q2 ]", "a": "[ A2 ]" },

@@ -27,8 +27,8 @@ const here = dirname(fileURLToPath(import.meta.url))
 const IMG_DIR = join(here, '..', 'public', 'images')
 
 // Mapping by visual inspection of the user's specific uploads.
-// Earliest timestamp → empty bedroom, latest → man at window.
 const TIMESTAMP_TO_PANEL = [
+  // Original 10 panels (modern athletic set) — preserved for archive
   { contains: '11_54_20', panel: 'rest' },
   { contains: '11_54_35', panel: 'library' },
   { contains: '11_54_45', panel: 'sauna' },
@@ -39,6 +39,13 @@ const TIMESTAMP_TO_PANEL = [
   { contains: '11_55_46', panel: 'iron' },
   { contains: '11_55_58', panel: 'running' },
   { contains: '11_56_07', panel: 'window' },
+  // Spartacus refresh (Peter feedback 2026-05-29) — 6 panels
+  { contains: '05_10_33', panel: 'hero' },
+  { contains: '05_10_50', panel: 'truth' },
+  { contains: '05_11_01', panel: 'become' },
+  { contains: '05_11_11', panel: 'considered' },
+  { contains: '05_11_19', panel: 'application' },
+  { contains: '05_11_30', panel: 'founder' },
 ]
 
 async function main() {
