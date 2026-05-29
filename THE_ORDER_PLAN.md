@@ -350,6 +350,125 @@ Both slots use the same design language as the rest of the site so the founder s
 - **Final wording of the application question copy** (specifically `commitment` and `readiness` framings).
 - **Webhook proxy decision** — Vercel Edge Function or accept browser-side.
 
+## 20. Image direction — Spartacus refresh (Peter feedback, 2026-05-29)
+
+**Peter's direction:** elegant + masculine + dark; **fewer men per shot**; Spartacus-style simple attire; focus on **environments and symbolic objects**; specific iconography requested — **AK rifle, shield, sword, round wooden table, meat on a board, water in wooden cups**. "Some simple savage looking shit."
+
+### Changes
+- Reduce panel count from 10 → 6. **The Code** and **FAQ** lose their images entirely — let the Roman numerals and restraint do the work.
+- New aesthetic boilerplate appended to every prompt:
+  > *Cinematic dim warrior aesthetic. Stone walls, rough wood, candlelight, deep shadows. Primal, savage, masculine. Spartacus-era simplicity — no modern objects, no modern athletic gear. Warm low amber light, film grain. Realistic photography. No text, no logos. Single scene only. 16:9 aspect ratio.*
+- **Start a new ChatGPT chat** for these — the previous one is style-locked to "modern athletic gym men" and will fight the new direction.
+
+### 6 new panel prompts
+
+Each saved as the filename in its heading. Append the boilerplate above.
+
+**`panel-hero.jpg`** — Heavy round wooden table in a dim stone hall, lit only by candles. Three shirtless men with strong builds sit around it in shadow, eating roast meat from a wooden board, drinking water from rough wooden cups. A sword leans against the table leg. Steam rising from the meat. Primal brotherhood.
+
+**`panel-truth.jpg`** — A lone shirtless man standing at a heavy stone window slit before dawn, looking out at misty mountains. Cold gray light. Bare stone cell behind him, no furniture beyond a wooden cot. He is alone.
+
+**`panel-become.jpg`** — Three shirtless men running together along a misty dirt path through dark pine forest at first light. Primal silhouettes, strong builds, weighted determined expressions. Simple dark cloth wrapped at the waist — no modern athletic clothing.
+
+**`panel-considered.jpg`** — A heavy old leather-bound book lying open on a rough wooden table, lit by a single candle. A short sword resting beside the book, blade catching the light. Stone wall in dim background. No man, no people — just the objects on the table.
+
+**`panel-application.jpg`** — A wooden AK-47 rifle resting horizontally on a heavy rough wooden table. A single candle beside it casting amber light along the barrel. Dark stone wall behind. No man, no people — only the rifle and the candle. Disciplined stillness.
+
+**`panel-founder.jpg`** — A lone shirtless muscular man sitting waist-deep in a heavy wooden barrel of ice water, inside a dim stone chamber. Head bowed, eyes closed. Single warm light source from a stone wall sconce. Primal, ritual.
+
+### Wiring after Peter generates them
+Save each at `public/images/[name].jpg`, then I'll update the section image refs to point at `panel-hero`, `panel-truth`, `panel-become`, `panel-considered`, `panel-application`, `panel-founder` and drop images from Code and FAQ sections.
+
+---
+
+## 21. CMS for Peter — single-password admin
+
+**Goal:** Peter visits `theorder.com/admin`, logs in with a single password (no GitHub account required), edits any text or uploads any image, hits save, the site goes live in ~30 seconds.
+
+### Architecture (Vite SPA + Vercel Functions)
+
+```
+theorder.com/                  ← public site (Vite SPA, what visitors see)
+theorder.com/admin             ← editor SPA route (gated by JWT)
+theorder.com/api/admin/*       ← Vercel Functions for auth, content, uploads
+```
+
+**No external CMS service.** No Decap, no Tina, no Sanity. We own the whole stack and Peter never sees GitHub.
+
+### Content extraction (one-time refactor)
+
+- `src/config/sectionContent.js` → `content/sections.json`
+- `src/config/questions.js` → `content/questions.json`
+- Section components import the JSON instead of the JS object (Vite handles JSON natively, hot reloads)
+- This makes the content **a data file** that can be GET/POST'd by an API without parsing JavaScript
+
+### API routes (Vercel Functions in `/api/`)
+
+| Route | Method | What it does |
+|---|---|---|
+| `/api/admin/login` | POST | Verifies password against `ADMIN_PASSWORD` env var, returns short-lived JWT |
+| `/api/admin/content` | GET | Returns current `sections.json` and `questions.json` |
+| `/api/admin/content` | POST | Writes new content, commits to GitHub via Octokit, returns success |
+| `/api/admin/upload` | POST | Uploads image to Vercel Blob, returns public URL |
+
+### Auth model
+- **Single password** stored in Vercel env var: `ADMIN_PASSWORD`
+- POST `/api/admin/login` returns a JWT signed with `ADMIN_JWT_SECRET` (24h expiry)
+- JWT stored in localStorage, sent in `Authorization: Bearer` header
+- Each protected route verifies JWT before doing anything
+
+### Image storage
+- **Vercel Blob** (free tier: 1 GB) — fast object storage with public CDN URLs
+- Uploaded images get a URL like `https://[hash].public.blob.vercel-storage.com/panel-hero-abc.jpg`
+- That URL is written into `sections.json` instead of `/images/panel-hero.jpg`
+- Old image paths (`/images/panel-*.jpg`) keep working — Blob URLs are the *new* path used after edits
+
+### Env vars (set in Vercel)
+
+| Name | Purpose |
+|---|---|
+| `ADMIN_PASSWORD` | Peter's single login password |
+| `ADMIN_JWT_SECRET` | JWT signing secret (random 32-byte hex string) |
+| `GITHUB_TOKEN` | Personal Access Token with `repo` scope, for committing content |
+| `GITHUB_REPO` | `wayfindercollective/theorder` |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob token (auto-set when Blob is enabled) |
+
+### Editor UI (what Peter sees at /admin)
+
+Single-page editor with tabs:
+
+1. **Sections** — every text slot rendered as a labeled input or textarea. Hero headline, Truth paragraphs, Code principles, Become blocks, Considered lines, FAQ Q&A, Founder paragraphs, Footer line.
+2. **Application** — the 5 questions and their options. Option values (Wayfinder scoring strings) are read-only with a warning. Option labels are editable.
+3. **Images** — every section image. Click thumbnail to upload a replacement.
+4. **Logo** — the SVG sigil currently. If Peter uploads a logo image, we switch to render that instead.
+
+Top of every tab: **"Save Changes"** button. After save: *"Saved. Live in ~30 seconds."*
+
+### What's NOT in v1 of the CMS
+- Multi-user / roles (single password, one editor at a time)
+- Version history beyond Git's own log
+- Preview-before-publish (every save is live)
+- Rich text editor (plain text only — the brand is restrained, doesn't need bold/italic)
+
+These can be added later if needed. v1 is "Peter can change anything text or visual without a developer."
+
+### Build order
+1. Refactor content into JSON files
+2. Set up Vercel Functions stub (`/api/admin/login`, returns dummy success)
+3. Build `/admin` login page
+4. Wire login → JWT → protected routes
+5. Build content editor for sections + questions
+6. Add GitHub commit via Octokit
+7. Add Vercel Blob image upload
+8. Build images tab
+9. Provision env vars in Vercel
+10. Hand off password to Peter
+
+### Time estimate
+~1 day of focused work. Single dependency on Vercel Blob (free to enable in Vercel dashboard).
+
+---
+
 ## 18. Hero film — the cinematic asset spec
 
 The hero showpiece is now an image/video sequence, not a 3D scene. The 3D round table was killed in v1.2 — too brittle, looked crude without proper assets, and the audience would see "WebGL render" not "premium". A cinematic AI-generated film is the right vehicle.

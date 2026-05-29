@@ -1,0 +1,139 @@
+{
+  "brand": {
+    "logo": null
+  },
+  "hero": {
+    "eyebrow": "[ Eyebrow — 1–3 words ]",
+    "headline": "[ Headline — 3–7 words ]",
+    "restraint": "[ Restraint line — single line under CTA ]",
+    "cta": "[ CTA button ]"
+  },
+  "heroFilm": {
+    "video": null,
+    "frames": [
+      { "src": "/images/panel-brothers.jpg" }
+    ]
+  },
+  "truth": {
+    "eyebrow": "I",
+    "heading": "[ Heading — names the condition ]",
+    "paragraphs": [
+      "[ Paragraph 1 ]",
+      "[ Paragraph 2 ]",
+      "[ Paragraph 3 ]"
+    ],
+    "turn": "[ Turn line — italic, the pivot ]",
+    "image": "/images/panel-window.jpg",
+    "imageAlign": "right"
+  },
+  "code": {
+    "eyebrow": "II",
+    "heading": "The Code",
+    "intro": "[ Intro — what we hold (optional) ]",
+    "image": "/images/panel-iron.jpg",
+    "imageAlign": "left",
+    "principles": [
+      { "roman": "I", "text": "Integrity." },
+      { "roman": "II", "text": "Loyalty." },
+      { "roman": "III", "text": "Competence." }
+    ]
+  },
+  "become": {
+    "eyebrow": "III",
+    "heading": "What You Become",
+    "image": "/images/panel-running.jpg",
+    "imageAlign": "full",
+    "blocks": [
+      {
+        "title": "[ Outcome 1 title ]",
+        "body": "[ Outcome 1 — what you receive in this area ]"
+      },
+      {
+        "title": "[ Outcome 2 title ]",
+        "body": "[ Outcome 2 — what you receive in this area ]"
+      },
+      {
+        "title": "[ Outcome 3 title ]",
+        "body": "[ Outcome 3 — what you receive in this area ]"
+      }
+    ]
+  },
+  "considered": {
+    "eyebrow": "IV",
+    "heading": "[ Heading — 2–4 words ]",
+    "for_": "[ Apply if… line ]",
+    "not": "[ Do not apply if… line ]",
+    "image": "/images/panel-library.jpg",
+    "imageAlign": "right"
+  },
+  "application": {
+    "eyebrow": "The Application",
+    "heading": "[ Heading ]",
+    "sub": "[ Sub ]",
+    "submitButton": "[ Submit button ]",
+    "submittingButton": "Submitting…",
+    "image": "/images/panel-journal.jpg",
+    "imageAlign": "full"
+  },
+  "founder": {
+    "eyebrow": "V",
+    "heading": "[ Heading — e.g. From the Founder ]",
+    "placeholderMark": "[ Founder portrait ]",
+    "paragraphs": [
+      "[ Paragraph 1 — who he is ]",
+      "[ Paragraph 2 — what he saw missing ]",
+      "[ Paragraph 3 — the invitation ]"
+    ],
+    "signature": "[ — Founder name, year ]",
+    "templated": true,
+    "image": "/images/panel-cold.jpg",
+    "imageAlign": "full"
+  },
+  "evidence": {
+    "eyebrow": "VI",
+    "heading": "[ Heading — e.g. Testimony ]",
+    "intro": "[ Intro line ]",
+    "templated": true,
+    "cards": [
+      { "quote": "[ Testimony 1 ]", "attribution": "[ Name — year ]" },
+      { "quote": "[ Testimony 2 ]", "attribution": "[ Name — year ]" },
+      { "quote": "[ Testimony 3 ]", "attribution": "[ Name — year ]" }
+    ]
+  },
+  "faq": {
+    "eyebrow": "VI",
+    "heading": "[ Heading — e.g. Questions a serious man asks ]",
+    "image": "/images/panel-sauna.jpg",
+    "imageAlign": "left",
+    "items": [
+      { "q": "[ Q1 ]", "a": "[ A1 ]" },
+      { "q": "[ Q2 ]", "a": "[ A2 ]" },
+      { "q": "[ Q3 — religion / cross ]", "a": "[ A3 ]" },
+      { "q": "[ Q4 — cost ]", "a": "[ A4 ]" },
+      { "q": "[ Q5 — differentiation ]", "a": "[ A5 ]" }
+    ]
+  },
+  "footer": {
+    "restraint": "[ Footer line — one philosophical line ]",
+    "copyright": "© The Order",
+    "privacyHref": "https://wayfindercollective.io/privacy"
+  },
+  "finalScreen": {
+    "heading": "[ Final heading ]",
+    "sub": "[ Sub line ]",
+    "begin": "[ Encouragement — italic ]"
+  },
+  "form": {
+    "nameLabel": "Full name",
+    "namePlaceholder": "[ Name hint ]",
+    "emailLabel": "Email",
+    "emailPlaceholder": "[ Email hint ]",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "Number",
+    "emailError": "That email does not look right.",
+    "phoneError": "That number does not look right."
+  },
+  "consent": {
+    "smsLine": "I consent to receive SMS communications from Wayfinder Coaching about my application. Message and data rates may apply. Reply STOP to opt out at any time."
+  }
+}

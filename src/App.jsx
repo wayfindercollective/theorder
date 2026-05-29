@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Header } from './components/sections/Header.jsx'
 import { Hero } from './components/sections/Hero.jsx'
 import { TheTruthSection } from './components/sections/TheTruthSection.jsx'
@@ -7,18 +7,32 @@ import { WhatYouBecomeSection } from './components/sections/WhatYouBecomeSection
 import { WhoIsConsideredSection } from './components/sections/WhoIsConsideredSection.jsx'
 import { ApplicationSection } from './components/sections/ApplicationSection.jsx'
 import { FounderSection } from './components/sections/FounderSection.jsx'
-// import { EvidenceSection } from './components/sections/EvidenceSection.jsx' // hidden until testimonies exist — see flag below
+// import { EvidenceSection } from './components/sections/EvidenceSection.jsx' // hidden until testimonies exist
 import { FAQSection } from './components/sections/FAQSection.jsx'
 import { FooterSection } from './components/sections/FooterSection.jsx'
 import { usePendingLeadsSync } from './hooks/usePendingLeadsSync.js'
 import { captureUTMs } from './lib/utm.js'
 import { bootAnalytics, track } from './lib/analytics.js'
 
-export default function App() {
+// Lazy-load admin so public visitors never download it.
+const AdminApp = lazy(() => import('./admin/AdminApp.jsx'))
+
+function isAdminRoute() {
+  return typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+}
+
+function AdminRoot() {
+  return (
+    <Suspense fallback={<div className="admin-loading"><p className="restraint">Loading editor…</p></div>}>
+      <AdminApp />
+    </Suspense>
+  )
+}
+
+function PublicSite() {
   usePendingLeadsSync()
 
   useEffect(() => {
-    // start at top, ignore browser scroll restoration
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
     if (window.location.hash) {
       window.history.replaceState({}, '', window.location.pathname + window.location.search)
@@ -52,4 +66,8 @@ export default function App() {
       <FooterSection />
     </>
   )
+}
+
+export default function App() {
+  return isAdminRoute() ? <AdminRoot /> : <PublicSite />
 }

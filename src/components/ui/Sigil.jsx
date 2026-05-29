@@ -2,11 +2,29 @@
  * The Sigil — shield + cross + sword, drawn as inline SVG.
  * Used as the brand mark in the header, footer, and as a section accent.
  *
- * size: pixel size of the rendered SVG.
+ * If brand.logo is set in sections.json (via the admin Logo tab), renders that
+ * image instead of the SVG sigil.
+ *
+ * size: pixel size of the rendered mark (height).
  * variant: 'full' (with sword), 'shield' (no sword overlay).
  */
 
+import { brandContent } from '../../config/sectionContent.js'
+
 export function Sigil({ size = 56, variant = 'full', className = '' }) {
+  const customLogo = brandContent?.logo
+  if (customLogo) {
+    return (
+      <img
+        src={customLogo}
+        alt="The Order"
+        height={size}
+        className={`sigil sigil-custom ${className}`.trim()}
+        style={{ height: size, width: 'auto' }}
+        draggable={false}
+      />
+    )
+  }
   return (
     <svg
       width={size}
