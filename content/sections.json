@@ -30,6 +30,8 @@
     "eyebrow": "II",
     "heading": "The Code",
     "intro": "[ Intro — what we hold (optional) ]",
+    "image": "/images/panel-considered.jpg",
+    "imageAlign": "right",
     "principles": [
       { "roman": "I", "text": "Integrity." },
       { "roman": "II", "text": "Loyalty." },
@@ -60,18 +62,14 @@
     "eyebrow": "IV",
     "heading": "[ Heading — 2–4 words ]",
     "for_": "[ Apply if… line ]",
-    "not": "[ Do not apply if… line ]",
-    "image": "/images/panel-considered.jpg",
-    "imageAlign": "right"
+    "not": "[ Do not apply if… line ]"
   },
   "application": {
     "eyebrow": "The Application",
     "heading": "[ Heading ]",
     "sub": "[ Sub ]",
     "submitButton": "[ Submit button ]",
-    "submittingButton": "Submitting…",
-    "image": "/images/panel-application.jpg",
-    "imageAlign": "full"
+    "submittingButton": "Submitting…"
   },
   "founder": {
     "eyebrow": "V",
