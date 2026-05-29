@@ -138,15 +138,20 @@ button {
 .shell-narrow { max-width: var(--reading-w); margin: 0 auto; padding: 0 1.5rem; }
 
 .section {
-  padding: clamp(5rem, 10vw, 9rem) 0;
   position: relative;
   overflow: hidden; /* contain side-image masks */
+  min-height: 100vh;
+  padding: clamp(3rem, 6vw, 5rem) 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .section > .shell,
 .section > .shell-narrow {
   position: relative;
   z-index: 2;
+  width: 100%;
 }
 
 /* ============================================================
