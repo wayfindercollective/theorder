@@ -164,12 +164,10 @@ export function ApplicationSection() {
       <div className="shell-narrow application-shell">
         {!submitted && (
           <>
-            <div className="application-head">
+            <div className="application-head application-head-compact">
               <div className="eyebrow">
                 <span className="brass-rule" /> {applicationCopy.eyebrow} <span className="brass-rule" />
               </div>
-              <h2 className="display section-heading">{applicationCopy.heading}</h2>
-              <p className="restraint application-sub">{applicationCopy.sub}</p>
               <div className="progress-track application-progress" aria-hidden="true">
                 <div
                   className="progress-fill"

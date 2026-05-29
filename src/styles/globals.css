@@ -141,7 +141,7 @@ button {
   position: relative;
   overflow: hidden; /* contain side-image masks */
   min-height: 100vh;
-  padding: clamp(3rem, 6vw, 5rem) 0;
+  padding: clamp(2rem, 4vw, 3.5rem) 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -152,6 +152,14 @@ button {
   position: relative;
   z-index: 2;
   width: 100%;
+}
+
+.section-heading {
+  text-align: center;
+  margin: 0.8rem 0 0;
+  font-size: clamp(1.6rem, 3.3vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
 }
 
 /* ============================================================
@@ -404,14 +412,14 @@ button {
 .choice {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
   width: 100%;
-  padding: 1.1rem 1.4rem;
+  padding: 0.7rem 1.1rem;
   background: var(--bg-surface);
   border: 1px solid var(--iron);
   color: var(--parchment);
   font-family: var(--font-body);
-  font-size: 1.05rem;
+  font-size: 1rem;
   text-align: left;
   cursor: pointer;
   transition: all 320ms var(--ease-order);
@@ -431,15 +439,15 @@ button {
 }
 
 .choice-badge {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--brass-deep);
   color: var(--brass);
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   letter-spacing: 0.1em;
   flex-shrink: 0;
 }
@@ -771,13 +779,7 @@ button {
    SECTION HEADINGS (shared)
    ============================================================ */
 
-.section-heading {
-  text-align: center;
-  margin: 1.1rem 0 0;
-  font-size: clamp(1.9rem, 4.2vw, 3.2rem);
-  line-height: 1.1;
-  letter-spacing: 0.04em;
-}
+/* override moved above into the section block */
 
 .eyebrow {
   display: block;
@@ -930,35 +932,39 @@ button {
 .section-application {
   background: linear-gradient(180deg, var(--bg-deep) 0%, #0d0b0a 50%, var(--bg-deep) 100%);
 }
-.application-shell { display: flex; flex-direction: column; gap: 2.5rem; }
+.application-shell { display: flex; flex-direction: column; gap: 1.2rem; }
 .application-head { text-align: center; }
-.application-sub {
-  margin-top: 1rem;
-  color: var(--ash);
+.application-head-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
 }
 .application-progress {
-  max-width: 360px;
-  margin: 2rem auto 0;
+  max-width: 320px;
+  width: 100%;
 }
 .application-card {
-  padding: clamp(1.8rem, 4vw, 3rem);
+  padding: clamp(1.2rem, 3vw, 2rem);
 }
 
-.qs { display: flex; flex-direction: column; gap: 1.6rem; }
+.qs { display: flex; flex-direction: column; gap: 1rem; }
 .qs-meta { display: flex; justify-content: space-between; align-items: center; }
 .qs-question {
-  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
   letter-spacing: 0.04em;
-  line-height: 1.3;
+  line-height: 1.25;
+  margin: 0;
 }
 .qs-sub {
   color: var(--ash);
   font-style: italic;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  margin: 0;
 }
-.qs-choices { display: flex; flex-direction: column; gap: 0.75rem; }
-.qs-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1.5rem; }
-.qs-nav .btn-ghost { padding: 0.85rem 1.6rem; }
+.qs-choices { display: flex; flex-direction: column; gap: 0.5rem; }
+.qs-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 0.8rem; }
+.qs-nav .btn-ghost { padding: 0.65rem 1.3rem; }
 
 .qs-contact { display: flex; flex-direction: column; gap: 1.4rem; }
 .qs-field { display: flex; flex-direction: column; gap: 0.4rem; position: relative; }
