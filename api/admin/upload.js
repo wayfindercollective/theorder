@@ -34,6 +34,16 @@ async function readRawBody(req) {
   return Buffer.concat(chunks)
 }
 
+/**
+ * Token resolution order:
+ *   1. IMAGES_BLOB_READ_WRITE_TOKEN  — the public store, prefixed when an old
+ *      private store still uses the default name on the project
+ *   2. BLOB_READ_WRITE_TOKEN         — the default name, if no prefix needed
+ */
+function getBlobToken() {
+  return process.env.IMAGES_BLOB_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN || ''
+}
+
 export default async function handler(req, res) {
   const payload = await requireAuth(req, res)
   if (!payload) return
@@ -43,8 +53,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'method not allowed' })
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return res.status(500).json({ error: 'BLOB_READ_WRITE_TOKEN not configured — enable Vercel Blob in dashboard' })
+  const token = getBlobToken()
+  if (!token) {
+    return res.status(500).json({ error: 'No Blob token found. Set IMAGES_BLOB_READ_WRITE_TOKEN (preferred) or BLOB_READ_WRITE_TOKEN.' })
   }
 
   const filename = safeName(req.headers['x-filename'] || `upload-${Date.now()}`)
@@ -60,6 +71,7 @@ export default async function handler(req, res) {
       access: 'public',
       contentType,
       addRandomSuffix: false,
+      token,
     })
     return res.status(200).json({ url: blob.url, path: blob.pathname })
   } catch (err) {
