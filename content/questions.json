@@ -7,11 +7,26 @@
       "question": "[ Q1 — opener question ]",
       "subtitle": "[ Q1 subtitle — optional ]",
       "options": [
-        { "label": "[ Option 1 ]", "value": "Option 1" },
-        { "label": "[ Option 2 ]", "value": "Option 2" },
-        { "label": "[ Option 3 ]", "value": "Option 3" },
-        { "label": "[ Option 4 ]", "value": "Option 4" },
-        { "label": "[ Option 5 ]", "value": "Option 5" }
+        {
+          "label": "[ Option 1 ]",
+          "value": "Option 1"
+        },
+        {
+          "label": "[ Option 2 ]",
+          "value": "Option 2"
+        },
+        {
+          "label": "[ Option 3 ]",
+          "value": "Option 3"
+        },
+        {
+          "label": "[ Option 4 ]",
+          "value": "Option 4"
+        },
+        {
+          "label": "[ Option 5 ]",
+          "value": "Option 5"
+        }
       ]
     },
     {
@@ -21,10 +36,22 @@
       "question": "[ Q2 — commitment question ]",
       "subtitle": "[ Q2 subtitle — optional ]",
       "options": [
-        { "label": "[ Commitment — highest ]", "value": "Fully commits and follows through" },
-        { "label": "[ Commitment — high ]", "value": "Mostly commits" },
-        { "label": "[ Commitment — mid ]", "value": "Inconsistent commitment" },
-        { "label": "[ Commitment — low ]", "value": "Rarely commits" }
+        {
+          "label": "[ Commitment — highest ]",
+          "value": "Fully commits and follows through"
+        },
+        {
+          "label": "[ Commitment — high ]",
+          "value": "Mostly commits"
+        },
+        {
+          "label": "[ Commitment — mid ]",
+          "value": "Inconsistent commitment"
+        },
+        {
+          "label": "[ Commitment — low ]",
+          "value": "Rarely commits"
+        }
       ]
     },
     {
@@ -34,10 +61,22 @@
       "question": "[ Q3 — readiness question ]",
       "subtitle": "[ Q3 subtitle — optional ]",
       "options": [
-        { "label": "[ Readiness — now ]", "value": "Ready now" },
-        { "label": "[ Readiness — soon ]", "value": "Ready soon" },
-        { "label": "[ Readiness — open ]", "value": "Open to it" },
-        { "label": "[ Readiness — exploring ]", "value": "Exploring" }
+        {
+          "label": "[ Readiness — now ]",
+          "value": "Ready now"
+        },
+        {
+          "label": "[ Readiness — soon ]",
+          "value": "Ready soon"
+        },
+        {
+          "label": "[ Readiness — open ]",
+          "value": "Open to it"
+        },
+        {
+          "label": "[ Readiness — exploring ]",
+          "value": "Exploring"
+        }
       ]
     },
     {
@@ -47,12 +86,30 @@
       "question": "[ Q4 — income question ]",
       "subtitle": "[ Q4 subtitle — optional ]",
       "options": [
-        { "label": "[ $100k+ ]", "value": "$100k+ Per Month" },
-        { "label": "[ $10–100k ]", "value": "$10-100k Per Month" },
-        { "label": "[ $5–10k ]", "value": "$5-10k Per Month" },
-        { "label": "[ $3–5k ]", "value": "$3-5k Per Month" },
-        { "label": "[ $1–3k ]", "value": "$1-3k Per Month" },
-        { "label": "[ $0–1k ]", "value": "$0-1k Per Month" }
+        {
+          "label": "[ $100k+ ]",
+          "value": "$100k+ Per Month"
+        },
+        {
+          "label": "[ $10–100k ]",
+          "value": "$10-100k Per Month"
+        },
+        {
+          "label": "[ $5–10k ]",
+          "value": "$5-10k Per Month"
+        },
+        {
+          "label": "[ $3–5k ]",
+          "value": "$3-5k Per Month"
+        },
+        {
+          "label": "[ $1–3k ]",
+          "value": "$1-3k Per Month"
+        },
+        {
+          "label": "[ $0–1k ]",
+          "value": "$0-1k Per Month"
+        }
       ]
     },
     {
