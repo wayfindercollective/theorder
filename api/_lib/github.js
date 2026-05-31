@@ -32,26 +32,44 @@ export async function readJsonFile(path) {
 export async function writeJsonFile(path, jsonObj, message) {
   const { kit, owner, name, branch } = getCtx()
 
-  // Get current SHA for conditional update (avoid clobbering concurrent edits)
+  const content = JSON.stringify(jsonObj, null, 2) + '\n'
+  const encoded = Buffer.from(content, 'utf-8').toString('base64')
+
+  // Conditional update with retry: GitHub's CDN can return stale SHAs right
+  // after a commit, causing 409 "expected SHA X but is at Y". On conflict we
+  // parse the actual SHA out of the error and retry once.
+  async function attempt(sha) {
+    return kit.repos.createOrUpdateFileContents({
+      owner,
+      repo: name,
+      path,
+      message: message || `cms: update ${path}`,
+      content: encoded,
+      branch,
+      sha,
+    })
+  }
+
   let sha
   try {
     const existing = await readJsonFile(path)
     sha = existing.sha
-  } catch (err) {
+  } catch {
     // file doesn't exist — sha stays undefined (create)
   }
 
-  const content = JSON.stringify(jsonObj, null, 2) + '\n'
-  const encoded = Buffer.from(content, 'utf-8').toString('base64')
-
-  await kit.repos.createOrUpdateFileContents({
-    owner,
-    repo: name,
-    path,
-    message: message || `cms: update ${path}`,
-    content: encoded,
-    branch,
-    sha,
-  })
+  try {
+    await attempt(sha)
+  } catch (err) {
+    const msg = err?.message || ''
+    const status = err?.status
+    // Match "is at <sha>" from the GitHub Contents API conflict message
+    const match = msg.match(/is at ([0-9a-f]{40})/i)
+    if ((status === 409 || status === 422) && match) {
+      await attempt(match[1])
+    } else {
+      throw err
+    }
+  }
   return { ok: true }
 }
