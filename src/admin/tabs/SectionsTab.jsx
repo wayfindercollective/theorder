@@ -26,11 +26,12 @@ const SECTION_DEFS = [
   {
     key: 'truth',
     title: 'The Truth',
+    previewWrap: 'section-truth-preview',
     fields: [
       { path: ['truth', 'heading'],       label: 'Heading', hint: 'Names the condition. 3–7 words.' },
-      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', markdown: true },
-      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', markdown: true },
-      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', markdown: true },
+      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', markdown: true, previewClass: 'truth-p' },
+      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', markdown: true, previewClass: 'truth-p' },
+      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', markdown: true, previewClass: 'truth-p' },
       { path: ['truth', 'turn'],          label: 'Turn line (italic)', hint: 'The pivot — one line. Rendered italic.' },
     ],
   },
@@ -51,11 +52,11 @@ const SECTION_DEFS = [
     fields: [
       { path: ['become', 'heading'], label: 'Heading' },
       { path: ['become', 'blocks', 0, 'title'], label: 'Block 1 — title', hint: '2–5 words.' },
-      { path: ['become', 'blocks', 0, 'body'],  label: 'Block 1 — body', markdown: true },
+      { path: ['become', 'blocks', 0, 'body'],  label: 'Block 1 — body', markdown: true, previewClass: 'become-body' },
       { path: ['become', 'blocks', 1, 'title'], label: 'Block 2 — title' },
-      { path: ['become', 'blocks', 1, 'body'],  label: 'Block 2 — body', markdown: true },
+      { path: ['become', 'blocks', 1, 'body'],  label: 'Block 2 — body', markdown: true, previewClass: 'become-body' },
       { path: ['become', 'blocks', 2, 'title'], label: 'Block 3 — title' },
-      { path: ['become', 'blocks', 2, 'body'],  label: 'Block 3 — body', markdown: true },
+      { path: ['become', 'blocks', 2, 'body'],  label: 'Block 3 — body', markdown: true, previewClass: 'become-body' },
     ],
   },
   {
@@ -80,29 +81,31 @@ const SECTION_DEFS = [
   {
     key: 'founder',
     title: 'From the Founder',
+    previewWrap: 'section-founder-preview',
     fields: [
       { path: ['founder', 'heading'],          label: 'Heading' },
-      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1 — who he is', markdown: true },
-      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2 — what he saw missing', markdown: true },
-      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3 — the invitation', markdown: true },
+      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1 — who he is', markdown: true, previewClass: 'founder-p' },
+      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2 — what he saw missing', markdown: true, previewClass: 'founder-p' },
+      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3 — the invitation', markdown: true, previewClass: 'founder-p' },
       { path: ['founder', 'signature'],        label: 'Signature', hint: 'e.g. — Nico Seedsman, 2026' },
     ],
   },
   {
     key: 'faq',
     title: 'FAQ',
+    previewWrap: 'section-faq-preview',
     fields: [
       { path: ['faq', 'heading'], label: 'Heading' },
       { path: ['faq', 'items', 0, 'q'], label: 'Q1' },
-      { path: ['faq', 'items', 0, 'a'], label: 'A1', markdown: true },
+      { path: ['faq', 'items', 0, 'a'], label: 'A1', markdown: true, previewClass: 'faq-preview-p' },
       { path: ['faq', 'items', 1, 'q'], label: 'Q2' },
-      { path: ['faq', 'items', 1, 'a'], label: 'A2', markdown: true },
+      { path: ['faq', 'items', 1, 'a'], label: 'A2', markdown: true, previewClass: 'faq-preview-p' },
       { path: ['faq', 'items', 2, 'q'], label: 'Q3' },
-      { path: ['faq', 'items', 2, 'a'], label: 'A3', markdown: true },
+      { path: ['faq', 'items', 2, 'a'], label: 'A3', markdown: true, previewClass: 'faq-preview-p' },
       { path: ['faq', 'items', 3, 'q'], label: 'Q4' },
-      { path: ['faq', 'items', 3, 'a'], label: 'A4', markdown: true },
+      { path: ['faq', 'items', 3, 'a'], label: 'A4', markdown: true, previewClass: 'faq-preview-p' },
       { path: ['faq', 'items', 4, 'q'], label: 'Q5' },
-      { path: ['faq', 'items', 4, 'a'], label: 'A5', markdown: true },
+      { path: ['faq', 'items', 4, 'a'], label: 'A5', markdown: true, previewClass: 'faq-preview-p' },
     ],
   },
   {
@@ -166,6 +169,8 @@ export function SectionsTab({ sections, onChange }) {
                     onChange={(v) => update(f.path, v)}
                     rows={4}
                     hint={f.hint || 'Markdown: **bold**, *italic*, [link](https://…)'}
+                    previewClass={f.previewClass || ''}
+                    previewWrapClass={sec.previewWrap || ''}
                   />
                 )
               }

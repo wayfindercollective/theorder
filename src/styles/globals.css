@@ -1275,7 +1275,8 @@ button {
   max-height: 320px;
   padding: 0 0.6rem 1.8rem 4rem;
 }
-.faq-a p {
+.faq-a p,
+.faq-preview-p {
   color: var(--parchment-mute);
   font-size: 1.05rem;
   line-height: 1.6;
@@ -1679,16 +1680,51 @@ button {
 
 .md-preview {
   border: 1px solid var(--iron);
-  padding: 0.9rem 1rem;
-  background: rgba(10, 9, 8, 0.3);
+  padding: 1.4rem 1.6rem;
+  background: var(--bg-deep);
   min-height: 80px;
   color: var(--parchment);
+  position: relative;
 }
-.md-preview p { margin: 0 0 0.7em; }
-.md-preview p:last-child { margin-bottom: 0; }
+.md-preview-inner > p { margin: 0 0 0.9em; }
+.md-preview-inner > p:last-child { margin-bottom: 0; }
 .md-preview a { color: var(--brass-light); text-decoration: underline; }
 .md-preview strong { color: var(--parchment); }
-.md-preview em { color: var(--parchment-dim, var(--parchment)); }
+.md-preview em { color: var(--parchment); }
+
+/* Tiny "this is a preview" tag so the editor never lies about what it is */
+.md-preview::before {
+  content: 'PREVIEW';
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  color: var(--ash);
+  opacity: 0.6;
+}
+
+/* Section-flavored backgrounds for the preview wrap so it FEELS like the section
+   it'll render in. Subtle radial tints — same colour palette the real sections use. */
+.md-preview.section-truth-preview {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(166, 136, 74, 0.06), transparent 60%),
+    var(--bg-deep);
+}
+.md-preview.section-founder-preview {
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(95, 30, 28, 0.10), transparent 65%),
+    var(--bg-leather);
+}
+.md-preview.section-faq-preview {
+  background: var(--bg-surface);
+}
+
+/* Truth paragraphs are centered on the live site — wider min-height so preview
+   doesn't collapse weirdly when content is short. */
+.md-preview.section-truth-preview { min-height: 120px; }
+.md-preview.section-truth-preview .md-preview-inner { text-align: center; }
 
 /* Restore banner — appears below topbar on first load if a draft was found */
 

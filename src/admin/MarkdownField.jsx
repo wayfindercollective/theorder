@@ -24,7 +24,7 @@ function wrapSelection(textarea, prefix, suffix = prefix) {
   }
 }
 
-export function MarkdownField({ id, value, onChange, rows = 4, placeholder, label, hint }) {
+export function MarkdownField({ id, value, onChange, rows = 4, placeholder, label, hint, previewClass = '', previewWrapClass = '' }) {
   const taRef = useRef(null)
   const [preview, setPreview] = useState(false)
 
@@ -74,10 +74,12 @@ export function MarkdownField({ id, value, onChange, rows = 4, placeholder, labe
         </button>
       </div>
       {preview ? (
-        <div
-          className="md-preview"
-          dangerouslySetInnerHTML={{ __html: renderMarkdown(value || '') }}
-        />
+        <div className={'md-preview' + (previewWrapClass ? ' ' + previewWrapClass : '')}>
+          <div
+            className="md-preview-inner"
+            dangerouslySetInnerHTML={{ __html: renderMarkdown(value || '', previewClass) }}
+          />
+        </div>
       ) : (
         <textarea
           id={id}

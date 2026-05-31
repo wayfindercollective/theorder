@@ -47,19 +47,20 @@ export function renderInlineMarkdown(text) {
   return applyInlineTokens(escapeHtml(text)).replace(/\n/g, '<br>')
 }
 
-export function renderMarkdown(text) {
+export function renderMarkdown(text, pClass = '') {
   if (text == null) return ''
   const blocks = String(text).split(/\n{2,}/)
+  const open = pClass ? `<p class="${escapeAttr(pClass)}">` : '<p>'
   return blocks
     .map((block) => {
       const inline = applyInlineTokens(escapeHtml(block)).replace(/\n/g, '<br>')
-      return `<p>${inline}</p>`
+      return `${open}${inline}</p>`
     })
     .join('')
 }
 
-export function mdHtml(text) {
-  return { __html: renderMarkdown(text) }
+export function mdHtml(text, pClass = '') {
+  return { __html: renderMarkdown(text, pClass) }
 }
 
 export function mdInline(text) {
