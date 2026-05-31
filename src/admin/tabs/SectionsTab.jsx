@@ -29,9 +29,9 @@ const SECTION_DEFS = [
     previewWrap: 'section-truth-preview',
     fields: [
       { path: ['truth', 'heading'],       label: 'Heading', hint: 'Names the condition. 3–7 words. Rendered in display font, centered.' },
-      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', markdown: true, previewClass: 'truth-p', hint: 'Centered on site. Markdown: **bold**, *italic*, [link](https://…)' },
-      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', markdown: true, previewClass: 'truth-p', hint: 'Centered on site. Markdown: **bold**, *italic*, [link](https://…)' },
-      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', markdown: true, previewClass: 'truth-p', hint: 'Centered on site. Markdown: **bold**, *italic*, [link](https://…)' },
+      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', markdown: true, previewClass: 'truth-p', hint: 'Centered body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
+      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', markdown: true, previewClass: 'truth-p', hint: 'Centered body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
+      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', markdown: true, previewClass: 'truth-p', hint: 'Centered body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
       { path: ['truth', 'turn'],          label: 'Turn line', italic: true, hint: 'The pivot — one line. Renders italic, brass-light colour.' },
     ],
   },
@@ -51,12 +51,12 @@ const SECTION_DEFS = [
     title: 'What You Become',
     fields: [
       { path: ['become', 'heading'], label: 'Heading' },
-      { path: ['become', 'blocks', 0, 'title'], label: 'Block 1 — title', hint: '2–5 words.' },
-      { path: ['become', 'blocks', 0, 'body'],  label: 'Block 1 — body', markdown: true, previewClass: 'become-body' },
-      { path: ['become', 'blocks', 1, 'title'], label: 'Block 2 — title' },
-      { path: ['become', 'blocks', 1, 'body'],  label: 'Block 2 — body', markdown: true, previewClass: 'become-body' },
-      { path: ['become', 'blocks', 2, 'title'], label: 'Block 3 — title' },
-      { path: ['become', 'blocks', 2, 'body'],  label: 'Block 3 — body', markdown: true, previewClass: 'become-body' },
+      { path: ['become', 'blocks', 0, 'title'], label: 'Block 1 — title', hint: '2–5 words. Display font.' },
+      { path: ['become', 'blocks', 0, 'body'],  label: 'Block 1 — body', markdown: true, previewClass: 'become-body', hint: 'Plain body text (not italic). Optional inline formatting: **bold**, *italic word*, [link](url).' },
+      { path: ['become', 'blocks', 1, 'title'], label: 'Block 2 — title', hint: '2–5 words. Display font.' },
+      { path: ['become', 'blocks', 1, 'body'],  label: 'Block 2 — body', markdown: true, previewClass: 'become-body', hint: 'Plain body text (not italic). Optional inline formatting: **bold**, *italic word*, [link](url).' },
+      { path: ['become', 'blocks', 2, 'title'], label: 'Block 3 — title', hint: '2–5 words. Display font.' },
+      { path: ['become', 'blocks', 2, 'body'],  label: 'Block 3 — body', markdown: true, previewClass: 'become-body', hint: 'Plain body text (not italic). Optional inline formatting: **bold**, *italic word*, [link](url).' },
     ],
   },
   {
@@ -84,9 +84,9 @@ const SECTION_DEFS = [
     previewWrap: 'section-founder-preview',
     fields: [
       { path: ['founder', 'heading'],          label: 'Heading', hint: 'Display font, centered.' },
-      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1 — who he is', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Renders italic on site. Markdown: **bold**, *italic*, [link](https://…)' },
-      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2 — what he saw missing', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Renders italic on site. Markdown: **bold**, *italic*, [link](https://…)' },
-      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3 — the invitation', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Renders italic on site. Markdown: **bold**, *italic*, [link](https://…)' },
+      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1 — who he is', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
+      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2 — what he saw missing', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
+      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3 — the invitation', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
       { path: ['founder', 'signature'],        label: 'Signature', hint: 'Brass-coloured display font. e.g. — Nico Seedsman, 2026' },
     ],
   },
@@ -95,17 +95,17 @@ const SECTION_DEFS = [
     title: 'FAQ',
     previewWrap: 'section-faq-preview',
     fields: [
-      { path: ['faq', 'heading'], label: 'Heading' },
-      { path: ['faq', 'items', 0, 'q'], label: 'Q1' },
-      { path: ['faq', 'items', 0, 'a'], label: 'A1', markdown: true, previewClass: 'faq-preview-p' },
+      { path: ['faq', 'heading'], label: 'Heading', hint: 'Display font, centered.' },
+      { path: ['faq', 'items', 0, 'q'], label: 'Q1', hint: 'Display font, parchment colour.' },
+      { path: ['faq', 'items', 0, 'a'], label: 'A1', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
       { path: ['faq', 'items', 1, 'q'], label: 'Q2' },
-      { path: ['faq', 'items', 1, 'a'], label: 'A2', markdown: true, previewClass: 'faq-preview-p' },
+      { path: ['faq', 'items', 1, 'a'], label: 'A2', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
       { path: ['faq', 'items', 2, 'q'], label: 'Q3' },
-      { path: ['faq', 'items', 2, 'a'], label: 'A3', markdown: true, previewClass: 'faq-preview-p' },
+      { path: ['faq', 'items', 2, 'a'], label: 'A3', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
       { path: ['faq', 'items', 3, 'q'], label: 'Q4' },
-      { path: ['faq', 'items', 3, 'a'], label: 'A4', markdown: true, previewClass: 'faq-preview-p' },
+      { path: ['faq', 'items', 3, 'a'], label: 'A4', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
       { path: ['faq', 'items', 4, 'q'], label: 'Q5' },
-      { path: ['faq', 'items', 4, 'a'], label: 'A5', markdown: true, previewClass: 'faq-preview-p' },
+      { path: ['faq', 'items', 4, 'a'], label: 'A5', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
     ],
   },
   {
@@ -168,7 +168,7 @@ export function SectionsTab({ sections, onChange }) {
                     value={value}
                     onChange={(v) => update(f.path, v)}
                     rows={4}
-                    hint={f.hint || 'Markdown: **bold**, *italic*, [link](https://…)'}
+                    hint={f.hint || 'Optional inline formatting: **bold**, *italic word*, [link](url).'}
                     previewClass={f.previewClass || ''}
                     previewWrapClass={sec.previewWrap || ''}
                     italic={!!f.italic}
