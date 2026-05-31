@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "crop:saturday": "node scripts/crop-saturday.mjs"
+    "crop:saturday": "node scripts/crop-saturday.mjs",
+    "migrate:images": "node scripts/migrate-images-to-blob.mjs"
   },
   "dependencies": {
     "@octokit/rest": "^21.0.2",
