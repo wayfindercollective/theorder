@@ -28,11 +28,11 @@ const SECTION_DEFS = [
     title: 'The Truth',
     previewWrap: 'section-truth-preview',
     fields: [
-      { path: ['truth', 'heading'],       label: 'Heading', hint: 'Names the condition. 3–7 words.' },
-      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', markdown: true, previewClass: 'truth-p' },
-      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', markdown: true, previewClass: 'truth-p' },
-      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', markdown: true, previewClass: 'truth-p' },
-      { path: ['truth', 'turn'],          label: 'Turn line (italic)', hint: 'The pivot — one line. Rendered italic.' },
+      { path: ['truth', 'heading'],       label: 'Heading', hint: 'Names the condition. 3–7 words. Rendered in display font, centered.' },
+      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', markdown: true, previewClass: 'truth-p', hint: 'Centered on site. Markdown: **bold**, *italic*, [link](https://…)' },
+      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', markdown: true, previewClass: 'truth-p', hint: 'Centered on site. Markdown: **bold**, *italic*, [link](https://…)' },
+      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', markdown: true, previewClass: 'truth-p', hint: 'Centered on site. Markdown: **bold**, *italic*, [link](https://…)' },
+      { path: ['truth', 'turn'],          label: 'Turn line', italic: true, hint: 'The pivot — one line. Renders italic, brass-light colour.' },
     ],
   },
   {
@@ -63,9 +63,9 @@ const SECTION_DEFS = [
     key: 'considered',
     title: 'Who Is Considered',
     fields: [
-      { path: ['considered', 'heading'], label: 'Heading', hint: '2–4 words.' },
-      { path: ['considered', 'for_'],    label: 'Apply if… line', textarea: true },
-      { path: ['considered', 'not'],     label: 'Do not apply if… line', textarea: true },
+      { path: ['considered', 'heading'], label: 'Heading', hint: '2–4 words. Display font, centered.' },
+      { path: ['considered', 'for_'],    label: 'Apply if… line', textarea: true, hint: 'Centered, large, parchment colour.' },
+      { path: ['considered', 'not'],     label: 'Do not apply if… line', textarea: true, hint: 'Centered, large, faded grey to contrast with the line above.' },
     ],
   },
   {
@@ -83,11 +83,11 @@ const SECTION_DEFS = [
     title: 'From the Founder',
     previewWrap: 'section-founder-preview',
     fields: [
-      { path: ['founder', 'heading'],          label: 'Heading' },
-      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1 — who he is', markdown: true, previewClass: 'founder-p' },
-      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2 — what he saw missing', markdown: true, previewClass: 'founder-p' },
-      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3 — the invitation', markdown: true, previewClass: 'founder-p' },
-      { path: ['founder', 'signature'],        label: 'Signature', hint: 'e.g. — Nico Seedsman, 2026' },
+      { path: ['founder', 'heading'],          label: 'Heading', hint: 'Display font, centered.' },
+      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1 — who he is', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Renders italic on site. Markdown: **bold**, *italic*, [link](https://…)' },
+      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2 — what he saw missing', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Renders italic on site. Markdown: **bold**, *italic*, [link](https://…)' },
+      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3 — the invitation', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Renders italic on site. Markdown: **bold**, *italic*, [link](https://…)' },
+      { path: ['founder', 'signature'],        label: 'Signature', hint: 'Brass-coloured display font. e.g. — Nico Seedsman, 2026' },
     ],
   },
   {
@@ -112,8 +112,8 @@ const SECTION_DEFS = [
     key: 'footer',
     title: 'Footer',
     fields: [
-      { path: ['footer', 'restraint'],   label: 'Restraint line', hint: 'One philosophical line in the footer.' },
-      { path: ['footer', 'copyright'],   label: 'Copyright' },
+      { path: ['footer', 'restraint'],   label: 'Restraint line', italic: true, hint: 'One philosophical line. Renders italic in display font.' },
+      { path: ['footer', 'copyright'],   label: 'Copyright', hint: 'Renders in uppercase monospace, small.' },
       { path: ['footer', 'privacyHref'], label: 'Privacy link URL', hint: 'Full https:// URL.' },
     ],
   },
@@ -121,9 +121,9 @@ const SECTION_DEFS = [
     key: 'finalScreen',
     title: 'Final screen (after submitting application)',
     fields: [
-      { path: ['finalScreen', 'heading'], label: 'Heading' },
-      { path: ['finalScreen', 'sub'],     label: 'Sub line', textarea: true },
-      { path: ['finalScreen', 'begin'],   label: 'Encouragement (italic)', textarea: true },
+      { path: ['finalScreen', 'heading'], label: 'Heading', hint: 'Display font, large.' },
+      { path: ['finalScreen', 'sub'],     label: 'Sub line', textarea: true, hint: 'Standard body paragraph.' },
+      { path: ['finalScreen', 'begin'],   label: 'Encouragement', textarea: true, italic: true, hint: 'Renders italic, brass-light colour.' },
     ],
   },
 ]
@@ -171,9 +171,12 @@ export function SectionsTab({ sections, onChange }) {
                     hint={f.hint || 'Markdown: **bold**, *italic*, [link](https://…)'}
                     previewClass={f.previewClass || ''}
                     previewWrapClass={sec.previewWrap || ''}
+                    italic={!!f.italic}
                   />
                 )
               }
+
+              const italicClass = f.italic ? ' admin-input-italic' : ''
 
               return (
                 <label key={id} className="admin-field" htmlFor={id}>
@@ -181,7 +184,7 @@ export function SectionsTab({ sections, onChange }) {
                   {f.textarea ? (
                     <textarea
                       id={id}
-                      className="input-field admin-textarea"
+                      className={'input-field admin-textarea' + italicClass}
                       value={value}
                       rows={3}
                       onChange={(e) => update(f.path, e.target.value)}
@@ -189,7 +192,7 @@ export function SectionsTab({ sections, onChange }) {
                   ) : (
                     <input
                       id={id}
-                      className="input-field"
+                      className={'input-field' + italicClass}
                       type="text"
                       value={value}
                       onChange={(e) => update(f.path, e.target.value)}

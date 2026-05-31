@@ -45,18 +45,18 @@ export function ApplicationTab({ questions, onChange }) {
                 value={getAt(questions, ['questions', qi, 'question']) ?? ''}
                 onChange={(e) => update(['questions', qi, 'question'], e.target.value)}
               />
-              <span className="admin-field-hint">The question applicants read. Keep it punchy.</span>
+              <span className="admin-field-hint">The question applicants read. Display font, large, typed character-by-character.</span>
             </label>
 
             <label className="admin-field">
               <span className="admin-field-label">Subtitle (optional)</span>
               <input
-                className="input-field"
+                className="input-field admin-input-italic"
                 type="text"
                 value={getAt(questions, ['questions', qi, 'subtitle']) ?? ''}
                 onChange={(e) => update(['questions', qi, 'subtitle'], e.target.value)}
               />
-              <span className="admin-field-hint">Smaller line under the question. Leave blank to hide.</span>
+              <span className="admin-field-hint">Smaller line under the question. Renders italic. Leave blank to hide.</span>
             </label>
           </div>
 

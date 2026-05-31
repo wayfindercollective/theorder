@@ -1643,6 +1643,12 @@ button {
   margin-top: 0.1rem;
 }
 
+/* Italic input/textarea — visually flags fields the public site renders italic
+   (truth.turn, founder.paragraphs, finalScreen.begin, footer.restraint,
+   application question subtitle). Keeps editor-view in sync with site-view. */
+
+.admin-input-italic { font-style: italic; }
+
 /* Markdown field — toolbar + preview */
 
 .admin-field-md {

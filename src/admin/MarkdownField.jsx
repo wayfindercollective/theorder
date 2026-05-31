@@ -24,7 +24,7 @@ function wrapSelection(textarea, prefix, suffix = prefix) {
   }
 }
 
-export function MarkdownField({ id, value, onChange, rows = 4, placeholder, label, hint, previewClass = '', previewWrapClass = '' }) {
+export function MarkdownField({ id, value, onChange, rows = 4, placeholder, label, hint, previewClass = '', previewWrapClass = '', italic = false }) {
   const taRef = useRef(null)
   const [preview, setPreview] = useState(false)
 
@@ -84,7 +84,7 @@ export function MarkdownField({ id, value, onChange, rows = 4, placeholder, labe
         <textarea
           id={id}
           ref={taRef}
-          className="input-field admin-textarea"
+          className={'input-field admin-textarea' + (italic ? ' admin-input-italic' : '')}
           rows={rows}
           value={value || ''}
           placeholder={placeholder}
