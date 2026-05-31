@@ -4,14 +4,16 @@
   },
   "hero": {
     "eyebrow": "[ Eyebrow — 1–3 words ]",
-    "headline": "[ Headline — 3–7 words ]",
+    "headline": "[ Hero — 3–7 words ]",
     "restraint": "[ Restraint line — single line under CTA ]",
     "cta": "[ CTA button ]"
   },
   "heroFilm": {
     "video": null,
     "frames": [
-      { "src": "/images/panel-hero.jpg" }
+      {
+        "src": "/images/panel-hero.jpg"
+      }
     ]
   },
   "truth": {
@@ -33,9 +35,18 @@
     "image": "/images/panel-considered.jpg",
     "imageAlign": "right",
     "principles": [
-      { "roman": "I", "text": "Integrity." },
-      { "roman": "II", "text": "Loyalty." },
-      { "roman": "III", "text": "Competence." }
+      {
+        "roman": "I",
+        "text": "Integrity."
+      },
+      {
+        "roman": "II",
+        "text": "Loyalty."
+      },
+      {
+        "roman": "III",
+        "text": "Competence."
+      }
     ]
   },
   "become": {
@@ -91,20 +102,44 @@
     "intro": "[ Intro line ]",
     "templated": true,
     "cards": [
-      { "quote": "[ Testimony 1 ]", "attribution": "[ Name — year ]" },
-      { "quote": "[ Testimony 2 ]", "attribution": "[ Name — year ]" },
-      { "quote": "[ Testimony 3 ]", "attribution": "[ Name — year ]" }
+      {
+        "quote": "[ Testimony 1 ]",
+        "attribution": "[ Name — year ]"
+      },
+      {
+        "quote": "[ Testimony 2 ]",
+        "attribution": "[ Name — year ]"
+      },
+      {
+        "quote": "[ Testimony 3 ]",
+        "attribution": "[ Name — year ]"
+      }
     ]
   },
   "faq": {
     "eyebrow": "VI",
     "heading": "[ Heading — e.g. Questions a serious man asks ]",
     "items": [
-      { "q": "[ Q1 ]", "a": "[ A1 ]" },
-      { "q": "[ Q2 ]", "a": "[ A2 ]" },
-      { "q": "[ Q3 — religion / cross ]", "a": "[ A3 ]" },
-      { "q": "[ Q4 — cost ]", "a": "[ A4 ]" },
-      { "q": "[ Q5 — differentiation ]", "a": "[ A5 ]" }
+      {
+        "q": "[ Q1 ]",
+        "a": "[ A1 ]"
+      },
+      {
+        "q": "[ Q2 ]",
+        "a": "[ A2 ]"
+      },
+      {
+        "q": "[ Q3 — religion / cross ]",
+        "a": "[ A3 ]"
+      },
+      {
+        "q": "[ Q4 — cost ]",
+        "a": "[ A4 ]"
+      },
+      {
+        "q": "[ Q5 — differentiation ]",
+        "a": "[ A5 ]"
+      }
     ]
   },
   "footer": {
