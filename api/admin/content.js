@@ -41,18 +41,21 @@ export default async function handler(req, res) {
     if (typeof body === 'string') {
       try { body = JSON.parse(body) } catch { body = {} }
     }
-    const tasks = []
-    if (body?.sections) {
-      tasks.push(writeJsonFile(SECTIONS_PATH, body.sections, 'cms: update sections'))
-    }
-    if (body?.questions) {
-      tasks.push(writeJsonFile(QUESTIONS_PATH, body.questions, 'cms: update questions'))
-    }
-    if (tasks.length === 0) {
-      return res.status(400).json({ error: 'nothing to save' })
-    }
+    // Serialize the writes — two concurrent commits to the same branch
+    // race against each other and one will hit a stale-SHA conflict.
     try {
-      await Promise.all(tasks)
+      let wrote = 0
+      if (body?.sections) {
+        await writeJsonFile(SECTIONS_PATH, body.sections, 'cms: update sections')
+        wrote++
+      }
+      if (body?.questions) {
+        await writeJsonFile(QUESTIONS_PATH, body.questions, 'cms: update questions')
+        wrote++
+      }
+      if (wrote === 0) {
+        return res.status(400).json({ error: 'nothing to save' })
+      }
       return res.status(200).json({ ok: true })
     } catch (err) {
       return res.status(500).json({ error: err?.message || 'write failed' })
