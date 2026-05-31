@@ -1,5 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { founderContent } from '../../config/sectionContent.js'
+import { mdInline } from '../../lib/markdown.js'
 
 export function FounderSection() {
   const { ref, inView } = useInView()
@@ -37,7 +38,7 @@ export function FounderSection() {
 
           <div className="founder-text">
             {founderContent.paragraphs.map((p, i) => (
-              <p key={i} className="founder-p">{p}</p>
+              <p key={i} className="founder-p" dangerouslySetInnerHTML={mdInline(p)} />
             ))}
             <p className="founder-signature display">{founderContent.signature}</p>
           </div>

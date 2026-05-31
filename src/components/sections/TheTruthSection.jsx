@@ -1,5 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { truthContent } from '../../config/sectionContent.js'
+import { mdInline } from '../../lib/markdown.js'
 
 export function TheTruthSection() {
   const { ref, inView } = useInView()
@@ -25,7 +26,7 @@ export function TheTruthSection() {
 
         <div className={'stagger truth-body ' + (inView ? 'in-view' : '')}>
           {truthContent.paragraphs.map((p, i) => (
-            <p key={i} className="truth-p">{p}</p>
+            <p key={i} className="truth-p" dangerouslySetInnerHTML={mdInline(p)} />
           ))}
           <p className="truth-turn display">{truthContent.turn}</p>
         </div>

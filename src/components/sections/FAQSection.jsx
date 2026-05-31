@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useInView } from '../../hooks/useInView.js'
 import { faqContent } from '../../config/sectionContent.js'
+import { mdInline } from '../../lib/markdown.js'
 
 export function FAQSection() {
   const { ref, inView } = useInView()
@@ -39,7 +40,7 @@ export function FAQSection() {
                   <span className="faq-caret" aria-hidden="true">{isOpen ? '–' : '+'}</span>
                 </button>
                 <div className="faq-a">
-                  <p>{item.a}</p>
+                  <p dangerouslySetInnerHTML={mdInline(item.a)} />
                 </div>
               </li>
             )

@@ -1,5 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { becomeContent } from '../../config/sectionContent.js'
+import { mdInline } from '../../lib/markdown.js'
 
 export function WhatYouBecomeSection() {
   const { ref, inView } = useInView()
@@ -32,7 +33,7 @@ export function WhatYouBecomeSection() {
                 {['i', 'ii', 'iii'][i]}
               </span>
               <h3 className="display become-title">{b.title}</h3>
-              <p className="become-body">{b.body}</p>
+              <p className="become-body" dangerouslySetInnerHTML={mdInline(b.body)} />
             </article>
           ))}
         </div>

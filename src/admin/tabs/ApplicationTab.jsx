@@ -45,6 +45,7 @@ export function ApplicationTab({ questions, onChange }) {
                 value={getAt(questions, ['questions', qi, 'question']) ?? ''}
                 onChange={(e) => update(['questions', qi, 'question'], e.target.value)}
               />
+              <span className="admin-field-hint">The question applicants read. Keep it punchy.</span>
             </label>
 
             <label className="admin-field">
@@ -55,6 +56,7 @@ export function ApplicationTab({ questions, onChange }) {
                 value={getAt(questions, ['questions', qi, 'subtitle']) ?? ''}
                 onChange={(e) => update(['questions', qi, 'subtitle'], e.target.value)}
               />
+              <span className="admin-field-hint">Smaller line under the question. Leave blank to hide.</span>
             </label>
           </div>
 

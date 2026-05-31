@@ -1,30 +1,37 @@
 /**
  * SectionsTab — text inputs for every editable string in sections.json.
  *
- * Schema is driven by the FIELDS array below — each entry describes one
- * editable string. To add a new field, add an entry; no other code change.
+ * Schema is driven by the SECTION_DEFS array below — each entry describes one
+ * editable field. To add a new field, add an entry; no other code change.
+ *
+ * Field flags:
+ *   textarea   — multiline plain text
+ *   markdown   — multiline markdown (with toolbar + preview)
+ *   hint       — small grey caption under the field
  */
+
+import { MarkdownField } from '../MarkdownField.jsx'
 
 const SECTION_DEFS = [
   {
     key: 'hero',
     title: 'Hero',
     fields: [
-      { path: ['hero', 'eyebrow'],   label: 'Eyebrow' },
-      { path: ['hero', 'headline'],  label: 'Headline', textarea: true },
-      { path: ['hero', 'cta'],       label: 'CTA button' },
-      { path: ['hero', 'restraint'], label: 'Restraint line (under CTA)' },
+      { path: ['hero', 'eyebrow'],   label: 'Eyebrow', hint: '1–3 words. Small text above the headline.' },
+      { path: ['hero', 'headline'],  label: 'Headline', textarea: true, hint: '3–7 words. The single biggest line on the page.' },
+      { path: ['hero', 'cta'],       label: 'CTA button', hint: '2–4 words. Action verb.' },
+      { path: ['hero', 'restraint'], label: 'Restraint line (under CTA)', hint: 'One quiet line under the button. Optional.' },
     ],
   },
   {
     key: 'truth',
     title: 'The Truth',
     fields: [
-      { path: ['truth', 'heading'],       label: 'Heading' },
-      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', textarea: true },
-      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', textarea: true },
-      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', textarea: true },
-      { path: ['truth', 'turn'],          label: 'Turn line (italic)' },
+      { path: ['truth', 'heading'],       label: 'Heading', hint: 'Names the condition. 3–7 words.' },
+      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', markdown: true },
+      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', markdown: true },
+      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', markdown: true },
+      { path: ['truth', 'turn'],          label: 'Turn line (italic)', hint: 'The pivot — one line. Rendered italic.' },
     ],
   },
   {
@@ -32,8 +39,8 @@ const SECTION_DEFS = [
     title: 'The Code',
     fields: [
       { path: ['code', 'heading'],          label: 'Heading' },
-      { path: ['code', 'intro'],            label: 'Intro line' },
-      { path: ['code', 'principles', 0, 'text'], label: 'Principle I' },
+      { path: ['code', 'intro'],            label: 'Intro line', textarea: true, hint: 'One sentence above the principles. Optional.' },
+      { path: ['code', 'principles', 0, 'text'], label: 'Principle I', hint: 'One word or one sentence. Numbered I in Roman.' },
       { path: ['code', 'principles', 1, 'text'], label: 'Principle II' },
       { path: ['code', 'principles', 2, 'text'], label: 'Principle III' },
     ],
@@ -43,29 +50,30 @@ const SECTION_DEFS = [
     title: 'What You Become',
     fields: [
       { path: ['become', 'heading'], label: 'Heading' },
-      { path: ['become', 'blocks', 0, 'title'], label: 'Block 1 — title' },
-      { path: ['become', 'blocks', 0, 'body'],  label: 'Block 1 — body', textarea: true },
+      { path: ['become', 'blocks', 0, 'title'], label: 'Block 1 — title', hint: '2–5 words.' },
+      { path: ['become', 'blocks', 0, 'body'],  label: 'Block 1 — body', markdown: true },
       { path: ['become', 'blocks', 1, 'title'], label: 'Block 2 — title' },
-      { path: ['become', 'blocks', 1, 'body'],  label: 'Block 2 — body', textarea: true },
+      { path: ['become', 'blocks', 1, 'body'],  label: 'Block 2 — body', markdown: true },
       { path: ['become', 'blocks', 2, 'title'], label: 'Block 3 — title' },
-      { path: ['become', 'blocks', 2, 'body'],  label: 'Block 3 — body', textarea: true },
+      { path: ['become', 'blocks', 2, 'body'],  label: 'Block 3 — body', markdown: true },
     ],
   },
   {
     key: 'considered',
     title: 'Who Is Considered',
     fields: [
-      { path: ['considered', 'heading'], label: 'Heading' },
-      { path: ['considered', 'for_'],    label: 'Apply if… line' },
-      { path: ['considered', 'not'],     label: 'Do not apply if… line' },
+      { path: ['considered', 'heading'], label: 'Heading', hint: '2–4 words.' },
+      { path: ['considered', 'for_'],    label: 'Apply if… line', textarea: true },
+      { path: ['considered', 'not'],     label: 'Do not apply if… line', textarea: true },
     ],
   },
   {
     key: 'application',
     title: 'Application — copy around the form',
     fields: [
+      { path: ['application', 'eyebrow'],      label: 'Eyebrow' },
       { path: ['application', 'heading'],      label: 'Heading' },
-      { path: ['application', 'sub'],          label: 'Sub line' },
+      { path: ['application', 'sub'],          label: 'Sub line', textarea: true },
       { path: ['application', 'submitButton'], label: 'Submit button text' },
     ],
   },
@@ -74,10 +82,10 @@ const SECTION_DEFS = [
     title: 'From the Founder',
     fields: [
       { path: ['founder', 'heading'],          label: 'Heading' },
-      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1', textarea: true },
-      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2', textarea: true },
-      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3', textarea: true },
-      { path: ['founder', 'signature'],        label: 'Signature' },
+      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1 — who he is', markdown: true },
+      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2 — what he saw missing', markdown: true },
+      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3 — the invitation', markdown: true },
+      { path: ['founder', 'signature'],        label: 'Signature', hint: 'e.g. — Nico Seedsman, 2026' },
     ],
   },
   {
@@ -86,24 +94,24 @@ const SECTION_DEFS = [
     fields: [
       { path: ['faq', 'heading'], label: 'Heading' },
       { path: ['faq', 'items', 0, 'q'], label: 'Q1' },
-      { path: ['faq', 'items', 0, 'a'], label: 'A1', textarea: true },
+      { path: ['faq', 'items', 0, 'a'], label: 'A1', markdown: true },
       { path: ['faq', 'items', 1, 'q'], label: 'Q2' },
-      { path: ['faq', 'items', 1, 'a'], label: 'A2', textarea: true },
+      { path: ['faq', 'items', 1, 'a'], label: 'A2', markdown: true },
       { path: ['faq', 'items', 2, 'q'], label: 'Q3' },
-      { path: ['faq', 'items', 2, 'a'], label: 'A3', textarea: true },
+      { path: ['faq', 'items', 2, 'a'], label: 'A3', markdown: true },
       { path: ['faq', 'items', 3, 'q'], label: 'Q4' },
-      { path: ['faq', 'items', 3, 'a'], label: 'A4', textarea: true },
+      { path: ['faq', 'items', 3, 'a'], label: 'A4', markdown: true },
       { path: ['faq', 'items', 4, 'q'], label: 'Q5' },
-      { path: ['faq', 'items', 4, 'a'], label: 'A5', textarea: true },
+      { path: ['faq', 'items', 4, 'a'], label: 'A5', markdown: true },
     ],
   },
   {
     key: 'footer',
     title: 'Footer',
     fields: [
-      { path: ['footer', 'restraint'],   label: 'Restraint line' },
+      { path: ['footer', 'restraint'],   label: 'Restraint line', hint: 'One philosophical line in the footer.' },
       { path: ['footer', 'copyright'],   label: 'Copyright' },
-      { path: ['footer', 'privacyHref'], label: 'Privacy link URL' },
+      { path: ['footer', 'privacyHref'], label: 'Privacy link URL', hint: 'Full https:// URL.' },
     ],
   },
   {
@@ -111,8 +119,8 @@ const SECTION_DEFS = [
     title: 'Final screen (after submitting application)',
     fields: [
       { path: ['finalScreen', 'heading'], label: 'Heading' },
-      { path: ['finalScreen', 'sub'],     label: 'Sub line' },
-      { path: ['finalScreen', 'begin'],   label: 'Encouragement', textarea: true },
+      { path: ['finalScreen', 'sub'],     label: 'Sub line', textarea: true },
+      { path: ['finalScreen', 'begin'],   label: 'Encouragement (italic)', textarea: true },
     ],
   },
 ]
@@ -127,7 +135,6 @@ function getAt(obj, path) {
 }
 
 function setAt(obj, path, value) {
-  // Returns a structurally-cloned object with the value set at path.
   if (path.length === 0) return value
   const [head, ...rest] = path
   const isArrayKey = typeof head === 'number'
@@ -148,6 +155,21 @@ export function SectionsTab({ sections, onChange }) {
             {sec.fields.map((f) => {
               const value = getAt(sections, f.path) ?? ''
               const id = sec.key + '-' + f.path.join('-')
+
+              if (f.markdown) {
+                return (
+                  <MarkdownField
+                    key={id}
+                    id={id}
+                    label={f.label}
+                    value={value}
+                    onChange={(v) => update(f.path, v)}
+                    rows={4}
+                    hint={f.hint || 'Markdown: **bold**, *italic*, [link](https://…)'}
+                  />
+                )
+              }
+
               return (
                 <label key={id} className="admin-field" htmlFor={id}>
                   <span className="admin-field-label">{f.label}</span>
@@ -168,6 +190,7 @@ export function SectionsTab({ sections, onChange }) {
                       onChange={(e) => update(f.path, e.target.value)}
                     />
                   )}
+                  {f.hint && <span className="admin-field-hint">{f.hint}</span>}
                 </label>
               )
             })}
