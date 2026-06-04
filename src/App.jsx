@@ -11,6 +11,7 @@ import { FounderSection } from './components/sections/FounderSection.jsx'
 import { FAQSection } from './components/sections/FAQSection.jsx'
 import { FooterSection } from './components/sections/FooterSection.jsx'
 import { usePendingLeadsSync } from './hooks/usePendingLeadsSync.js'
+import { PendingLeadsAdmin } from './components/ui/PendingLeadsAdmin.jsx'
 import { captureUTMs } from './lib/utm.js'
 import { bootAnalytics, track } from './lib/analytics.js'
 
@@ -19,6 +20,11 @@ const AdminApp = lazy(() => import('./admin/AdminApp.jsx'))
 
 function isAdminRoute() {
   return typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+}
+
+function isPendingLeadsAdmin() {
+  return typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('admin') === 'pending-leads'
 }
 
 function AdminRoot() {
@@ -69,5 +75,7 @@ function PublicSite() {
 }
 
 export default function App() {
-  return isAdminRoute() ? <AdminRoot /> : <PublicSite />
+  if (isAdminRoute()) return <AdminRoot />
+  if (isPendingLeadsAdmin()) return <PendingLeadsAdmin />
+  return <PublicSite />
 }

@@ -1,41 +1,58 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { questions } from '../../config/questions.js'
 import { applicationCopy } from '../../config/sectionContent.js'
+import { countryCodes } from '../../config/countryCodes.js'
 import { QuestionSlide } from '../ui/QuestionSlide.jsx'
 import { FinalScreen } from '../ui/FinalScreen.jsx'
 import { submitLead } from '../../lib/submitLead.js'
 import { newPendingId } from '../../lib/pendingLeads.js'
+import { normalizePhone } from '../../lib/phone.js'
 import { getUTMs, getLastCTA } from '../../lib/utm.js'
 import { track } from '../../lib/analytics.js'
 import { useInView } from '../../hooks/useInView.js'
 
 const FUNNEL_SLUG = import.meta.env.VITE_FUNNEL_SLUG || 'the-order'
-const SOURCE = import.meta.env.VITE_SITE_DOMAIN || 'theorder.placeholder'
+const SOURCE = import.meta.env.VITE_SITE_DOMAIN || 'theorder.global'
 
 function buildPayload(formData) {
   const contact = formData.contact || {}
   const fullName = (contact.fullName || '').trim()
   const [firstName, ...rest] = fullName.split(/\s+/)
   const lastName = rest.join(' ')
-  const country = contact.country || {}
+  // `country` is only written to formData once the user opens the picker; the
+  // input itself defaults to countryCodes[0] (US). Mirror that default here so
+  // default-country submits still get a dial code + phoneCountry.
+  const country = contact.country || countryCodes[0]
+  const consent = !!contact.smsConsent
+  const { phone, phoneCountry } = normalizePhone(contact.phone, country)
 
-  return {
-    pendingId: newPendingId(),
-    email: contact.email || '',
-    firstName: firstName || '',
-    lastName: lastName || '',
-    name: fullName,
-    phone: {
-      phone: contact.phone || '',
-      country: country.code || '',
-      dial: country.dial || '',
-      consent: !!contact.smsConsent,
-    },
-    smsConsent: !!contact.smsConsent,
+  // Scored answers — sent BOTH flat (Jeff-funnel handler) AND nested in
+  // `responses` (current Wayfinder OS handler). Whichever the funnel reads
+  // wins; the other is harmless rawResponses noise. See WAYFINDER_WIRING.md.
+  const responses = {
     mainChallenge: formData.mainChallenge || '',
     commitment: formData.commitment || '',
     readiness: formData.readiness || '',
     income: formData.income || '',
+  }
+
+  return {
+    pendingId: newPendingId(),
+    email: (contact.email || '').trim().toLowerCase(),
+    firstName: firstName || '',
+    lastName: lastName || '',
+    name: fullName,
+    fullName,
+    phone,
+    phoneCountry,
+    // Consent — all three keys to satisfy both handler versions.
+    smsConsent: consent,
+    smsConsentMarketing: consent,
+    smsConsentOperational: consent,
+    // Scored answers — flat …
+    ...responses,
+    // … and nested.
+    responses,
     source: SOURCE,
     funnel: FUNNEL_SLUG,
     submittedAt: new Date().toISOString(),
@@ -138,7 +155,11 @@ export function ApplicationSection() {
     if (!contactValid) return
     setSubmitting(true)
     const payload = buildPayload(formData)
-    track('form_submitted', { payload_keys: Object.keys(payload) })
+    track('form_submitted', {
+      income_bracket: formData.income || '',
+      life_area: formData.mainChallenge || '',
+      last_cta_location: getLastCTA(),
+    })
     const result = await submitLead(payload)
     if (result.ok) {
       track('wayfinder_lead_sent', { source: 'immediate' })

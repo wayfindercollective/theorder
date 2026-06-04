@@ -201,7 +201,7 @@ function ContactFields({ value, onChange, onSubmit, submitting, canAdvance }) {
             type="tel"
             autoComplete="tel"
             value={v.phone || ''}
-            onChange={(e) => onChange({ phone: e.target.value.replace(/[^\d\s()-]/g, '') })}
+            onChange={(e) => onChange({ phone: e.target.value.replace(/[^\d\s()+-]/g, '') })}
             onBlur={() => setPhoneTouched(true)}
             placeholder={formCopy.phonePlaceholder}
             required

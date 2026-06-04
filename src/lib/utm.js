@@ -1,24 +1,21 @@
 const KEY = 'order_utm'
 const FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
+const CLICK_IDS = ['gclid', 'fbclid']
 
 export function captureUTMs() {
   try {
     const params = new URLSearchParams(window.location.search)
+    const stored = JSON.parse(sessionStorage.getItem(KEY) || '{}')
     const fromUrl = {}
-    let any = false
-    FIELDS.forEach((f) => {
+    ;[...FIELDS, ...CLICK_IDS].forEach((f) => {
       const v = params.get(f)
-      if (v) {
-        fromUrl[f] = v
-        any = true
-      }
+      if (v) fromUrl[f] = v
     })
-    if (any) {
-      sessionStorage.setItem(KEY, JSON.stringify(fromUrl))
-      return fromUrl
-    }
-    const raw = sessionStorage.getItem(KEY)
-    return raw ? JSON.parse(raw) : {}
+    // Merge — a later page that carries only gclid must not erase the
+    // utm_* captured on first touch. New present values win; absent keys kept.
+    const merged = { ...stored, ...fromUrl }
+    sessionStorage.setItem(KEY, JSON.stringify(merged))
+    return merged
   } catch {
     return {}
   }
@@ -35,6 +32,8 @@ export function getUTMs() {
       utm_campaign: stored.utm_campaign ?? '',
       ...(stored.utm_term ? { utm_term: stored.utm_term } : {}),
       ...(stored.utm_content ? { utm_content: stored.utm_content } : {}),
+      ...(stored.gclid ? { gclid: stored.gclid } : {}),
+      ...(stored.fbclid ? { fbclid: stored.fbclid } : {}),
     }
   } catch {
     return { utm_source: '', utm_medium: '', utm_campaign: '' }
