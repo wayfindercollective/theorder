@@ -17,14 +17,23 @@ export function Hero() {
         <div className="hero-vignette" aria-hidden="true" />
 
         <div className="hero-content shell">
-          <div className="hero-eyebrow eyebrow">
-            <span className="brass-rule" /> {heroContent.eyebrow} <span className="brass-rule" />
-          </div>
+          {heroContent.eyebrow && (
+            <div className="hero-eyebrow eyebrow">
+              <span className="brass-rule" /> {heroContent.eyebrow} <span className="brass-rule" />
+            </div>
+          )}
 
           <h1 className="hero-headline display tooled">
             {heroContent.headline}
           </h1>
 
+          {heroContent.verseLine && (
+            <p className="hero-verse display">{heroContent.verseLine}</p>
+          )}
+        </div>
+
+        {/* CTA + scroll cue sit low — under the candle — not with the headline */}
+        <div className="hero-foot">
           <div className="hero-actions">
             <button
               className="btn btn-primary"
@@ -33,13 +42,15 @@ export function Hero() {
             >
               {heroContent.cta}
             </button>
-            <p className="restraint hero-restraint">{heroContent.restraint}</p>
+            {heroContent.restraint && (
+              <p className="restraint hero-restraint">{heroContent.restraint}</p>
+            )}
           </div>
-        </div>
 
-        <div className="hero-fold-cue" aria-hidden="true">
-          <span className="restraint">Scroll</span>
-          <span className="hero-fold-line" />
+          <div className="hero-fold-cue" aria-hidden="true">
+            <span className="restraint hero-scroll">Scroll</span>
+            <span className="hero-fold-line" />
+          </div>
         </div>
       </div>
     </section>

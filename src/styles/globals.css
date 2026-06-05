@@ -338,6 +338,45 @@ button {
 
 .btn-primary:active { transform: translateY(0); }
 
+/* CTA shine — a blade-glint sweep. A narrow specular highlight rides
+   left → right across the brushed brass, the way light runs down a sword
+   as it's drawn. Idle: one slow glint roughly every 7s. Hover: a single
+   deliberate draw. Painted under the label (z-index:-1) so the lettering
+   stays crisp; clipped to the button by overflow:hidden. The
+   prefers-reduced-motion block disables it automatically. */
+.btn-primary {
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  left: 0;
+  width: 48%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(95deg,
+    rgba(255, 250, 236, 0) 35%,
+    rgba(255, 250, 236, 0.75) 50%,
+    rgba(255, 250, 236, 0) 65%);
+  transform: skewX(-18deg) translateX(-220%);
+  animation: bladeGlint 7s var(--ease-order) infinite;
+}
+@keyframes bladeGlint {
+  0%   { transform: skewX(-18deg) translateX(-220%); }
+  14%  { transform: skewX(-18deg) translateX(320%); }
+  100% { transform: skewX(-18deg) translateX(320%); }
+}
+.btn-primary:hover::after {
+  animation: bladeGlintDraw 760ms var(--ease-order);
+}
+@keyframes bladeGlintDraw {
+  0%   { transform: skewX(-18deg) translateX(-220%); }
+  100% { transform: skewX(-18deg) translateX(320%); }
+}
+
 .btn-ghost {
   color: var(--parchment);
   background: transparent;
@@ -686,6 +725,10 @@ button {
 .hero-film img {
   transition: opacity 220ms var(--ease-order);
   will-change: opacity;
+  /* Anchor the crop to the top edge so a subject framed high in the
+     shot — the gladiator's head — is never cut off; cover sheds height
+     from the bottom instead, which also leaves a little sky overhead. */
+  object-position: center top;
 }
 
 .hero-film-placeholder {
@@ -709,7 +752,7 @@ button {
   pointer-events: none;
   background:
     radial-gradient(ellipse at 50% 60%, transparent 25%, rgba(10, 9, 8, 0.45) 70%, rgba(10, 9, 8, 0.9) 100%),
-    linear-gradient(180deg, rgba(10, 9, 8, 0.85) 0%, rgba(10, 9, 8, 0.2) 22%, transparent 45%, transparent 70%, rgba(10, 9, 8, 0.9) 100%);
+    linear-gradient(180deg, rgba(10, 9, 8, 0.55) 0%, rgba(10, 9, 8, 0.12) 26%, transparent 45%, transparent 70%, rgba(10, 9, 8, 0.9) 100%);
   z-index: 1;
 }
 
@@ -757,21 +800,29 @@ button {
   letter-spacing: 0.22em;
 }
 
-.hero-fold-cue {
+/* CTA + scroll cue, anchored low in the hero (under the candle) */
+.hero-foot {
   position: absolute;
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  bottom: 3.5rem;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.7rem;
+  gap: 2.5rem;
+}
+.hero-fold-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
   opacity: 0.5;
   animation: fadeIn 1400ms var(--ease-order) 1600ms both;
 }
+.hero-scroll { font-size: 0.6rem; letter-spacing: 0.3em; }
 .hero-fold-line {
-  width: 1px; height: 38px;
+  width: 1px; height: 22px;
   background: linear-gradient(180deg, var(--brass), transparent);
 }
 
@@ -1287,29 +1338,313 @@ button {
    ============================================================ */
 
 .site-footer {
-  padding: 5rem 0 3.5rem;
+  padding: 1.2rem 0;
   border-top: 1px solid var(--iron);
   background: var(--bg-deep);
 }
-.footer-inner { text-align: center; display: flex; flex-direction: column; align-items: center; }
-.footer-mark { opacity: 0.85; }
-.footer-restraint {
-  margin-top: 1.6rem;
-  font-size: clamp(1rem, 1.8vw, 1.25rem);
-  letter-spacing: 0.08em;
-  color: var(--parchment-mute);
-  max-width: 38ch;
-  font-style: italic;
-  line-height: 1.5;
-}
-.footer-meta {
+/* one compact horizontal line: logo · email · copyright · privacy */
+.footer-inner {
   display: flex;
-  gap: 2rem;
-  justify-content: center;
+  flex-flow: row wrap;
   align-items: center;
+  justify-content: center;
+  gap: 0.7rem 1.8rem;
+  text-align: center;
 }
-.footer-meta a { color: var(--ash); }
-.footer-meta a:hover { color: var(--brass-light); }
+.footer-mark { display: inline-flex; align-items: center; opacity: 0.85; }
+.footer-contact-link {
+  color: var(--brass-light);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
+.footer-contact-link:hover { color: var(--parchment); }
+.footer-copyright { color: var(--ash); }
+.footer-privacy { color: var(--ash); }
+.footer-privacy:hover { color: var(--brass-light); }
+
+/* ============================================================
+   COPY OVERHAUL — verse, provocation, Who We Are, offerings,
+   serious questions, CTA band, How We Operate, closing
+   ============================================================ */
+
+/* stagger: extend the cascade past 6 and guarantee later children reveal
+   (the base rules only covered nth-child 1–6, leaving longer lists hidden). */
+.stagger.in-view > *:nth-child(7)  { opacity: 1; transform: translateY(0); transition-delay: 1200ms; }
+.stagger.in-view > *:nth-child(8)  { opacity: 1; transform: translateY(0); transition-delay: 1400ms; }
+.stagger.in-view > *:nth-child(9)  { opacity: 1; transform: translateY(0); transition-delay: 1600ms; }
+.stagger.in-view > *:nth-child(10) { opacity: 1; transform: translateY(0); transition-delay: 1800ms; }
+.stagger.in-view > * { opacity: 1; transform: translateY(0); }
+
+/* Hero — verse line between headline and CTA */
+.hero-verse {
+  margin-top: 1.4rem;
+  color: var(--brass-light);
+  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: fadeIn 1400ms var(--ease-order) 700ms both;
+}
+
+/* The Truth — provocation lines over the painting (Cole, Destruction) */
+.section-truth .section-bg-image { opacity: 0.5; }
+
+/* Who We Are — round-table image behind the manifesto. Ease the candle
+   glare back, then lay a soft dark plate behind the whole text column
+   (eyebrow, heading, divider, prose) so the words read easily. The plate
+   fades to nothing at its edges — the three men and the table still show
+   through, just dimmed where the text sits. */
+.section-code .section-bg-image { opacity: 0.55; filter: brightness(1.18) contrast(1.04); }
+.section-code .code-bg { opacity: 0.2; }
+.section-code .code-inner {
+  padding: clamp(2rem, 5vw, 3.4rem) clamp(1.5rem, 4vw, 2.6rem);
+}
+.section-code .code-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 128% 112% at 50% 50%,
+    rgba(10, 9, 8, 0.78) 0%,
+    rgba(10, 9, 8, 0.66) 60%,
+    rgba(10, 9, 8, 0) 100%);
+}
+.section-code .section-heading { text-shadow: 0 2px 14px rgba(0, 0, 0, 0.82), 0 1px 0 rgba(0, 0, 0, 0.7); }
+.section-code .values-intro p { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.85); }
+
+/* We're Offering You — the fighter's head is high in the frame; bias the crop
+   toward the top so the top of his head stays fully visible. */
+.section-become .section-bg-image { background-position: center 12%; }
+.truth-provocation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  text-align: center;
+  margin: 0.4rem auto 0;
+  max-width: 1000px;
+}
+.truth-line {
+  font-size: clamp(1.3rem, 2.7vw, 2.05rem);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  color: var(--parchment);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+.truth-gap { display: block; height: clamp(0.8rem, 1.8vh, 1.5rem); }
+@media (max-width: 680px) {
+  .truth-line { white-space: normal; font-size: clamp(1.4rem, 6vw, 1.9rem); }
+}
+
+/* The Principles — its own section, clean dark ground */
+.section-principles { background: var(--bg-deep); }
+.section-principles .eyebrow { letter-spacing: 0.4em; }
+
+/* Who We Are — intro prose + the Principles wall */
+.values-intro { max-width: var(--reading-w); margin: 0 auto; }
+.values-intro p {
+  font-size: 1.12rem;
+  line-height: 1.72;
+  color: var(--parchment-mute);
+  text-align: center;
+}
+.values-intro p + p { margin-top: 1.2rem; }
+.values-label { margin-top: 3rem; text-align: center; letter-spacing: 0.4em; }
+/* Flexbox (not grid) so the last partial row centres itself for symmetry,
+   and fixed 4-up columns wide enough that no word is ever clipped. */
+.values-wall {
+  list-style: none;
+  padding: 0;
+  margin: 2.2rem auto 0;
+  max-width: 1140px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.value-word {
+  flex: 0 0 20%;
+  max-width: 20%;
+  text-align: center;
+  padding: 0.5rem 0.5rem;
+  font-size: clamp(0.82rem, 1.25vw, 1rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+@media (max-width: 760px) {
+  .value-word { flex-basis: 33.333%; max-width: 33.333%; }
+}
+@media (max-width: 480px) {
+  .value-word { flex-basis: 50%; max-width: 50%; }
+}
+
+/* We're Offering You — engraved word list */
+.offerings-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 760px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.4rem 2rem;
+  text-align: center;
+}
+.offering {
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+  letter-spacing: 0.06em;
+  color: var(--parchment);
+  line-height: 1.2;
+}
+.offering-closing {
+  margin-top: 3rem;
+  text-align: center;
+  color: var(--brass-light);
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+@media (max-width: 600px) {
+  .offerings-grid { grid-template-columns: 1fr; gap: 1rem; }
+}
+
+/* Questions a Serious Man Asks — reflective list */
+.serious-questions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.serious-question {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--iron);
+}
+.serious-question:first-child { border-top: 1px solid var(--iron); }
+.sq-num { font-size: 0.82rem; letter-spacing: 0.25em; }
+.sq-text {
+  font-size: clamp(1rem, 1.7vw, 1.22rem);
+  line-height: 1.35;
+  letter-spacing: 0.03em;
+  color: var(--parchment);
+}
+@media (max-width: 600px) {
+  .serious-question { grid-template-columns: 1fr; gap: 0.5rem; }
+}
+
+/* "Come this way" — inline button at the foot of a content section,
+   sitting over whatever background that section already has. */
+.cta-inline {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2.2rem, 4.5vw, 3.5rem);
+  position: relative;
+  z-index: 2;
+}
+
+/* How We Operate & What to Expect */
+.section-how { background: var(--bg-deep); }
+.how-body { display: flex; flex-direction: column; gap: 0.9rem; }
+.how-para-wrap { display: flex; flex-direction: column; gap: 0.9rem; }
+.how-para {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--parchment-mute);
+  text-align: center;
+}
+.how-pullquote {
+  margin: 0.3rem 0;
+  text-align: center;
+  color: var(--brass-light);
+  font-size: clamp(1.3rem, 2.8vw, 1.9rem);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+/* Closing — sigil + wordmark + verses + CTA */
+.section-closing {
+  background: linear-gradient(180deg, var(--bg-deep) 0%, #0d0a09 50%, var(--bg-deep) 100%);
+  text-align: center;
+}
+.closing-inner { display: flex; flex-direction: column; align-items: center; }
+.closing-head { display: flex; flex-direction: column; align-items: center; }
+.closing-sigil { opacity: 0.9; }
+.closing-wordmark {
+  margin-top: 1.4rem;
+  font-size: clamp(2rem, 6vw, 3.6rem);
+  letter-spacing: 0.18em;
+}
+.closing-verses {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  max-width: 42ch;
+  margin: 0 auto;
+}
+.closing-verse { margin: 0; }
+.closing-verse-text {
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+  color: var(--parchment);
+  font-style: italic;
+}
+.closing-ref {
+  display: block;
+  margin-top: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-style: normal;
+}
+.closing-cta { margin-top: 3.5rem; }
+
+/* ============================================================
+   LEGIBILITY OVER FULL-BLEED IMAGERY
+   Headings and prose that sit on top of a section-bg-image need a
+   protective shadow so light type never dissolves into a bright
+   patch of the picture — the founder's sunlit valley, the offering
+   floor, the table's candlelight. Mirrors the shadow the manifesto
+   already carries (.section-code .values-intro p).
+   ============================================================ */
+
+.section-become .section-heading,
+.section-founder .section-heading,
+.section-application .section-heading {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.82), 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* "I hope that you join us." — brass over the warm training floor;
+   the lightest pairing on the page, so give it the most help. */
+.section-become .offering-closing {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.88);
+}
+
+/* Founder — the letter is laid over the brightest region of the window
+   image (the sunburst valley sits directly behind the text column).
+   A soft local scrim dims that patch, and a shadow keeps the italic
+   prose crisp, without boxing the text or hiding the picture. */
+.section-founder .founder-text { position: relative; z-index: 1; }
+.section-founder .founder-text::before {
+  content: '';
+  position: absolute;
+  inset: -1.4rem -1.8rem;
+  background: radial-gradient(ellipse at center,
+    rgba(10, 9, 8, 0.72) 0%,
+    rgba(10, 9, 8, 0) 78%);
+  z-index: -1;
+  pointer-events: none;
+}
+.section-founder .founder-p,
+.section-founder .founder-signature {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.85);
+}
 
 /* ============================================================
    ADMIN — /admin route

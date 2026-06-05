@@ -1,5 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { evidenceContent } from '../../config/sectionContent.js'
+import { CtaButton } from '../ui/CtaButton.jsx'
 
 export function EvidenceSection() {
   const { ref, inView } = useInView()
@@ -30,6 +31,8 @@ export function EvidenceSection() {
             Testimony slots — to be filled by those admitted.
           </p>
         )}
+
+        <CtaButton location="afterWhoWeAre" className={'reveal ' + (inView ? 'in-view' : '')} />
       </div>
     </section>
   )

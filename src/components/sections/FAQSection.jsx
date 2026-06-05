@@ -1,20 +1,15 @@
-import { useState } from 'react'
 import { useInView } from '../../hooks/useInView.js'
 import { faqContent } from '../../config/sectionContent.js'
-import { mdInline } from '../../lib/markdown.js'
+import { CtaButton } from '../ui/CtaButton.jsx'
 
 export function FAQSection() {
   const { ref, inView } = useInView()
-  const [open, setOpen] = useState(-1)
+  const questions = (faqContent.questions || '')
+    .split('\n')
+    .map((q) => q.trim())
+    .filter(Boolean)
   return (
     <section className="section section-faq" ref={ref}>
-      {faqContent.image && (
-        <div
-          className={`section-side-image section-side-image-${faqContent.imageAlign || 'left'}`}
-          style={{ backgroundImage: `url(${faqContent.image})` }}
-          aria-hidden="true"
-        />
-      )}
       <div className="shell-narrow">
         <div className={'reveal ' + (inView ? 'in-view' : '')}>
           <div className="eyebrow">
@@ -24,28 +19,16 @@ export function FAQSection() {
           <div className="section-divider" style={{ margin: '2rem auto 3rem' }} />
         </div>
 
-        <ul className={'faq-list stagger ' + (inView ? 'in-view' : '')}>
-          {faqContent.items.map((item, i) => {
-            const isOpen = open === i
-            return (
-              <li key={i} className={'faq-item' + (isOpen ? ' open' : '')}>
-                <button
-                  className="faq-q"
-                  onClick={() => setOpen(isOpen ? -1 : i)}
-                  type="button"
-                  aria-expanded={isOpen}
-                >
-                  <span className="faq-num display">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="faq-q-text display">{item.q}</span>
-                  <span className="faq-caret" aria-hidden="true">{isOpen ? '–' : '+'}</span>
-                </button>
-                <div className="faq-a">
-                  <p dangerouslySetInnerHTML={mdInline(item.a)} />
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+        <ol className={'serious-questions stagger ' + (inView ? 'in-view' : '')}>
+          {questions.map((q, i) => (
+            <li key={i} className="serious-question">
+              <span className="sq-num display engraved">{String(i + 1).padStart(2, '0')}</span>
+              <span className="sq-text display">{q}</span>
+            </li>
+          ))}
+        </ol>
+
+        <CtaButton location="afterQuestions" className={'reveal ' + (inView ? 'in-view' : '')} />
       </div>
     </section>
   )

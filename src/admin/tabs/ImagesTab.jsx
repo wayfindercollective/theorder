@@ -11,13 +11,12 @@ import { humanizeError, listImages, uploadImage } from '../adminApi.js'
 
 const IMAGE_SLOTS = [
   { key: ['hero', '__heroFilm__'], label: 'Hero — film fallback frame', heroFilm: true },
-  { key: ['truth', 'image'],       label: 'The Truth' },
-  { key: ['code', 'image'],        label: 'The Code (optional)' },
-  { key: ['become', 'image'],      label: 'What You Become (full-bleed)' },
-  { key: ['considered', 'image'],  label: 'Who Is Considered' },
+  { key: ['truth', 'image'],       label: 'The Truth — landscape (full-bleed)' },
+  { key: ['code', 'image'],        label: 'Who We Are (optional)' },
+  { key: ['become', 'image'],      label: "We're Offering You (full-bleed)" },
+  { key: ['considered', 'image'],  label: 'Who Is Considered (hidden section)' },
   { key: ['application', 'image'], label: 'Application (full-bleed)' },
-  { key: ['founder', 'image'],     label: 'From the Founder (full-bleed)' },
-  { key: ['faq', 'image'],         label: 'FAQ (optional)' },
+  { key: ['founder', 'image'],     label: 'Who Am I / Founder (full-bleed)' },
 ]
 
 function getAt(obj, path) {

@@ -129,11 +129,6 @@ function HeroFrames({ progressRef }) {
 }
 
 function HeroPlaceholder() {
-  return (
-    <div className="hero-film hero-film-placeholder" aria-hidden="true">
-      <div className="hero-placeholder-mark">
-        <span className="restraint">[ Hero film — to be added ]</span>
-      </div>
-    </div>
-  )
+  // No video, no frames — a clean dark hero. Title only.
+  return <div className="hero-film hero-film-placeholder" aria-hidden="true" />
 }

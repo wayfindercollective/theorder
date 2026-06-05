@@ -3,12 +3,15 @@ import { Header } from './components/sections/Header.jsx'
 import { Hero } from './components/sections/Hero.jsx'
 import { TheTruthSection } from './components/sections/TheTruthSection.jsx'
 import { TheCodeSection } from './components/sections/TheCodeSection.jsx'
+import { PrinciplesSection } from './components/sections/PrinciplesSection.jsx'
 import { WhatYouBecomeSection } from './components/sections/WhatYouBecomeSection.jsx'
-import { WhoIsConsideredSection } from './components/sections/WhoIsConsideredSection.jsx'
+// import { WhoIsConsideredSection } from './components/sections/WhoIsConsideredSection.jsx' // hidden until copy exists
 import { ApplicationSection } from './components/sections/ApplicationSection.jsx'
 import { FounderSection } from './components/sections/FounderSection.jsx'
-// import { EvidenceSection } from './components/sections/EvidenceSection.jsx' // hidden until testimonies exist
+import { EvidenceSection } from './components/sections/EvidenceSection.jsx'
 import { FAQSection } from './components/sections/FAQSection.jsx'
+import { HowWeOperateSection } from './components/sections/HowWeOperateSection.jsx'
+import { ClosingSection } from './components/sections/ClosingSection.jsx'
 import { FooterSection } from './components/sections/FooterSection.jsx'
 import { usePendingLeadsSync } from './hooks/usePendingLeadsSync.js'
 import { PendingLeadsAdmin } from './components/ui/PendingLeadsAdmin.jsx'
@@ -62,12 +65,15 @@ function PublicSite() {
         <Hero />
         <TheTruthSection />
         <TheCodeSection />
-        <WhatYouBecomeSection />
-        <WhoIsConsideredSection />
-        <ApplicationSection />
+        <PrinciplesSection />
+        <EvidenceSection />
         <FounderSection />
-        {/* Testimonies hidden until first cohort completes — re-enable: import + <EvidenceSection /> */}
+        <WhatYouBecomeSection />
         <FAQSection />
+        <HowWeOperateSection />
+        <ApplicationSection />
+        {/* Who Is Considered hidden until copy exists — re-enable: import + <WhoIsConsideredSection /> */}
+        <ClosingSection />
       </main>
       <FooterSection />
     </>

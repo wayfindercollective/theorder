@@ -5,7 +5,7 @@
  * editable field. To add a new field, add an entry; no other code change.
  *
  * Field flags:
- *   textarea   — multiline plain text
+ *   textarea   — multiline plain text (rows defaults to 3, override with `rows`)
  *   markdown   — multiline markdown (with toolbar + preview)
  *   hint       — small grey caption under the field
  */
@@ -17,53 +17,44 @@ const SECTION_DEFS = [
     key: 'hero',
     title: 'Hero',
     fields: [
-      { path: ['hero', 'eyebrow'],   label: 'Eyebrow', hint: '1–3 words. Small text above the headline.' },
-      { path: ['hero', 'headline'],  label: 'Headline', textarea: true, hint: '3–7 words. The single biggest line on the page.' },
+      { path: ['hero', 'eyebrow'],   label: 'Eyebrow', hint: 'Small text above the headline. Optional — leave blank to hide.' },
+      { path: ['hero', 'headline'],  label: 'Headline', textarea: true, hint: 'The single biggest line on the page.' },
+      { path: ['hero', 'verseLine'], label: 'Verse line (above CTA)', hint: 'One quiet line between the headline and the button. e.g. Mark 12:30 · Mark 12:31' },
       { path: ['hero', 'cta'],       label: 'CTA button', hint: '2–4 words. Action verb.' },
-      { path: ['hero', 'restraint'], label: 'Restraint line (under CTA)', hint: 'One quiet line under the button. Optional.' },
+      { path: ['hero', 'restraint'], label: 'Restraint line (under CTA)', hint: 'One quiet line under the button. Optional — leave blank to hide.' },
     ],
   },
   {
     key: 'truth',
-    title: 'The Truth',
-    previewWrap: 'section-truth-preview',
+    title: 'The Truth — provocation',
     fields: [
-      { path: ['truth', 'heading'],       label: 'Heading', hint: 'Names the condition. 3–7 words. Rendered in display font, centered.' },
-      { path: ['truth', 'paragraphs', 0], label: 'Paragraph 1', markdown: true, previewClass: 'truth-p', hint: 'Centered body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['truth', 'paragraphs', 1], label: 'Paragraph 2', markdown: true, previewClass: 'truth-p', hint: 'Centered body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['truth', 'paragraphs', 2], label: 'Paragraph 3', markdown: true, previewClass: 'truth-p', hint: 'Centered body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['truth', 'turn'],          label: 'Turn line', italic: true, hint: 'The pivot — one line. Renders italic, brass-light colour.' },
+      { path: ['truth', 'provocation'], label: 'Provocation lines', textarea: true, rows: 7, hint: 'One line per row. Leave a blank row to break into a new stanza. Rendered large, centered, over the landscape image.' },
     ],
   },
   {
     key: 'code',
-    title: 'The Code',
+    title: 'Who We Are',
     fields: [
-      { path: ['code', 'heading'],          label: 'Heading' },
-      { path: ['code', 'intro'],            label: 'Intro line', textarea: true, hint: 'One sentence above the principles. Optional.' },
-      { path: ['code', 'principles', 0, 'text'], label: 'Principle I', hint: 'One word or one sentence. Numbered I in Roman.' },
-      { path: ['code', 'principles', 1, 'text'], label: 'Principle II' },
-      { path: ['code', 'principles', 2, 'text'], label: 'Principle III' },
+      { path: ['code', 'heading'],     label: 'Heading' },
+      { path: ['code', 'intro'],       label: 'Intro', markdown: true, previewClass: 'values-intro', hint: 'One or two paragraphs. Separate with a blank line. Optional inline formatting: **bold**, *italic word*, [link](url).' },
+      { path: ['code', 'valuesLabel'], label: 'Principles label', hint: 'Small label above the values grid. e.g. The Principles' },
+      { path: ['code', 'values'],      label: 'The Principles (values)', textarea: true, rows: 12, hint: 'One value per line. Rendered as the engraved grid.' },
     ],
   },
   {
     key: 'become',
-    title: 'What You Become',
+    title: "We're Offering You",
     fields: [
-      { path: ['become', 'heading'], label: 'Heading' },
-      { path: ['become', 'blocks', 0, 'title'], label: 'Block 1 — title', hint: '2–5 words. Display font.' },
-      { path: ['become', 'blocks', 0, 'body'],  label: 'Block 1 — body', markdown: true, previewClass: 'become-body', hint: 'Plain body text (not italic). Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['become', 'blocks', 1, 'title'], label: 'Block 2 — title', hint: '2–5 words. Display font.' },
-      { path: ['become', 'blocks', 1, 'body'],  label: 'Block 2 — body', markdown: true, previewClass: 'become-body', hint: 'Plain body text (not italic). Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['become', 'blocks', 2, 'title'], label: 'Block 3 — title', hint: '2–5 words. Display font.' },
-      { path: ['become', 'blocks', 2, 'body'],  label: 'Block 3 — body', markdown: true, previewClass: 'become-body', hint: 'Plain body text (not italic). Optional inline formatting: **bold**, *italic word*, [link](url).' },
+      { path: ['become', 'heading'],   label: 'Heading' },
+      { path: ['become', 'offerings'], label: 'Offerings', textarea: true, rows: 10, hint: 'One offering per line.' },
+      { path: ['become', 'closing'],   label: 'Closing line', hint: 'One line under the list. e.g. I hope that you join us.' },
     ],
   },
   {
     key: 'considered',
-    title: 'Who Is Considered',
+    title: 'Who Is Considered (hidden — fill to re-enable)',
     fields: [
-      { path: ['considered', 'heading'], label: 'Heading', hint: '2–4 words. Display font, centered.' },
+      { path: ['considered', 'heading'], label: 'Heading', hint: '2–4 words. This section is hidden on the site until it has copy and is re-enabled in code.' },
       { path: ['considered', 'for_'],    label: 'Apply if… line', textarea: true, hint: 'Centered, large, parchment colour.' },
       { path: ['considered', 'not'],     label: 'Do not apply if… line', textarea: true, hint: 'Centered, large, faded grey to contrast with the line above.' },
     ],
@@ -80,39 +71,66 @@ const SECTION_DEFS = [
   },
   {
     key: 'founder',
-    title: 'From the Founder',
+    title: 'Who Am I (Founder)',
     previewWrap: 'section-founder-preview',
     fields: [
-      { path: ['founder', 'heading'],          label: 'Heading', hint: 'Display font, centered.' },
-      { path: ['founder', 'paragraphs', 0],    label: 'Paragraph 1 — who he is', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
-      { path: ['founder', 'paragraphs', 1],    label: 'Paragraph 2 — what he saw missing', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
-      { path: ['founder', 'paragraphs', 2],    label: 'Paragraph 3 — the invitation', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
-      { path: ['founder', 'signature'],        label: 'Signature', hint: 'Brass-coloured display font. e.g. — Nico Seedsman, 2026' },
+      { path: ['founder', 'heading'],         label: 'Heading', hint: 'Display font, centered.' },
+      { path: ['founder', 'placeholderMark'], label: 'Portrait label', hint: 'Caption in the portrait frame until a photo is uploaded. e.g. Nico Seedsman — Afghanistan' },
+      { path: ['founder', 'paragraphs', 0],   label: 'Paragraph 1', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
+      { path: ['founder', 'paragraphs', 1],   label: 'Paragraph 2', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
+      { path: ['founder', 'paragraphs', 2],   label: 'Paragraph 3', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
+      { path: ['founder', 'paragraphs', 3],   label: 'Paragraph 4', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
+      { path: ['founder', 'signature'],       label: 'Signature', hint: 'Brass-coloured display font. e.g. — Nico Seedsman' },
     ],
   },
   {
     key: 'faq',
-    title: 'FAQ',
-    previewWrap: 'section-faq-preview',
+    title: 'Questions a Serious Man Asks',
     fields: [
-      { path: ['faq', 'heading'], label: 'Heading', hint: 'Display font, centered.' },
-      { path: ['faq', 'items', 0, 'q'], label: 'Q1', hint: 'Display font, parchment colour.' },
-      { path: ['faq', 'items', 0, 'a'], label: 'A1', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['faq', 'items', 1, 'q'], label: 'Q2' },
-      { path: ['faq', 'items', 1, 'a'], label: 'A2', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['faq', 'items', 2, 'q'], label: 'Q3' },
-      { path: ['faq', 'items', 2, 'a'], label: 'A3', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['faq', 'items', 3, 'q'], label: 'Q4' },
-      { path: ['faq', 'items', 3, 'a'], label: 'A4', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
-      { path: ['faq', 'items', 4, 'q'], label: 'Q5' },
-      { path: ['faq', 'items', 4, 'a'], label: 'A5', markdown: true, previewClass: 'faq-preview-p', hint: 'Plain body text. Optional inline formatting: **bold**, *italic word*, [link](url).' },
+      { path: ['faq', 'heading'],   label: 'Heading', hint: 'Display font, centered.' },
+      { path: ['faq', 'questions'], label: 'Questions', textarea: true, rows: 9, hint: 'One question per line. Each renders as a numbered reflective line. No answers.' },
+    ],
+  },
+  {
+    key: 'howWeOperate',
+    title: 'How We Operate & What to Expect',
+    fields: [
+      { path: ['howWeOperate', 'heading'],       label: 'Heading' },
+      { path: ['howWeOperate', 'paragraphs', 0], label: 'Paragraph 1', textarea: true },
+      { path: ['howWeOperate', 'paragraphs', 1], label: 'Paragraph 2', textarea: true },
+      { path: ['howWeOperate', 'paragraphs', 2], label: 'Paragraph 3', textarea: true },
+      { path: ['howWeOperate', 'pullQuote'],     label: 'Pull-quote', italic: true, hint: 'Large quote shown after paragraph 3.' },
+      { path: ['howWeOperate', 'paragraphs', 3], label: 'Paragraph 4', textarea: true },
+      { path: ['howWeOperate', 'paragraphs', 4], label: 'Paragraph 5', textarea: true },
+      { path: ['howWeOperate', 'paragraphs', 5], label: 'Paragraph 6', textarea: true },
+      { path: ['howWeOperate', 'paragraphs', 6], label: 'Paragraph 7', textarea: true },
+    ],
+  },
+  {
+    key: 'cta',
+    title: 'Call to Action button',
+    fields: [
+      { path: ['cta', 'label'], label: 'Button label', hint: 'Used on every "Come this way" band across the page.' },
+    ],
+  },
+  {
+    key: 'closing',
+    title: 'Closing (logo + verses)',
+    fields: [
+      { path: ['closing', 'wordmark'],          label: 'Wordmark', hint: 'Large word under the sigil. e.g. THE ORDER' },
+      { path: ['closing', 'verses', 0, 'text'], label: 'Verse 1 — text', textarea: true },
+      { path: ['closing', 'verses', 0, 'ref'],  label: 'Verse 1 — reference', hint: 'e.g. Mark 12:30' },
+      { path: ['closing', 'verses', 1, 'text'], label: 'Verse 2 — text', textarea: true },
+      { path: ['closing', 'verses', 1, 'ref'],  label: 'Verse 2 — reference', hint: 'e.g. Mark 12:31' },
     ],
   },
   {
     key: 'footer',
     title: 'Footer',
     fields: [
-      { path: ['footer', 'restraint'],   label: 'Restraint line', italic: true, hint: 'One philosophical line. Renders italic in display font.' },
+      { path: ['footer', 'restraint'],   label: 'Restraint line', italic: true, hint: 'One philosophical line. Optional — leave blank to hide.' },
+      { path: ['footer', 'email'],       label: 'Contact email', hint: 'Shown as a mailto link at the bottom of the page. e.g. info@theorder.global' },
+      { path: ['footer', 'phone'],       label: 'Contact phone', hint: 'Shown as a tel link. Optional — leave blank to hide.' },
       { path: ['footer', 'copyright'],   label: 'Copyright', hint: 'Renders in uppercase monospace, small.' },
       { path: ['footer', 'privacyHref'], label: 'Privacy link URL', hint: 'Full https:// URL.' },
     ],
@@ -186,7 +204,7 @@ export function SectionsTab({ sections, onChange }) {
                       id={id}
                       className={'input-field admin-textarea' + italicClass}
                       value={value}
-                      rows={3}
+                      rows={f.rows || 3}
                       onChange={(e) => update(f.path, e.target.value)}
                     />
                   ) : (
