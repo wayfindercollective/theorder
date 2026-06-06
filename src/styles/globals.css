@@ -704,6 +704,9 @@ button {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  /* dark ground behind the film, so the strip exposed when the hero
+     image is dropped reads as night sky rather than a transparent gap */
+  background: var(--bg-deep);
 }
 
 .hero-film {
@@ -725,10 +728,12 @@ button {
 .hero-film img {
   transition: opacity 220ms var(--ease-order);
   will-change: opacity;
-  /* Anchor the crop to the top edge so a subject framed high in the
-     shot — the gladiator's head — is never cut off; cover sheds height
-     from the bottom instead, which also leaves a little sky overhead. */
+  /* Show the very top of the shot (the gladiator's head sits high in the
+     frame, with almost no sky above it in the source), then drop the whole
+     image so the crown clears the top edge with comfortable headroom. The
+     strip this exposes above reads as dark sky under the hero vignette. */
   object-position: center top;
+  transform: translateY(clamp(2rem, 6vh, 6rem));
 }
 
 .hero-film-placeholder {
@@ -1437,15 +1442,20 @@ button {
   .truth-line { white-space: normal; font-size: clamp(1.4rem, 6vw, 1.9rem); }
 }
 
-/* The Principles — its own section, clean dark ground */
-.section-principles { background: var(--bg-deep); }
+/* The Principles — its own section, clean dark ground. Fit the band to its
+   content (no forced 100vh) so the words aren't marooned in empty space. */
+.section-principles {
+  background: var(--bg-deep);
+  min-height: auto;
+  padding: clamp(2.2rem, 5vw, 3.6rem) 0;
+}
 .section-principles .eyebrow { letter-spacing: 0.4em; }
 
 /* Who We Are — intro prose + the Principles wall */
 .values-intro { max-width: var(--reading-w); margin: 0 auto; }
 .values-intro p {
-  font-size: 1.12rem;
-  line-height: 1.72;
+  font-size: clamp(1.2rem, 1.55vw, 1.42rem);
+  line-height: 1.75;
   color: var(--parchment-mute);
   text-align: center;
 }
@@ -1456,7 +1466,7 @@ button {
 .values-wall {
   list-style: none;
   padding: 0;
-  margin: 2.2rem auto 0;
+  margin: 1.5rem auto 0;
   max-width: 1140px;
   display: flex;
   flex-wrap: wrap;
@@ -1467,10 +1477,16 @@ button {
   max-width: 20%;
   text-align: center;
   padding: 0.5rem 0.5rem;
-  font-size: clamp(0.82rem, 1.25vw, 1rem);
+  font-size: clamp(0.95rem, 1.45vw, 1.15rem);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.3;
+}
+/* Brighter, higher-contrast brass for the principle words so they read
+   clearly on the dark ground (the default engraved gradient dips too dark). */
+.section-principles .value-word.engraved {
+  background-image: linear-gradient(180deg, #ead9a6 0%, var(--brass-light) 52%, var(--brass) 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
 }
 @media (max-width: 760px) {
   .value-word { flex-basis: 33.333%; max-width: 33.333%; }

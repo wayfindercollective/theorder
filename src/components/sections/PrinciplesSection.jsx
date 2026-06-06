@@ -16,7 +16,7 @@ export function PrinciplesSection() {
           <div className="eyebrow">
             <span className="brass-rule" /> {codeContent.valuesLabel} <span className="brass-rule" />
           </div>
-          <div className="section-divider" style={{ margin: '1.8rem auto 0' }} />
+          <div className="section-divider" style={{ margin: '1.1rem auto 0' }} />
         </div>
 
         <ul className={'values-wall reveal ' + (inView ? 'in-view' : '')}>

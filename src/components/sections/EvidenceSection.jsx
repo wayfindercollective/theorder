@@ -28,7 +28,7 @@ export function EvidenceSection() {
 
         {evidenceContent.templated && (
           <p className="template-note restraint">
-            Testimony slots — to be filled by those admitted.
+            Testimony slots - to be filled by those admitted.
           </p>
         )}
 
