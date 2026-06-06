@@ -1393,12 +1393,17 @@ button {
 /* The Truth — provocation lines over the painting (Cole, Destruction) */
 .section-truth .section-bg-image { opacity: 0.5; }
 
-/* Who We Are — round-table image behind the manifesto. Ease the candle
-   glare back, then lay a soft dark plate behind the whole text column
-   (eyebrow, heading, divider, prose) so the words read easily. The plate
-   fades to nothing at its edges — the three men and the table still show
-   through, just dimmed where the text sits. */
-.section-code .section-bg-image { opacity: 0.55; filter: brightness(1.18) contrast(1.04); }
+/* Who We Are — round-table image behind the manifesto. Bring the scene
+   right up so the three men and the table actually read, and widen the
+   vignette so the outer two aren't swallowed by the edge fade. The dark
+   plate below still sits between the picture and the text column (eyebrow,
+   heading, divider, prose), so the words stay legible even brightened. */
+.section-code .section-bg-image {
+  opacity: 0.85;
+  filter: brightness(1.55) contrast(1.08);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, black 62%, transparent 100%);
+}
 .section-code .code-bg { opacity: 0.2; }
 .section-code .code-inner {
   padding: clamp(2rem, 5vw, 3.4rem) clamp(1.5rem, 4vw, 2.6rem);
