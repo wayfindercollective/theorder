@@ -141,7 +141,9 @@ export function ApplicationSection() {
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email || '')
     const digits = (c.phone || '').replace(/\D/g, '')
     const phoneOk = digits.length >= 7
-    return nameOk && emailOk && phoneOk && !!c.smsConsent
+    // SMS consent is OPTIONAL — it does NOT gate submission. The value is still
+    // captured truthfully in the payload (smsConsent*); unticked = consent false.
+    return nameOk && emailOk && phoneOk
   }, [q, formData])
 
   const handleSubmit = useCallback(async () => {
