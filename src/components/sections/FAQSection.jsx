@@ -1,6 +1,7 @@
 import { useInView } from '../../hooks/useInView.js'
 import { faqContent } from '../../config/sectionContent.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
+import { SectionPainting } from '../ui/SectionPainting.jsx'
 
 export function FAQSection() {
   const { ref, inView } = useInView()
@@ -10,6 +11,7 @@ export function FAQSection() {
     .filter(Boolean)
   return (
     <section className="section section-faq" ref={ref}>
+      <SectionPainting image={faqContent.image} />
       <div className="shell-narrow">
         <div className={'reveal ' + (inView ? 'in-view' : '')}>
           <div className="eyebrow">

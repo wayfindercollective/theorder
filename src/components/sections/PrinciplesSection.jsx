@@ -1,5 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
-import { codeContent } from '../../config/sectionContent.js'
+import { codeContent, principlesContent } from '../../config/sectionContent.js'
+import { SectionPainting } from '../ui/SectionPainting.jsx'
 
 // The Principles — the values wall, on a clean dark ground (no image),
 // split out of "Who We Are" so each fits one screen.
@@ -11,6 +12,7 @@ export function PrinciplesSection() {
     .filter(Boolean)
   return (
     <section className="section section-principles" ref={ref}>
+      <SectionPainting image={principlesContent.image} />
       <div className="shell">
         <div className={'reveal ' + (inView ? 'in-view' : '')}>
           <div className="eyebrow">

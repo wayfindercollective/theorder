@@ -15,6 +15,7 @@ export const heroContent      = data.hero
 export const heroFilm         = data.heroFilm
 export const truthContent     = data.truth
 export const codeContent      = data.code
+export const principlesContent = data.principles || {}
 export const becomeContent    = data.become
 export const consideredContent = data.considered
 export const applicationCopy  = data.application

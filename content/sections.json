@@ -32,6 +32,10 @@
     "image": "/images/whoweare-table.jpg",
     "imageAlign": "full"
   },
+  "principles": {
+    "image": "/images/painting-principles.jpg",
+    "imageAlign": "full"
+  },
   "become": {
     "eyebrow": "V",
     "heading": "We're Offering You",
@@ -48,7 +52,7 @@
   },
   "application": {
     "eyebrow": "The Application",
-    "image": null,
+    "image": "/images/painting-application.jpg",
     "heading": "[ Heading ]",
     "sub": "[ Sub ]",
     "submitButton": "[ Submit button ]",
@@ -72,6 +76,8 @@
   "evidence": {
     "eyebrow": "III",
     "heading": "Testimonials",
+    "image": "/images/painting-testimony.jpg",
+    "imageAlign": "full",
     "intro": "",
     "templated": true,
     "cards": [
@@ -92,11 +98,15 @@
   "faq": {
     "eyebrow": "VI",
     "heading": "Questions a Serious Man Asks",
+    "image": "/images/painting-faq.jpg",
+    "imageAlign": "full",
     "questions": "Do you wish not only to heal, but to grow and prosper?\nAre you tired of swimming upstream from your destiny and from God?\nAre you capable, humble and courageous enough to pass an eight-week virtual selection?\nDo you want to stand in a global brotherhood of savage gentlemen who hold the same principles as you?\nDo you want to attend daring, fun, life-changing retreats with those same brethren?\nDo you want to work daily - held accountable, and holding others accountable - toward lasting transformation and reinvention?\nDo you want to be the truest, most authentic version of yourself, released from the shackles of fear and attachment?"
   },
   "howWeOperate": {
     "eyebrow": "VII",
     "heading": "How We Operate & What to Expect",
+    "image": "/images/painting-operate.png",
+    "imageAlign": "full",
     "paragraphs": [
       "We meet entirely virtually, online - except for in-person retreats.",
       "Our initial eight-week Selection & Prosperity Program is where you join: part selection, part learning to become your own coach, responsible for your own self-determined prosperity.",
@@ -110,6 +120,8 @@
   },
   "closing": {
     "wordmark": "THE ORDER",
+    "image": "/images/painting-closing.jpg",
+    "imageAlign": "full",
     "verses": [
       {
         "text": "Love the Lord your God with all your heart and with all your soul and with all your mind and with all your strength.",

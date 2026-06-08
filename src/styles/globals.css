@@ -213,11 +213,14 @@ button {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.55;
+  opacity: 0.72;
   pointer-events: none;
   z-index: 1;
-  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 95%);
-  mask-image: radial-gradient(ellipse at center, black 40%, transparent 95%);
+  /* one warm, oil-toned palette across every painting so disparate
+     sources read as a single body of work */
+  filter: sepia(0.18) saturate(1.12) contrast(1.03) brightness(0.98);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 58%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, black 58%, transparent 100%);
 }
 
 /* Mobile: side images become full-bleed soft vignette so text stays readable */
@@ -231,6 +234,47 @@ button {
     -webkit-mask-image: radial-gradient(ellipse at center, black 35%, transparent 90%);
     mask-image: radial-gradient(ellipse at center, black 35%, transparent 90%);
   }
+}
+
+/* ============================================================
+   ONE GIANT PAINTING — every segment is a framed oil on canvas.
+   The warm grade on .section-bg-image unifies the palette; here we
+   add the canvas weave and a framed vignette so each background reads
+   as a real painting and the whole scroll as one continuous gallery
+   wall. Driven off :has(.section-bg-image), so existing and new
+   segments pick it up automatically. The hero (.hero, not .section)
+   is untouched — the warrior stays as shot.
+   ============================================================ */
+
+/* readable content rides above the painting and its two overlays */
+.section:has(.section-bg-image) > .shell,
+.section:has(.section-bg-image) > .shell-narrow { z-index: 3; }
+
+/* canvas weave — the tooth of the linen, riding the paint in soft light */
+.section:has(.section-bg-image)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+  background-size: 190px 190px;
+  opacity: 0.3;
+  mix-blend-mode: soft-light;
+}
+
+/* framed vignette — sets the picture back in shadow, melts each scene
+   into the dark above and below so the wall feels continuous, and keeps
+   the centre open so the painting still reads */
+.section:has(.section-bg-image)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 42%, transparent 30%, rgba(7, 6, 5, 0.5) 90%, rgba(7, 6, 5, 0.82) 100%),
+    linear-gradient(180deg, rgba(7, 6, 5, 0.55) 0%, transparent 20%, transparent 76%, rgba(7, 6, 5, 0.78) 100%);
 }
 
 .section-divider {
@@ -1400,7 +1444,7 @@ button {
    heading, divider, prose), so the words stay legible even brightened. */
 .section-code .section-bg-image {
   opacity: 0.85;
-  filter: brightness(1.55) contrast(1.08);
+  filter: sepia(0.18) saturate(1.12) brightness(1.5) contrast(1.08);
   -webkit-mask-image: radial-gradient(ellipse at center, black 62%, transparent 100%);
   mask-image: radial-gradient(ellipse at center, black 62%, transparent 100%);
 }
@@ -1665,6 +1709,45 @@ button {
 .section-founder .founder-p,
 .section-founder .founder-signature {
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* Newly-painted text segments — a feathered plate behind the words
+   (no hard box, so the gallery wall stays continuous) plus relief
+   shadows. Sections built on opaque cards (Testimonials, Application)
+   need only their heading/eyebrow lifted. */
+.section-principles .shell::before,
+.section-faq .shell-narrow::before,
+.section-how .shell-narrow::before,
+.section-closing .shell-narrow::before {
+  content: '';
+  position: absolute;
+  inset: -1.6rem -1.2rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center,
+    rgba(8, 7, 6, 0.76) 0%,
+    rgba(8, 7, 6, 0.58) 55%,
+    rgba(8, 7, 6, 0) 100%);
+}
+
+.section-principles .value-word,
+.section-faq .sq-text,
+.section-faq .sq-num,
+.section-how .how-para,
+.section-closing .closing-verse-text,
+.section-closing .closing-ref {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
+}
+
+.section-evidence .section-heading,
+.section-evidence .evidence-intro,
+.section-faq .section-heading,
+.section-how .section-heading,
+.section-principles .eyebrow,
+.section-evidence .eyebrow,
+.section-faq .eyebrow,
+.section-how .eyebrow {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
 /* ============================================================

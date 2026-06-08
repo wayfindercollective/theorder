@@ -1,11 +1,13 @@
 import { useInView } from '../../hooks/useInView.js'
 import { evidenceContent } from '../../config/sectionContent.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
+import { SectionPainting } from '../ui/SectionPainting.jsx'
 
 export function EvidenceSection() {
   const { ref, inView } = useInView()
   return (
     <section className="section section-evidence" ref={ref}>
+      <SectionPainting image={evidenceContent.image} />
       <div className="shell">
         <div className={'reveal evidence-head ' + (inView ? 'in-view' : '')}>
           <div className="eyebrow">
