@@ -1333,8 +1333,8 @@ button {
 .section-evidence { background: var(--bg-deep); }
 /* Raise the crop so the soldiers' faces sit above the testimonial tiles, and
    drop the tiles down so they no longer cover the men's faces and bodies. */
-.section-evidence .section-bg-image { background-position: center 24%; }
-.section-evidence .evidence-grid { margin-top: 4.5rem; }
+.section-evidence .section-bg-image { background-position: center 55%; }
+.section-evidence .evidence-grid { margin-top: 7rem; }
 .evidence-head { text-align: center; }
 .evidence-intro {
   text-align: center;
@@ -2566,7 +2566,9 @@ button {
     bottom: 0;
     justify-content: center;
     padding-top: 0;
-    padding-bottom: 0;
+    /* Bias the centred block upward so the verse line clears the CTA + scroll
+       cue anchored at the bottom (the hero logo made the block taller). */
+    padding-bottom: clamp(8rem, 18vh, 13rem);
     padding-left: clamp(1.5rem, 5vw, 5rem);
     padding-right: 1.5rem;
   }

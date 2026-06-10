@@ -28,12 +28,6 @@ export function EvidenceSection() {
           ))}
         </div>
 
-        {evidenceContent.templated && (
-          <p className="template-note restraint">
-            Testimony slots - to be filled by those admitted.
-          </p>
-        )}
-
         <CtaButton location="afterWhoWeAre" className={'reveal ' + (inView ? 'in-view' : '')} />
       </div>
     </section>
