@@ -187,21 +187,18 @@ export function ApplicationSection() {
       <div className="shell-narrow application-shell">
         {!submitted && (
           <>
-            <div className="application-head application-head-compact">
-              <div className="eyebrow">
+            <div className="application-card card card-stitched nailed" ref={formRef}>
+              <span className="nail-tl" />
+              <span className="nail-br" />
+              <div className="eyebrow application-eyebrow">
                 <span className="brass-rule" /> {applicationCopy.eyebrow} <span className="brass-rule" />
               </div>
               <div className="progress-track application-progress" aria-hidden="true">
                 <div
                   className="progress-fill"
-                  style={{ width: `${(step / total) * 100}%` }}
+                  style={{ width: `${submitting ? 100 : ((step - 1) / total) * 100}%` }}
                 />
               </div>
-            </div>
-
-            <div className="application-card card card-stitched nailed" ref={formRef}>
-              <span className="nail-tl" />
-              <span className="nail-br" />
               <QuestionSlide
                 question={q}
                 step={step}
@@ -215,6 +212,9 @@ export function ApplicationSection() {
                 onSubmit={handleSubmit}
                 submitting={submitting}
               />
+              <div className="application-step restraint" aria-hidden="true">
+                Step {step} / {total}
+              </div>
             </div>
           </>
         )}

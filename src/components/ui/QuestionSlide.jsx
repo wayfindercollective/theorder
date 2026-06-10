@@ -53,10 +53,6 @@ export function QuestionSlide({
         transition: 'opacity 320ms var(--ease-order), transform 320ms var(--ease-order)',
       }}
     >
-      <div className="qs-meta">
-        <span className="restraint">Step {String(step).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
-      </div>
-
       <h2 className="qs-question display tooled">
         <Typewriter text={question.question} speed={14} />
       </h2>

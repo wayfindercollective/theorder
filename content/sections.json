@@ -52,11 +52,11 @@
     "not": "[ Do not apply if… line ]"
   },
   "application": {
-    "eyebrow": "The Application",
+    "eyebrow": "Apply Now",
     "image": "/images/oil-naval.jpg",
     "heading": "[ Heading ]",
     "sub": "[ Sub ]",
-    "submitButton": "Apply Now",
+    "submitButton": "Submit",
     "submittingButton": "Submitting…"
   },
   "founder": {
