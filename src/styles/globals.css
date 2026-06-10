@@ -842,8 +842,10 @@ button {
 .hero-logo-mark {
   display: block;
   width: auto;
-  height: clamp(78px, 9vw, 132px);
-  margin: 0 auto 0.4rem;
+  /* matches the closing-section mark (clamp(170px,26vw,280px)); capped by
+     viewport height so it shrinks rather than push the CTA off short screens */
+  height: min(clamp(170px, 26vw, 280px), 30vh);
+  margin: 0 auto 0.6rem;
   opacity: 0.96;
   animation: fadeIn 1600ms var(--ease-order) 80ms both;
 }
@@ -2565,10 +2567,11 @@ button {
     top: 0;
     bottom: 0;
     justify-content: center;
+    gap: clamp(1rem, 2.4vh, 1.6rem);
     padding-top: 0;
-    /* Bias the centred block upward so the verse line clears the CTA + scroll
-       cue anchored at the bottom (the hero logo made the block taller). */
-    padding-bottom: clamp(8rem, 18vh, 13rem);
+    /* CTA now flows inside this column; leave room at the bottom so the centred
+       group clears the scroll cue anchored at the foot. */
+    padding-bottom: clamp(3.5rem, 8vh, 6rem);
     padding-left: clamp(1.5rem, 5vw, 5rem);
     padding-right: 1.5rem;
   }
@@ -2576,7 +2579,18 @@ button {
     left: 0;
     right: auto;
     width: 50%;
+    /* match hero-content's padding so the scroll cue centres on the same
+       vertical axis as the logo, headline, verse and CTA */
+    padding-left: clamp(1.5rem, 5vw, 5rem);
+    padding-right: 1.5rem;
   }
+}
+
+/* Short viewports: the big hero logo + headline + verse + CTA need the full
+   height, so drop the decorative scroll cue rather than let it crowd the CTA. */
+@media (min-width: 901px) and (max-height: 720px) {
+  .hero--split .hero-fold-cue { display: none; }
+  .hero--split .hero-headline { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 }
 
 /* ----- Mobile: un-split. Restore v1's centred shells so the page stacks

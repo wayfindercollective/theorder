@@ -8,6 +8,21 @@ export function Hero() {
   const heroRef = useRef(null)
   const scrollToForm = useScrollToForm('application')
 
+  const actions = (
+    <div className="hero-actions">
+      <button
+        className="btn btn-primary"
+        onClick={() => scrollToForm('hero')}
+        type="button"
+      >
+        {heroContent.cta}
+      </button>
+      {heroContent.restraint && (
+        <p className="restraint hero-restraint">{heroContent.restraint}</p>
+      )}
+    </div>
+  )
+
   return (
     <section id="top" className={'hero' + (DESIGN_V2 ? ' hero--split' : '')} ref={heroRef}>
       <div className="hero-sticky">
@@ -33,22 +48,14 @@ export function Hero() {
           {heroContent.verseLine && (
             <p className="hero-verse display">{heroContent.verseLine}</p>
           )}
+
+          {/* v2: CTA flows with the logo/headline/verse as one aligned column.
+              v1: CTA stays anchored low in the foot (under the candle). */}
+          {DESIGN_V2 && actions}
         </div>
 
-        {/* CTA + scroll cue sit low — under the candle — not with the headline */}
         <div className="hero-foot">
-          <div className="hero-actions">
-            <button
-              className="btn btn-primary"
-              onClick={() => scrollToForm('hero')}
-              type="button"
-            >
-              {heroContent.cta}
-            </button>
-            {heroContent.restraint && (
-              <p className="restraint hero-restraint">{heroContent.restraint}</p>
-            )}
-          </div>
+          {!DESIGN_V2 && actions}
 
           <div className="hero-fold-cue" aria-hidden="true">
             <span className="restraint hero-scroll">Scroll</span>
