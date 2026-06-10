@@ -2504,17 +2504,11 @@ button {
    collapses each image to a soft full-bleed vignette, so we keep v1's stacked,
    centred reading there (see the max-width:900px reset below). ----- */
 @media (min-width: 901px) {
-  /* Translucent plate behind the offset text column — only where the split is
-     live, so it never covers the full-bleed painting on mobile. Feathered (no
-     hard edge); geometry comes from each section's base ::before rule. */
-  .design-split .shell::before,
-  .design-split .shell-narrow::before,
-  .design-split .code-inner::before {
-    background: radial-gradient(ellipse 118% 130% at 50% 50%,
-      rgba(8, 7, 6, 0.88) 0%,
-      rgba(8, 7, 6, 0.74) 56%,
-      rgba(8, 7, 6, 0.25) 100%);
-  }
+  /* Desktop split: NO plate behind the text — it rides directly on the dark
+     ground so the painting's blurred inner edge stays visible right up to the
+     words. (The mobile plate lives in the max-width:900 block below.) The base
+     ::before plates are zeroed for split sections by the .design-split rule
+     above; nothing re-adds them here. */
 
   /* Text column rides in the half opposite the image, centred within that half.
      img-right → text left; img-left → text right. */
