@@ -151,10 +151,10 @@
     "begin": "[ Encouragement - italic ]"
   },
   "form": {
-    "nameLabel": "Full name",
-    "namePlaceholder": "[ Name hint ]",
+    "nameLabel": "Name",
+    "namePlaceholder": "Name",
     "emailLabel": "Email",
-    "emailPlaceholder": "[ Email hint ]",
+    "emailPlaceholder": "example@gmail.com",
     "phoneLabel": "Phone",
     "phonePlaceholder": "Number",
     "emailError": "That email does not look right.",

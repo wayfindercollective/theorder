@@ -1,19 +1,22 @@
 import { useInView } from '../../hooks/useInView.js'
 import { codeContent } from '../../config/sectionContent.js'
 import { mdHtml } from '../../lib/markdown.js'
+import { sectionAlign } from '../../config/design.js'
 
 // "Who We Are" — heading + manifesto prose, round-table image behind it.
 // The Principles wall lives in its own section (PrinciplesSection).
 export function TheCodeSection() {
   const { ref, inView } = useInView({ threshold: 0.2 })
+  const align = sectionAlign('code', codeContent.imageAlign)
+  const splitClass = align !== 'full' ? ` design-split img-${align}` : ''
   return (
-    <section className="section section-code" ref={ref}>
+    <section className={'section section-code' + splitClass} ref={ref}>
       <div className="code-bg" aria-hidden="true" />
       {codeContent.image && (
         <div
-          className={codeContent.imageAlign === 'full'
+          className={align === 'full'
             ? 'section-bg-image'
-            : `section-side-image section-side-image-${codeContent.imageAlign || 'right'}`}
+            : `section-side-image section-side-image-${align}`}
           style={{ backgroundImage: `url(${codeContent.image})` }}
           aria-hidden="true"
         />

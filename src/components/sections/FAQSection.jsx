@@ -2,16 +2,19 @@ import { useInView } from '../../hooks/useInView.js'
 import { faqContent } from '../../config/sectionContent.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
+import { sectionAlign } from '../../config/design.js'
 
 export function FAQSection() {
   const { ref, inView } = useInView()
+  const align = sectionAlign('faq', faqContent.imageAlign)
+  const splitClass = align !== 'full' ? ` design-split img-${align}` : ''
   const questions = (faqContent.questions || '')
     .split('\n')
     .map((q) => q.trim())
     .filter(Boolean)
   return (
-    <section className="section section-faq" ref={ref}>
-      <SectionPainting image={faqContent.image} />
+    <section className={'section section-faq' + splitClass} ref={ref}>
+      <SectionPainting image={faqContent.image} align={align} />
       <div className="shell-narrow">
         <div className={'reveal ' + (inView ? 'in-view' : '')}>
           <div className="eyebrow">

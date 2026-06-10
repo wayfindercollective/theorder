@@ -1,22 +1,20 @@
 import { useInView } from '../../hooks/useInView.js'
 import { becomeContent } from '../../config/sectionContent.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
+import { SectionPainting } from '../ui/SectionPainting.jsx'
+import { sectionAlign } from '../../config/design.js'
 
 export function WhatYouBecomeSection() {
   const { ref, inView } = useInView()
+  const align = sectionAlign('become', becomeContent.imageAlign)
+  const splitClass = align !== 'full' ? ` design-split img-${align}` : ''
   const offerings = (becomeContent.offerings || '')
     .split('\n')
     .map((o) => o.trim())
     .filter(Boolean)
   return (
-    <section className="section section-become" ref={ref}>
-      {becomeContent.image && (
-        <div
-          className="section-bg-image"
-          style={{ backgroundImage: `url(${becomeContent.image})` }}
-          aria-hidden="true"
-        />
-      )}
+    <section className={'section section-become' + splitClass} ref={ref}>
+      <SectionPainting image={becomeContent.image} align={align} />
       <div className="shell">
         <div className={'reveal become-head ' + (inView ? 'in-view' : '')}>
           <div className="eyebrow">

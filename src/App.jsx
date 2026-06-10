@@ -17,6 +17,7 @@ import { usePendingLeadsSync } from './hooks/usePendingLeadsSync.js'
 import { PendingLeadsAdmin } from './components/ui/PendingLeadsAdmin.jsx'
 import { captureUTMs } from './lib/utm.js'
 import { bootAnalytics, track } from './lib/analytics.js'
+import { DESIGN_V2 } from './config/design.js'
 
 // Lazy-load admin so public visitors never download it.
 const AdminApp = lazy(() => import('./admin/AdminApp.jsx'))
@@ -61,7 +62,7 @@ function PublicSite() {
   return (
     <>
       <Header />
-      <main>
+      <main className={DESIGN_V2 ? 'design-v2' : undefined}>
         <Hero />
         <TheTruthSection />
         <TheCodeSection />

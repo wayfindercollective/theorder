@@ -2,13 +2,14 @@ import { useRef } from 'react'
 import { HeroFilm } from '../showpiece/HeroFilm.jsx'
 import { heroContent } from '../../config/sectionContent.js'
 import { useScrollToForm } from '../../hooks/useScrollToForm.js'
+import { DESIGN_V2 } from '../../config/design.js'
 
 export function Hero() {
   const heroRef = useRef(null)
   const scrollToForm = useScrollToForm('application')
 
   return (
-    <section id="top" className="hero" ref={heroRef}>
+    <section id="top" className={'hero' + (DESIGN_V2 ? ' hero--split' : '')} ref={heroRef}>
       <div className="hero-sticky">
         <div className="hero-canvas">
           <HeroFilm scrollEl={heroRef} />

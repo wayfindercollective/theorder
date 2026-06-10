@@ -2,16 +2,19 @@ import { useInView } from '../../hooks/useInView.js'
 import { howWeOperateContent } from '../../config/sectionContent.js'
 import { mdInline } from '../../lib/markdown.js'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
+import { sectionAlign } from '../../config/design.js'
 
 // The pull-quote drops in after this paragraph index (the "fuck yes" beat).
 const PULLQUOTE_AFTER = 2
 
 export function HowWeOperateSection() {
   const { ref, inView } = useInView()
+  const align = sectionAlign('howWeOperate', howWeOperateContent.imageAlign)
+  const splitClass = align !== 'full' ? ` design-split img-${align}` : ''
   const paras = howWeOperateContent.paragraphs || []
   return (
-    <section className="section section-how" ref={ref}>
-      <SectionPainting image={howWeOperateContent.image} />
+    <section className={'section section-how' + splitClass} ref={ref}>
+      <SectionPainting image={howWeOperateContent.image} align={align} />
       <div className="shell-narrow">
         <div className={'reveal ' + (inView ? 'in-view' : '')}>
           <div className="eyebrow">

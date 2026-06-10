@@ -22,7 +22,7 @@ function Typewriter({ text, speed = 12 }) {
     }, speed)
     return () => clearInterval(id)
   }, [text, speed])
-  return <span>{out}<span className="tw-caret">|</span></span>
+  return <span>{out}</span>
 }
 
 export function QuestionSlide({

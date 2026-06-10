@@ -184,10 +184,10 @@ button {
 .section-side-image-right {
   right: 0;
   -webkit-mask-image:
-    linear-gradient(to left, black 55%, transparent 100%),
+    linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
     linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   mask-image:
-    linear-gradient(to left, black 55%, transparent 100%),
+    linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
     linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
@@ -196,10 +196,10 @@ button {
 .section-side-image-left {
   left: 0;
   -webkit-mask-image:
-    linear-gradient(to right, black 55%, transparent 100%),
+    linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
     linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   mask-image:
-    linear-gradient(to right, black 55%, transparent 100%),
+    linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
     linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
@@ -250,12 +250,15 @@ button {
 
 /* readable content rides above the painting and its two overlays */
 .section:has(.section-bg-image) > .shell,
-.section:has(.section-bg-image) > .shell-narrow { z-index: 3; }
+.section:has(.section-bg-image) > .shell-narrow,
+.section:has(.section-side-image) > .shell,
+.section:has(.section-side-image) > .shell-narrow { z-index: 3; }
 
 /* painted surface — fine linen weave over a broad, uneven varnish mottle,
    both riding the paint in soft light so the scene reads as pigment on
    canvas rather than a photograph */
-.section:has(.section-bg-image)::before {
+.section:has(.section-bg-image)::before,
+.section:has(.section-side-image)::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -273,7 +276,8 @@ button {
    set the picture back in its frame, melt each scene into the dark above and
    below so the wall feels continuous, and keep the centre lit like a canvas
    under a gallery light */
-.section:has(.section-bg-image)::after {
+.section:has(.section-bg-image)::after,
+.section:has(.section-side-image)::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1531,7 +1535,8 @@ button {
   min-height: 100vh;
   padding: clamp(2.2rem, 5vw, 3.6rem) 0;
 }
-.section-principles .eyebrow { letter-spacing: 0.4em; }
+/* The Principles — render the label as a heading, not a caption (both designs). */
+.section-principles .eyebrow { font-size: clamp(1rem, 2.2vw, 1.5rem); letter-spacing: 0.4em; }
 
 /* Who We Are — intro prose + the Principles wall */
 .values-intro { max-width: var(--reading-w); margin: 0 auto; }
@@ -1748,7 +1753,6 @@ button {
    (no hard box, so the gallery wall stays continuous) plus relief
    shadows. Sections built on opaque cards (Testimonials, Application)
    need only their heading/eyebrow lifted. */
-.section-truth .shell::before,
 .section-become .shell::before,
 .section-evidence .shell::before,
 .section-principles .shell::before,
@@ -2417,4 +2421,104 @@ button {
   .md-toolbar { flex-wrap: wrap; }
   .admin-save-btn { padding: 0.6rem 1rem; }
   .admin-logout   { padding: 0.6rem 0.9rem; }
+}
+
+/* ============================================================
+   DESIGN v2 — SPLIT-ALIGNED LAYOUT  (served at /2 or ?v=2)
+   Five sections pull the painting to one side (faded at its inner
+   edge) and move the text into the opposite half, to calm the page.
+   Reuses the .section-side-image-left/right system; every rule below
+   only bites when those classes / .design-split render, which happens
+   solely in v2 — so the centred v1 design stays untouched.
+   ============================================================ */
+
+/* --- Grade parity: side images get the same warm oil lift + brightness as the
+   full-bleed paintings (the base .section-side-image carried no grade). --- */
+.section-side-image {
+  filter: sepia(0.08) saturate(1.08) contrast(0.97) brightness(1.36);
+}
+/* mirror the per-painting grades used by the full-bleed versions */
+.section-code .section-side-image {
+  filter: sepia(0.08) saturate(1.08) brightness(1.5) contrast(0.98);
+}
+.section-become .section-side-image {
+  filter: sepia(0.14) saturate(1.04) contrast(1.02) brightness(1.03);
+}
+
+/* --- Per-image crops: keep each painting's focal subject in the outer
+   (un-faded) half of its slot. First-pass values, tunable by eye. --- */
+.section-code .section-side-image-right  { background-position: 70% 42%; }   /* knight + banner, centre-right */
+.section-become .section-side-image-left { background-position: 32% 50%; }   /* white gown + kneeling knight */
+.section-faq .section-side-image-right   { background-position: center 48%; } /* St George, centred portrait */
+.section-how .section-side-image-left    { background-position: 58% 52%; }   /* lead horse's nose + lance, fading into the text */
+
+/* --- Split text rides on the dark ground itself: drop the translucent plate
+   behind the words so the "box" reads as fully transparent. The text-shadows
+   already on these elements keep them legible against the faded inner edge. --- */
+.design-split .shell::before,
+.design-split .shell-narrow::before,
+.design-split .code-inner::before {
+  background: none;
+}
+
+/* --- Testimonials (v2-only): keep the individual testimonial cards (the boxes
+   that show where each quote will go), but drop the section's overall
+   translucent plate so the whole block doesn't read as one big box. --- */
+.design-v2 .section-evidence .shell::before { background: none; }
+
+/* ----- Desktop: the actual split. Below 900px the existing side-image rule
+   collapses each image to a soft full-bleed vignette, so we keep v1's stacked,
+   centred reading there (see the max-width:900px reset below). ----- */
+@media (min-width: 901px) {
+  /* Text column rides in the half opposite the image, centred within that half.
+     img-right → text left; img-left → text right. */
+  .design-split.img-right > .shell,
+  .design-split.img-right > .shell-narrow {
+    margin-left: clamp(1.5rem, 4vw, 4rem);
+    margin-right: auto;
+    max-width: min(var(--reading-w), 42vw);
+  }
+  .design-split.img-left > .shell,
+  .design-split.img-left > .shell-narrow {
+    margin-right: clamp(1.5rem, 4vw, 4rem);
+    margin-left: auto;
+    max-width: min(var(--reading-w), 42vw);
+  }
+
+  /* ---- Hero, split: horseman pulled right, wordmark + CTA in the left half ---- */
+  .hero--split .hero-film {
+    left: auto;
+    right: 0;
+    width: 56%;
+    -webkit-mask-image: linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%);
+    mask-image: linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%);
+  }
+  .hero--split .hero-film img {
+    object-position: center 42%; /* keep the rearing horse + rider in frame */
+  }
+  .hero--split .hero-content {
+    left: 0;
+    right: auto;
+    width: 50%;
+    top: 0;
+    bottom: 0;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: clamp(1.5rem, 5vw, 5rem);
+    padding-right: 1.5rem;
+  }
+  .hero--split .hero-foot {
+    left: 0;
+    right: auto;
+    width: 50%;
+  }
+}
+
+/* ----- Mobile: un-split. Restore v1's centred shells so the page stacks
+   exactly like the default design (the image softens to a full-bleed vignette,
+   and the hero overrides above simply don't apply). ----- */
+@media (max-width: 900px) {
+  .design-split > .shell        { max-width: var(--max-w);     margin: 0 auto; }
+  .design-split > .shell-narrow { max-width: var(--reading-w); margin: 0 auto; }
 }
