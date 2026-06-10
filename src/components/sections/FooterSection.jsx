@@ -1,12 +1,11 @@
 import { footerContent } from '../../config/sectionContent.js'
-import { Sigil } from '../ui/Sigil.jsx'
 
 export function FooterSection() {
   return (
     <footer className="site-footer">
       <div className="shell footer-inner">
         <a href="#top" className="footer-mark" aria-label="The Order">
-          <Sigil size={26} variant="full" />
+          <img className="logo-mark footer-logo" src="/images/logo-mark.png" alt="" />
         </a>
 
         {footerContent.email && (

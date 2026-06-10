@@ -33,11 +33,12 @@
     "imageAlign": "full"
   },
   "principles": {
+    "eyebrow": "III",
     "image": "/images/oil-principles.jpg",
     "imageAlign": "full"
   },
   "become": {
-    "eyebrow": "V",
+    "eyebrow": "VI",
     "heading": "We're Offering You",
     "offerings": "Brotherhood\nProsperity\nSavagery\nWarrior Code\nCommunity\nAdventure\nMentoring\nResilience\nCourage\nJoy",
     "closing": "I hope that you join us.",
@@ -55,11 +56,11 @@
     "image": "/images/oil-naval.jpg",
     "heading": "[ Heading ]",
     "sub": "[ Sub ]",
-    "submitButton": "[ Submit button ]",
+    "submitButton": "Apply Now",
     "submittingButton": "Submitting…"
   },
   "founder": {
-    "eyebrow": "IV",
+    "eyebrow": "V",
     "heading": "Who Am I",
     "placeholderMark": "Nico Seedsman - Afghanistan",
     "portrait": "/images/founder-portrait.jpg",
@@ -75,7 +76,7 @@
     "imageAlign": "full"
   },
   "evidence": {
-    "eyebrow": "III",
+    "eyebrow": "IV",
     "heading": "Testimonials",
     "image": "/images/oil-testimony.jpg",
     "imageAlign": "full",
@@ -97,14 +98,14 @@
     ]
   },
   "faq": {
-    "eyebrow": "VI",
+    "eyebrow": "VII",
     "heading": "Questions a Serious Man Asks",
     "image": "/images/oil-faq.jpg",
     "imageAlign": "full",
     "questions": "Do you wish not only to heal, but to grow and prosper?\nAre you tired of swimming upstream from your destiny and from God?\nAre you capable, humble and courageous enough to pass an eight-week virtual selection?\nDo you want to stand in a global brotherhood of savage gentlemen who hold the same principles as you?\nDo you want to attend daring, fun, life-changing retreats with those same brethren?\nDo you want to work daily - held accountable, and holding others accountable - toward lasting transformation and reinvention?\nDo you want to be the truest, most authentic version of yourself, released from the shackles of fear and attachment?"
   },
   "howWeOperate": {
-    "eyebrow": "VII",
+    "eyebrow": "VIII",
     "heading": "How We Operate & What to Expect",
     "image": "/images/oil-operate.jpg",
     "imageAlign": "full",

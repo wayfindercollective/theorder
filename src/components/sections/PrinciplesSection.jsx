@@ -15,6 +15,11 @@ export function PrinciplesSection() {
       <SectionPainting image={principlesContent.image} />
       <div className="shell">
         <div className={'reveal ' + (inView ? 'in-view' : '')}>
+          {principlesContent.eyebrow && (
+            <div className="eyebrow eyebrow--numeral">
+              <span className="brass-rule" /> {principlesContent.eyebrow} <span className="brass-rule" />
+            </div>
+          )}
           <div className="eyebrow">
             <span className="brass-rule" /> {codeContent.valuesLabel} <span className="brass-rule" />
           </div>

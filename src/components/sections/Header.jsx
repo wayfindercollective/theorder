@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Sigil } from '../ui/Sigil.jsx'
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -14,7 +13,7 @@ export function Header() {
     <header className={'site-header' + (scrolled ? ' is-scrolled' : '')}>
       <div className="shell site-header-inner">
         <a href="#top" className="header-mark" aria-label="The Order">
-          <Sigil size={36} variant="full" />
+          <img className="logo-mark header-logo" src="/images/logo-mark.png" alt="" />
           <span className="display header-wordmark">The Order</span>
         </a>
       </div>

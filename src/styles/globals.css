@@ -578,7 +578,8 @@ button {
 /* progress bar */
 .progress-track {
   width: 100%;
-  height: 2px;
+  height: 4px;
+  border-radius: 2px;
   background: var(--iron);
   position: relative;
   overflow: hidden;
@@ -1537,6 +1538,7 @@ button {
 }
 /* The Principles — render the label as a heading, not a caption (both designs). */
 .section-principles .eyebrow { font-size: clamp(1rem, 2.2vw, 1.5rem); letter-spacing: 0.4em; }
+.section-principles .eyebrow--numeral { font-size: 0.72rem; letter-spacing: 0.18em; }
 
 /* Who We Are — intro prose + the Principles wall */
 .values-intro { max-width: var(--reading-w); margin: 0 auto; }
@@ -1675,7 +1677,11 @@ button {
 }
 .closing-inner { display: flex; flex-direction: column; align-items: center; }
 .closing-head { display: flex; flex-direction: column; align-items: center; }
-.closing-sigil { opacity: 0.9; }
+/* painted logo mark — replaces the vector sigil in header / closing / footer */
+.logo-mark { display: block; width: auto; }
+.header-logo { height: 38px; }
+.footer-logo { height: 32px; }
+.closing-sigil { height: 100px; width: auto; opacity: 0.92; }
 .closing-wordmark {
   margin-top: 1.4rem;
   font-size: clamp(2rem, 6vw, 3.6rem);
