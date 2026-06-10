@@ -1553,6 +1553,19 @@ button {
 /* The Principles — render the label as a heading, not a caption (both designs). */
 .section-principles .eyebrow { font-size: clamp(1rem, 2.2vw, 1.5rem); letter-spacing: 0.4em; }
 .section-principles .eyebrow--numeral { font-size: 0.72rem; letter-spacing: 0.18em; }
+/* Narrow screens: tighten the label and its flanking rules so "THE PRINCIPLES"
+   stays on a single line instead of wrapping. */
+@media (max-width: 560px) {
+  .section-principles .eyebrow:not(.eyebrow--numeral) {
+    font-size: clamp(0.85rem, 4vw, 1.15rem);
+    letter-spacing: 0.16em;
+    white-space: nowrap;
+  }
+  .section-principles .eyebrow:not(.eyebrow--numeral) .brass-rule {
+    width: 20px;
+    margin: 0 0.4rem;
+  }
+}
 
 /* Who We Are — intro prose + the Principles wall */
 .values-intro { max-width: var(--reading-w); margin: 0 auto; }
@@ -2472,9 +2485,10 @@ button {
 .section-faq .section-side-image-right   { background-position: center 48%; } /* St George, centred portrait */
 .section-how .section-side-image-left    { background-position: 58% 52%; }   /* lead horse's nose + lance, fading into the text */
 
-/* --- Split text rides on the dark ground itself: drop the translucent plate
-   behind the words so the "box" reads as fully transparent. The text-shadows
-   already on these elements keep them legible against the faded inner edge. --- */
+/* --- Default (and mobile): no plate. On mobile the layout un-splits to a
+   centred column over a faded full-bleed painting, so a plate would just hide
+   the picture. The desktop split adds its plate inside the min-width:901px
+   block below, where text actually overlays one half of the painting. --- */
 .design-split .shell::before,
 .design-split .shell-narrow::before,
 .design-split .code-inner::before {
@@ -2490,6 +2504,18 @@ button {
    collapses each image to a soft full-bleed vignette, so we keep v1's stacked,
    centred reading there (see the max-width:900px reset below). ----- */
 @media (min-width: 901px) {
+  /* Translucent plate behind the offset text column — only where the split is
+     live, so it never covers the full-bleed painting on mobile. Feathered (no
+     hard edge); geometry comes from each section's base ::before rule. */
+  .design-split .shell::before,
+  .design-split .shell-narrow::before,
+  .design-split .code-inner::before {
+    background: radial-gradient(ellipse 118% 130% at 50% 50%,
+      rgba(8, 7, 6, 0.88) 0%,
+      rgba(8, 7, 6, 0.74) 56%,
+      rgba(8, 7, 6, 0.25) 100%);
+  }
+
   /* Text column rides in the half opposite the image, centred within that half.
      img-right → text left; img-left → text right. */
   .design-split.img-right > .shell,
@@ -2541,4 +2567,21 @@ button {
 @media (max-width: 900px) {
   .design-split > .shell        { max-width: var(--max-w);     margin: 0 auto; }
   .design-split > .shell-narrow { max-width: var(--reading-w); margin: 0 auto; }
+
+  /* Moderate feathered plate behind the centred text so the brighter, busier
+     paintings (e.g. How We Operate's papers) stay readable — lighter than the
+     desktop split plate, and it fades to nothing at the edges so the full-bleed
+     painting still shows through above and below the words. */
+  .design-split .shell::before,
+  .design-split .shell-narrow::before,
+  .design-split .code-inner::before {
+    background: radial-gradient(ellipse 116% 116% at 50% 50%,
+      rgba(8, 7, 6, 0.72) 0%,
+      rgba(8, 7, 6, 0.5) 55%,
+      rgba(8, 7, 6, 0) 100%);
+  }
+
+  /* "We're Offering You" full-bleed crop on mobile: shift right off the bright
+     white gown so the kneeling knight is the visible figure, not the woman. */
+  .section-become .section-side-image { background-position: 60% 50%; }
 }
