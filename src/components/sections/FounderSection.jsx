@@ -1,6 +1,7 @@
 import { useInView } from '../../hooks/useInView.js'
 import { founderContent } from '../../config/sectionContent.js'
 import { mdInline } from '../../lib/markdown.js'
+import { CtaButton } from '../ui/CtaButton.jsx'
 
 export function FounderSection() {
   const { ref, inView } = useInView()
@@ -48,6 +49,8 @@ export function FounderSection() {
             <p className="founder-signature display">{founderContent.signature}</p>
           </div>
         </div>
+
+        <CtaButton location="afterFounder" className={'reveal ' + (inView ? 'in-view' : '')} />
       </div>
     </section>
   )

@@ -2,6 +2,7 @@ import { useInView } from '../../hooks/useInView.js'
 import { codeContent } from '../../config/sectionContent.js'
 import { mdHtml } from '../../lib/markdown.js'
 import { sectionAlign } from '../../config/design.js'
+import { CtaButton } from '../ui/CtaButton.jsx'
 
 // "Who We Are" — heading + manifesto prose, round-table image behind it.
 // The Principles wall lives in its own section (PrinciplesSection).
@@ -31,6 +32,7 @@ export function TheCodeSection() {
           {codeContent.intro && (
             <div className="values-intro" dangerouslySetInnerHTML={mdHtml(codeContent.intro)} />
           )}
+          <CtaButton location="afterWhoWeAre" className={'reveal ' + (inView ? 'in-view' : '')} />
         </div>
       </div>
     </section>

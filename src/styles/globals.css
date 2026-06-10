@@ -1333,10 +1333,16 @@ button {
    ============================================================ */
 
 .section-evidence { background: var(--bg-deep); }
-/* Raise the crop so the soldiers' faces sit above the testimonial tiles, and
-   drop the tiles down so they no longer cover the men's faces and bodies. */
-.section-evidence .section-bg-image { background-position: center 55%; }
-.section-evidence .evidence-grid { margin-top: 7rem; }
+/* Pin the testimonial tiles to the bottom of the section so the soldiers'
+   faces and bodies read clearly above them: the shell fills the section height
+   with the heading at top and the tiles pushed down by an auto top margin. */
+.section-evidence .section-bg-image { background-position: center 48%; }
+.section-evidence > .shell {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.section-evidence .evidence-grid { margin-top: auto; }
 .evidence-head { text-align: center; }
 .evidence-intro {
   text-align: center;

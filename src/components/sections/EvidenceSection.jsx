@@ -1,6 +1,5 @@
 import { useInView } from '../../hooks/useInView.js'
 import { evidenceContent } from '../../config/sectionContent.js'
-import { CtaButton } from '../ui/CtaButton.jsx'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
 
 export function EvidenceSection() {
@@ -27,8 +26,6 @@ export function EvidenceSection() {
             </article>
           ))}
         </div>
-
-        <CtaButton location="afterWhoWeAre" className={'reveal ' + (inView ? 'in-view' : '')} />
       </div>
     </section>
   )
