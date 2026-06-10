@@ -707,10 +707,19 @@ button {
   z-index: 50;
   padding: 1.1rem 0;
   background: transparent;
-  transition: background 480ms var(--ease-order), border-color 480ms var(--ease-order);
+  transition: background 480ms var(--ease-order), border-color 480ms var(--ease-order),
+    transform 480ms var(--ease-order), opacity 480ms var(--ease-order);
   border-bottom: 1px solid transparent;
+  /* Hidden over the hero — the hero carries its own logo. Slides in once the
+     hero has scrolled past (.is-scrolled), then stays for the rest of the page. */
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
 }
 .site-header.is-scrolled {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
   background: rgba(10, 9, 8, 0.84);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -828,6 +837,15 @@ button {
   gap: 1.6rem;
   padding-top: clamp(7rem, 14vh, 11rem);
   padding-bottom: 5rem;
+}
+
+.hero-logo-mark {
+  display: block;
+  width: auto;
+  height: clamp(78px, 9vw, 132px);
+  margin: 0 auto 0.4rem;
+  opacity: 0.96;
+  animation: fadeIn 1600ms var(--ease-order) 80ms both;
 }
 
 .hero-eyebrow {
@@ -1313,6 +1331,10 @@ button {
    ============================================================ */
 
 .section-evidence { background: var(--bg-deep); }
+/* Raise the crop so the soldiers' faces sit above the testimonial tiles, and
+   drop the tiles down so they no longer cover the men's faces and bodies. */
+.section-evidence .section-bg-image { background-position: center 24%; }
+.section-evidence .evidence-grid { margin-top: 4.5rem; }
 .evidence-head { text-align: center; }
 .evidence-intro {
   text-align: center;
@@ -1708,7 +1730,7 @@ button {
 .logo-mark { display: block; width: auto; }
 .header-logo { height: 38px; }
 .footer-logo { height: 32px; }
-.closing-sigil { height: 100px; width: auto; opacity: 0.92; }
+.closing-sigil { height: clamp(170px, 26vw, 280px); width: auto; opacity: 0.94; }
 .closing-wordmark {
   margin-top: 1.4rem;
   font-size: clamp(2rem, 6vw, 3.6rem);

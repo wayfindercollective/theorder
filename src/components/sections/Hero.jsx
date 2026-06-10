@@ -18,6 +18,8 @@ export function Hero() {
         <div className="hero-vignette" aria-hidden="true" />
 
         <div className="hero-content shell">
+          <img className="logo-mark hero-logo-mark" src="/images/logo-mark.png" alt="The Order" />
+
           {heroContent.eyebrow && (
             <div className="hero-eyebrow eyebrow">
               <span className="brass-rule" /> {heroContent.eyebrow} <span className="brass-rule" />
