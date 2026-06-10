@@ -13,7 +13,7 @@
     "video": null,
     "frames": [
       {
-        "src": "/images/hero-gladiator.jpg"
+        "src": "/images/hero-horseman.jpg"
       }
     ]
   },
@@ -29,11 +29,11 @@
     "intro": "We are THE ORDER. We are the antithesis of hedonism. In a world of fading values, we remain steadfast as righteous men of heart, soul, mind and strength. We are an Order of men who uphold the old ways of chivalry and nobility - ways that have been lost, buried, and actively destroyed. We are gentlemen; we are fathers, husbands, brothers, lovers, men of God. But we are also savages, without the pomp - ruthlessly capable of defending one another, and those it is our duty to protect.\n\nWe are men of Truth, Action and Virtue; an ageless Brotherhood.",
     "valuesLabel": "The Principles",
     "values": "Nobility\nDiscipline\nLeadership\nHonour\nBrotherhood\nLoyalty\nIntegrity\nCourage\nRighteousness\nStrength\nTenacity\nTruth\nCommunity\nGod\nIndependence\nChivalry\nFamily\nLove\nConviction\nGlory\nSavage\nDuty\nLegacy\nBelief\nHospitality\nKindness\nJoy\nInitiative\nArt\nPlay\nProsperity\nBeauty\nPresence\nHumility\nWisdom\nSurrender\nBold\nHeart\nSoul\nAudacious\nDaring\nConscious\nEquanimity\nResilience\nPassion\nPrayer\nFaith\nGratitude\nBenevolence\nCelebration",
-    "image": "/images/whoweare-table.jpg",
+    "image": "/images/oil-offering.jpg",
     "imageAlign": "full"
   },
   "principles": {
-    "image": "/images/painting-principles.jpg",
+    "image": "/images/oil-principles.jpg",
     "imageAlign": "full"
   },
   "become": {
@@ -41,7 +41,7 @@
     "heading": "We're Offering You",
     "offerings": "Brotherhood\nProsperity\nSavagery\nWarrior Code\nCommunity\nAdventure\nMentoring\nResilience\nCourage\nJoy",
     "closing": "I hope that you join us.",
-    "image": "/images/offerings-training.jpg",
+    "image": "/images/oil-become.jpg",
     "imageAlign": "full"
   },
   "considered": {
@@ -52,7 +52,7 @@
   },
   "application": {
     "eyebrow": "The Application",
-    "image": "/images/painting-application.jpg",
+    "image": "/images/oil-naval.jpg",
     "heading": "[ Heading ]",
     "sub": "[ Sub ]",
     "submitButton": "[ Submit button ]",
@@ -62,6 +62,7 @@
     "eyebrow": "IV",
     "heading": "Who Am I",
     "placeholderMark": "Nico Seedsman - Afghanistan",
+    "portrait": "/images/founder-portrait.jpg",
     "paragraphs": [
       "I am a former SAS tier-1 (Special Operations) Operator with three kill/capture combat deployments - thirteen years in the military. I am a Master Freemason and a Knight of the Order of Saint Martino, Rome; a founder, an artist, a lover, a gentleman, a Christian, and a savage.",
       "I watched, patiently, waiting for an organisation, a leader, someone or something to come forth and restore Order - to bring us back to the old ways, to be masculine and righteous again. And it did not come.",
@@ -70,13 +71,13 @@
     ],
     "signature": "- Nico Seedsman",
     "templated": true,
-    "image": "/images/founder-window.jpg",
+    "image": null,
     "imageAlign": "full"
   },
   "evidence": {
     "eyebrow": "III",
     "heading": "Testimonials",
-    "image": "/images/painting-testimony.jpg",
+    "image": "/images/oil-testimony.jpg",
     "imageAlign": "full",
     "intro": "",
     "templated": true,
@@ -98,14 +99,14 @@
   "faq": {
     "eyebrow": "VI",
     "heading": "Questions a Serious Man Asks",
-    "image": "/images/painting-faq.jpg",
+    "image": "/images/oil-faq.jpg",
     "imageAlign": "full",
     "questions": "Do you wish not only to heal, but to grow and prosper?\nAre you tired of swimming upstream from your destiny and from God?\nAre you capable, humble and courageous enough to pass an eight-week virtual selection?\nDo you want to stand in a global brotherhood of savage gentlemen who hold the same principles as you?\nDo you want to attend daring, fun, life-changing retreats with those same brethren?\nDo you want to work daily - held accountable, and holding others accountable - toward lasting transformation and reinvention?\nDo you want to be the truest, most authentic version of yourself, released from the shackles of fear and attachment?"
   },
   "howWeOperate": {
     "eyebrow": "VII",
     "heading": "How We Operate & What to Expect",
-    "image": "/images/painting-operate.png",
+    "image": "/images/oil-operate.jpg",
     "imageAlign": "full",
     "paragraphs": [
       "We meet entirely virtually, online - except for in-person retreats.",
@@ -120,7 +121,7 @@
   },
   "closing": {
     "wordmark": "THE ORDER",
-    "image": "/images/painting-closing.jpg",
+    "image": "/images/oil-closing.jpg",
     "imageAlign": "full",
     "verses": [
       {

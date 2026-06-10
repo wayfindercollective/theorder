@@ -1,56 +1,27 @@
 {
   "questions": [
     {
-      "id": "mainChallenge",
-      "type": "choice",
-      "scored": false,
-      "question": "[ Q1 - opener question ]",
-      "subtitle": "[ Q1 subtitle - optional ]",
-      "options": [
-        {
-          "label": "[ Option 1 ]",
-          "value": "Option 1"
-        },
-        {
-          "label": "[ Option 2 ]",
-          "value": "Option 2"
-        },
-        {
-          "label": "[ Option 3 ]",
-          "value": "Option 3"
-        },
-        {
-          "label": "[ Option 4 ]",
-          "value": "Option 4"
-        },
-        {
-          "label": "[ Option 5 ]",
-          "value": "Option 5"
-        }
-      ]
-    },
-    {
       "id": "commitment",
       "type": "choice",
       "scored": true,
-      "question": "[ Q2 - commitment question ]",
-      "subtitle": "[ Q2 subtitle - optional ]",
+      "question": "When it truly matters, how do you show up?",
+      "subtitle": "",
       "options": [
         {
-          "label": "[ Commitment - highest ]",
-          "value": "Fully commits and follows through"
+          "label": "When I commit, it is done. My word is iron.",
+          "value": "I follow through fully when I commit"
         },
         {
-          "label": "[ Commitment - high ]",
-          "value": "Mostly commits"
+          "label": "I commit — but I need brothers to hold me to it.",
+          "value": "I am committed but sometimes need accountability"
         },
         {
-          "label": "[ Commitment - mid ]",
-          "value": "Inconsistent commitment"
+          "label": "I hesitate long before I act.",
+          "value": "I hesitate a lot before taking action"
         },
         {
-          "label": "[ Commitment - low ]",
-          "value": "Rarely commits"
+          "label": "Even when I care, I struggle to follow through.",
+          "value": "I struggle to follow through even when I care"
         }
       ]
     },
@@ -58,57 +29,24 @@
       "id": "readiness",
       "type": "choice",
       "scored": true,
-      "question": "[ Q3 - readiness question ]",
-      "subtitle": "[ Q3 subtitle - optional ]",
+      "question": "Are you ready to bring order to your life now?",
+      "subtitle": "",
       "options": [
         {
-          "label": "[ Readiness - now ]",
-          "value": "Ready now"
+          "label": "I am ready to begin now.",
+          "value": "I am ready to start now"
         },
         {
-          "label": "[ Readiness - soon ]",
-          "value": "Ready soon"
+          "label": "I am close — but I need the right path to be made clear.",
+          "value": "I think I am close, I just need clarity on the right path"
         },
         {
-          "label": "[ Readiness - open ]",
-          "value": "Open to it"
+          "label": "I am still exploring my options.",
+          "value": "I am exploring and trying to understand my options"
         },
         {
-          "label": "[ Readiness - exploring ]",
-          "value": "Exploring"
-        }
-      ]
-    },
-    {
-      "id": "income",
-      "type": "choice",
-      "scored": true,
-      "question": "[ Q4 - income question ]",
-      "subtitle": "[ Q4 subtitle - optional ]",
-      "options": [
-        {
-          "label": "[ $100k+ ]",
-          "value": "$100k+ Per Month"
-        },
-        {
-          "label": "[ $10–100k ]",
-          "value": "$10-100k Per Month"
-        },
-        {
-          "label": "[ $5–10k ]",
-          "value": "$5-10k Per Month"
-        },
-        {
-          "label": "[ $3–5k ]",
-          "value": "$3-5k Per Month"
-        },
-        {
-          "label": "[ $1–3k ]",
-          "value": "$1-3k Per Month"
-        },
-        {
-          "label": "[ $0–1k ]",
-          "value": "$0-1k Per Month"
+          "label": "I am not ready to change this yet.",
+          "value": "I am not ready to change this yet"
         }
       ]
     },
@@ -116,8 +54,8 @@
       "id": "contact",
       "type": "contact",
       "scored": false,
-      "question": "[ Q5 - contact step heading ]",
-      "subtitle": "[ Q5 subtitle - optional ]"
+      "question": "How do we reach you?",
+      "subtitle": ""
     }
   ]
 }

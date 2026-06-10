@@ -23,15 +23,20 @@ export function FounderSection() {
         </div>
 
         <div className={'founder-grid stagger ' + (inView ? 'in-view' : '')}>
-          <div className="founder-portrait card card-stitched nailed">
+          <div
+            className={'founder-portrait card nailed ' + (founderContent.portrait ? 'has-portrait' : 'card-stitched')}
+            style={founderContent.portrait ? { backgroundImage: `url(${founderContent.portrait})` } : undefined}
+          >
             <span className="nail-tl" />
             <span className="nail-br" />
-            <div className="founder-portrait-inner">
-              <span className="restraint founder-portrait-mark">
-                {founderContent.placeholderMark}
-              </span>
-            </div>
-            {founderContent.templated && (
+            {!founderContent.portrait && (
+              <div className="founder-portrait-inner">
+                <span className="restraint founder-portrait-mark">
+                  {founderContent.placeholderMark}
+                </span>
+              </div>
+            )}
+            {founderContent.templated && !founderContent.portrait && (
               <span className="template-flag">TEMPLATED</span>
             )}
           </div>

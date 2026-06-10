@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 372" width="300" height="372" role="img" aria-label="The Order">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&amp;display=swap');
+      .wordmark { font-family: 'Cinzel', 'Trajan Pro', Georgia, serif; font-weight: 600; }
+    </style>
+    <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e7c97c"/>
+      <stop offset="0.5" stop-color="#b9974f"/>
+      <stop offset="1" stop-color="#856a33"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7e848e"/>
+      <stop offset="0.5" stop-color="#e0e4e9"/>
+      <stop offset="1" stop-color="#71777f"/>
+    </linearGradient>
+    <linearGradient id="bladeSteel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#868c96"/>
+      <stop offset="0.5" stop-color="#e6e9ed"/>
+      <stop offset="1" stop-color="#777d86"/>
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c12a2a"/>
+      <stop offset="0.55" stop-color="#911a1a"/>
+      <stop offset="1" stop-color="#6d1212"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- SWORD (behind the shield: hilt above, blade-tip below) -->
+  <g filter="url(#soft)">
+    <!-- round ball pommel -->
+    <circle cx="150" cy="42" r="6" fill="url(#steel)" stroke="#5f656e" stroke-width="0.9"/>
+    <!-- cord-wrapped grip: base + clear diagonal binding -->
+    <path d="M146,49 L154,49 L153,65 L147,65 Z" fill="#565b64"/>
+    <g stroke-linecap="round">
+      <line x1="146.5" y1="63.6" x2="153.5" y2="60.4" stroke="#e3e7ec" stroke-width="1.7"/>
+      <line x1="146.7" y1="60" x2="153.3" y2="56.8" stroke="#b9bec6" stroke-width="1.7"/>
+      <line x1="146.9" y1="56.4" x2="153.1" y2="53.2" stroke="#e3e7ec" stroke-width="1.7"/>
+      <line x1="147.1" y1="52.8" x2="152.9" y2="49.8" stroke="#b9bec6" stroke-width="1.7"/>
+    </g>
+    <!-- crossguard: clean slim bar with gently flared ends -->
+    <path d="M120,64.6 C117.5,64.6 116.5,65.2 116.5,67 C116.5,68.8 117.5,69.4 120,69.4 L180,69.4 C182.5,69.4 183.5,68.8 183.5,67 C183.5,65.2 182.5,64.6 180,64.6 Z" fill="url(#steel)" stroke="#5f656e" stroke-width="0.9"/>
+    <!-- blade -->
+    <path d="M143,70 L157,70 L153,250 L150,284 L147,250 Z" fill="url(#bladeSteel)" stroke="#5f656e" stroke-width="0.9"/>
+    <path d="M150,71 L151.4,250 L150,281 L148.6,250 Z" fill="#ffffff" opacity="0.6"/>
+  </g>
+
+  <!-- SHIELD -->
+  <g filter="url(#soft)">
+    <!-- gold border -->
+    <path d="M86,80 L214,80 Q220,80 220,86 L220,152 C220,202 193,234 150,250 C107,234 80,202 80,152 L80,86 Q80,80 86,80 Z" fill="url(#brass)" stroke="#6f5828" stroke-width="1"/>
+    <!-- black field -->
+    <path d="M90,87 L210,87 Q213,87 213,90 L213,151 C213,197 189,226 150,241 C111,226 87,197 87,151 L87,90 Q87,87 90,87 Z" fill="#0b0a09"/>
+    <!-- thin inner gold line -->
+    <path d="M95,92 L205,92 Q207,92 207,94 L207,150 C207,192 185,219 150,233 C115,219 93,192 93,150 L93,94 Q93,92 95,92 Z" fill="none" stroke="url(#brass)" stroke-width="2"/>
+  </g>
+
+  <!-- RED CROSS (flared Latin, white-edged) -->
+  <path d="M139,103 L161,103 L157,121 L180,118 L180,142 L157,139 L160,212 L140,212 L143,139 L120,142 L120,118 L143,121 Z"
+        fill="url(#red)" stroke="#f3eee6" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M147,108 L153,108 L153,205 L147,205 Z" fill="#cf4444" opacity="0.38"/>
+
+  <!-- WORDMARK -->
+  <text class="wordmark" x="150" y="340" text-anchor="middle" font-size="33" letter-spacing="3.5" fill="#15110c">THE ORDER</text>
+</svg>

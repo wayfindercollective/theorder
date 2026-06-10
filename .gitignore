@@ -9,3 +9,12 @@ dist
 *.log
 *.ogg
 WhatsApp*
+
+# large local-only image sources / working folders (kept out of repo + deploy)
+public/images/new image/
+public/images/images for regen/
+public/images/IMAGES GIVEN BY NICO/
+asset-sources/
+# local dev artifacts
+public/logo-compare.html
+public/images/_*.jpg

@@ -213,14 +213,16 @@ button {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.72;
+  opacity: 0.96;
   pointer-events: none;
   z-index: 1;
-  /* one warm, oil-toned palette across every painting so disparate
-     sources read as a single body of work */
-  filter: sepia(0.18) saturate(1.12) contrast(1.03) brightness(0.98);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 58%, transparent 100%);
-  mask-image: radial-gradient(ellipse at center, black 58%, transparent 100%);
+  /* the sources are already dark chiaroscuro oils — lift them hard so the
+     scene actually reads, with only a faint unifying glaze on top */
+  filter: sepia(0.08) saturate(1.08) contrast(0.97) brightness(1.36);
+  /* fade the top and bottom of every photo into the dark so the sections
+     melt into one another — the whole scroll reads as one continuous canvas */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 23%, #000 77%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 23%, #000 77%, transparent 100%);
 }
 
 /* Mobile: side images become full-bleed soft vignette so text stays readable */
@@ -250,22 +252,27 @@ button {
 .section:has(.section-bg-image) > .shell,
 .section:has(.section-bg-image) > .shell-narrow { z-index: 3; }
 
-/* canvas weave — the tooth of the linen, riding the paint in soft light */
+/* painted surface — fine linen weave over a broad, uneven varnish mottle,
+   both riding the paint in soft light so the scene reads as pigment on
+   canvas rather than a photograph */
 .section:has(.section-bg-image)::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
-  background-size: 190px 190px;
-  opacity: 0.3;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.012' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23v)'/%3E%3C/svg%3E");
+  background-size: 190px 190px, 640px 640px;
+  opacity: 0.18;
   mix-blend-mode: soft-light;
 }
 
-/* framed vignette — sets the picture back in shadow, melts each scene
-   into the dark above and below so the wall feels continuous, and keeps
-   the centre open so the painting still reads */
+/* framed vignette — warm, oil-painting shadows (brown-black, never neutral)
+   set the picture back in its frame, melt each scene into the dark above and
+   below so the wall feels continuous, and keep the centre lit like a canvas
+   under a gallery light */
 .section:has(.section-bg-image)::after {
   content: '';
   position: absolute;
@@ -273,8 +280,8 @@ button {
   z-index: 2;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 50% 42%, transparent 30%, rgba(7, 6, 5, 0.5) 90%, rgba(7, 6, 5, 0.82) 100%),
-    linear-gradient(180deg, rgba(7, 6, 5, 0.55) 0%, transparent 20%, transparent 76%, rgba(7, 6, 5, 0.78) 100%);
+    radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(20, 12, 6, 0.16) 92%, rgba(13, 8, 4, 0.42) 100%),
+    linear-gradient(180deg, rgba(13, 8, 4, 0.22) 0%, transparent 24%, transparent 80%, rgba(13, 8, 4, 0.34) 100%);
 }
 
 .section-divider {
@@ -772,12 +779,10 @@ button {
 .hero-film img {
   transition: opacity 220ms var(--ease-order);
   will-change: opacity;
-  /* Show the very top of the shot (the gladiator's head sits high in the
-     frame, with almost no sky above it in the source), then drop the whole
-     image so the crown clears the top edge with comfortable headroom. The
-     strip this exposes above reads as dark sky under the hero vignette. */
-  object-position: center top;
-  transform: translateY(clamp(2rem, 6vh, 6rem));
+  /* Horseman is a tall portrait — centre the crop so the rider, the rearing
+     horse and the pyramids hold the middle band on wide screens; on mobile the
+     full portrait fills the tall hero. */
+  object-position: center;
 }
 
 .hero-film-placeholder {
@@ -1237,6 +1242,13 @@ button {
   background:
     repeating-linear-gradient(45deg, var(--bg-leather) 0px, var(--bg-leather) 12px, var(--bg-surface) 12px, var(--bg-surface) 24px);
 }
+/* real portrait dropped into the frame — fill it, anchored to the top so the
+   head stays in view (the source is a tall full-body standing figure) */
+.founder-portrait.has-portrait {
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
 .founder-portrait-inner {
   position: absolute;
   inset: 16px;
@@ -1434,8 +1446,28 @@ button {
   animation: fadeIn 1400ms var(--ease-order) 700ms both;
 }
 
-/* The Truth — provocation lines over the painting (Cole, Destruction) */
-.section-truth .section-bg-image { opacity: 0.5; }
+/* The Truth — provocation lines over the painting (Cole, Destruction).
+   Tone-grade the real masterpiece warmer + darker so its cooler, brighter
+   palette sits with the warm chiaroscuro oils (overrides the global lift). */
+.section-truth .section-bg-image {
+  opacity: 0.5;
+  filter: sepia(0.32) saturate(1.04) contrast(1.06) brightness(0.78);
+}
+
+/* We're Offering You — the Accolade is the brightest source (white gown, lit
+   hall); hold the global lift back so it doesn't blow out against the rest. */
+.section-become .section-bg-image {
+  filter: sepia(0.14) saturate(1.04) contrast(1.02) brightness(1.03);
+}
+
+/* FAQ — St George is a tall portrait; shift the crop down so the dragon at the
+   foot of the painting comes into view, and ease the bottom fade so it isn't
+   swallowed by the edge blur. */
+.section-faq .section-bg-image {
+  background-position: center 82%;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 23%, #000 93%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 23%, #000 93%, transparent 100%);
+}
 
 /* Who We Are — round-table image behind the manifesto. Bring the scene
    right up so the three men and the table actually read, and widen the
@@ -1443,10 +1475,8 @@ button {
    plate below still sits between the picture and the text column (eyebrow,
    heading, divider, prose), so the words stay legible even brightened. */
 .section-code .section-bg-image {
-  opacity: 0.85;
-  filter: sepia(0.18) saturate(1.12) brightness(1.5) contrast(1.08);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 62%, transparent 100%);
-  mask-image: radial-gradient(ellipse at center, black 62%, transparent 100%);
+  opacity: 0.96;
+  filter: sepia(0.08) saturate(1.08) brightness(1.5) contrast(0.98);
 }
 .section-code .code-bg { opacity: 0.2; }
 .section-code .code-inner {
@@ -1466,9 +1496,10 @@ button {
 .section-code .section-heading { text-shadow: 0 2px 14px rgba(0, 0, 0, 0.82), 0 1px 0 rgba(0, 0, 0, 0.7); }
 .section-code .values-intro p { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.85); }
 
-/* We're Offering You — the fighter's head is high in the frame; bias the crop
-   toward the top so the top of his head stays fully visible. */
-.section-become .section-bg-image { background-position: center 12%; }
+/* How We Operate — the fighter at the pillar sits high in the frame; bias the
+   crop toward the top so his head stays in view (this image moved here from
+   "We're Offering You", which now carries the cavalry charge). */
+.section-how .section-bg-image { background-position: center 12%; }
 .truth-provocation {
   display: flex;
   flex-direction: column;
@@ -1491,11 +1522,13 @@ button {
   .truth-line { white-space: normal; font-size: clamp(1.4rem, 6vw, 1.9rem); }
 }
 
-/* The Principles — its own section, clean dark ground. Fit the band to its
-   content (no forced 100vh) so the words aren't marooned in empty space. */
+/* The Principles — its own section. Give it a full viewport-height band so the
+   painting behind it isn't cropped to a thin strip; the base .section already
+   centres content vertically (justify-content: center), so the words sit dead
+   centre over the full image. */
 .section-principles {
   background: var(--bg-deep);
-  min-height: auto;
+  min-height: 100vh;
   padding: clamp(2.2rem, 5vw, 3.6rem) 0;
 }
 .section-principles .eyebrow { letter-spacing: 0.4em; }
@@ -1715,6 +1748,9 @@ button {
    (no hard box, so the gallery wall stays continuous) plus relief
    shadows. Sections built on opaque cards (Testimonials, Application)
    need only their heading/eyebrow lifted. */
+.section-truth .shell::before,
+.section-become .shell::before,
+.section-evidence .shell::before,
 .section-principles .shell::before,
 .section-faq .shell-narrow::before,
 .section-how .shell-narrow::before,
@@ -1725,8 +1761,8 @@ button {
   z-index: -1;
   pointer-events: none;
   background: radial-gradient(ellipse at center,
-    rgba(8, 7, 6, 0.76) 0%,
-    rgba(8, 7, 6, 0.58) 55%,
+    rgba(8, 7, 6, 0.78) 0%,
+    rgba(8, 7, 6, 0.6) 55%,
     rgba(8, 7, 6, 0) 100%);
 }
 
@@ -1735,7 +1771,9 @@ button {
 .section-faq .sq-num,
 .section-how .how-para,
 .section-closing .closing-verse-text,
-.section-closing .closing-ref {
+.section-closing .closing-ref,
+.section-become .offering,
+.section-become .offering-closing {
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
 }
 
@@ -1748,6 +1786,19 @@ button {
 .section-faq .eyebrow,
 .section-how .eyebrow {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* The Principles — the library oil is far brighter than the rest of the set, so
+   don't pile the global brightness-lift onto it (it's already bright), and lay a
+   stronger dark plate behind the gold values so they read over it. */
+.section-principles .section-bg-image {
+  filter: sepia(0.08) saturate(1.04) contrast(1.01) brightness(1.18);
+}
+.section-principles .shell::before {
+  background: radial-gradient(ellipse at center,
+    rgba(6, 5, 4, 0.88) 0%,
+    rgba(6, 5, 4, 0.7) 58%,
+    rgba(6, 5, 4, 0) 100%);
 }
 
 /* ============================================================
