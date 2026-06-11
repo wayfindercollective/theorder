@@ -1530,7 +1530,7 @@ button {
    heading, divider, prose), so the words stay legible even brightened. */
 .section-code .section-bg-image {
   opacity: 0.96;
-  filter: sepia(0.08) saturate(1.08) brightness(1.5) contrast(0.98);
+  filter: sepia(0.08) saturate(1.0) brightness(1.3) contrast(0.98);
 }
 .section-code .code-bg { opacity: 0.2; }
 .section-code .code-inner {
@@ -2508,7 +2508,7 @@ button {
 }
 /* mirror the per-painting grades used by the full-bleed versions */
 .section-code .section-side-image {
-  filter: sepia(0.08) saturate(1.08) brightness(1.5) contrast(0.98);
+  filter: sepia(0.08) saturate(1.0) brightness(1.3) contrast(0.98);
 }
 .section-become .section-side-image {
   filter: sepia(0.1) saturate(1.05) contrast(1.0) brightness(1.22);
