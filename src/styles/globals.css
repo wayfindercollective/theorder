@@ -1337,6 +1337,8 @@ button {
    faces and bodies read clearly above them: the shell fills the section height
    with the heading at top and the tiles pushed down by an auto top margin. */
 .section-evidence .section-bg-image { background-position: center 48%; }
+/* trim the section's bottom padding so the tiles can sit at the very bottom */
+.section-evidence { padding-bottom: clamp(0.5rem, 1vw, 1rem); }
 .section-evidence > .shell {
   flex: 1 1 auto;
   display: flex;
@@ -1499,8 +1501,11 @@ button {
    warm dark chiaroscuro render, so lift it to read (was darkened hard for the
    old cooler, brighter masterpiece). */
 .section-truth .section-bg-image {
-  opacity: 0.92;
-  filter: sepia(0.08) saturate(1.06) contrast(1.0) brightness(1.12);
+  opacity: 0.95;
+  /* push the crop up the image so the toppling statue (top-right) comes fully
+     into view */
+  background-position: center 30%;
+  filter: sepia(0.06) saturate(1.0) contrast(1.0) brightness(1.0);
 }
 
 /* We're Offering You — the knighting oil is now a warm dark render, so give it
