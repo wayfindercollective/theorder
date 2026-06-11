@@ -1,5 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { truthContent } from '../../config/sectionContent.js'
+import { mdInline } from '../../lib/markdown.js'
 
 export function TheTruthSection() {
   const { ref, inView } = useInView()
@@ -26,7 +27,7 @@ export function TheTruthSection() {
         <div className={'stagger truth-provocation ' + (inView ? 'in-view' : '')}>
           {lines.map((line, i) =>
             line.trim() ? (
-              <p key={i} className="truth-line display tooled">{line}</p>
+              <p key={i} className="truth-line display tooled" dangerouslySetInnerHTML={mdInline(line)} />
             ) : (
               <span key={i} className="truth-gap" aria-hidden="true" />
             )

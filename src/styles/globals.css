@@ -1333,6 +1333,20 @@ button {
    ============================================================ */
 
 .section-evidence { background: var(--bg-deep); }
+/* The heading floats over the brighter sky of the retreat painting — a soft
+   feathered plate keeps "Testimonials" crisp without a hard box. */
+.section-evidence .evidence-head { position: relative; z-index: 1; }
+.section-evidence .evidence-head::before {
+  content: '';
+  position: absolute;
+  inset: -1.6rem -3rem -0.4rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 92% 130% at 50% 38%,
+    rgba(8, 7, 6, 0.62) 0%,
+    rgba(8, 7, 6, 0.36) 55%,
+    rgba(8, 7, 6, 0) 100%);
+}
 /* Pin the testimonial tiles to the bottom of the section so the soldiers'
    faces and bodies read clearly above them: the shell fills the section height
    with the heading at top and the tiles pushed down by an auto top margin. */
@@ -1555,24 +1569,48 @@ button {
    "We're Offering You", which now carries the cavalry charge). */
 .section-how .section-bg-image { background-position: center 12%; }
 .truth-provocation {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(0.6rem, 1.6vh, 1.15rem);
+  gap: clamp(1rem, 2.4vh, 1.85rem);
   text-align: center;
   margin: 0.4rem auto 0;
   max-width: 1000px;
 }
+/* Feathered translucent plate so the provocation reads cleanly over the busy,
+   firelit city behind it (no hard box edge). */
+.truth-provocation::before {
+  content: '';
+  position: absolute;
+  inset: clamp(-3.5rem, -6vh, -2.5rem) clamp(-2rem, -6vw, -4.5rem);
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 100% 116% at 50% 50%,
+    rgba(8, 7, 6, 0.74) 0%,
+    rgba(8, 7, 6, 0.52) 55%,
+    rgba(8, 7, 6, 0) 100%);
+}
 .truth-line {
-  font-size: clamp(1.45rem, 2.9vw, 2.25rem);
-  line-height: 1.2;
+  /* the connective words ("And", "Are you…") sit quieter; the adjective + its
+     question mark are emphasised via <strong> below */
+  font-size: clamp(1.3rem, 2.5vw, 1.95rem);
+  line-height: 1.18;
   letter-spacing: 0.04em;
-  font-weight: 600;
-  color: var(--parchment);
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(0, 0, 0, 0.95);
+  font-weight: 500;
+  color: var(--parchment-mute);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.92), 0 1px 0 rgba(0, 0, 0, 0.95);
   white-space: nowrap;
 }
-.truth-gap { display: block; height: clamp(0.8rem, 1.8vh, 1.5rem); }
+.truth-line strong {
+  font-weight: 700;
+  font-size: 1.32em;
+  color: #f4e9cd;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(0, 0, 0, 0.95);
+}
+.truth-gap { display: block; height: clamp(1.1rem, 2.4vh, 2rem); }
 @media (max-width: 680px) {
   .truth-line { white-space: normal; font-size: clamp(1.4rem, 6vw, 1.9rem); }
 }
