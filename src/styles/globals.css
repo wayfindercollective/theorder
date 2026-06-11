@@ -1495,18 +1495,18 @@ button {
   animation: fadeIn 1400ms var(--ease-order) 700ms both;
 }
 
-/* The Truth — provocation lines over the painting (Cole, Destruction).
-   Tone-grade the real masterpiece warmer + darker so its cooler, brighter
-   palette sits with the warm chiaroscuro oils (overrides the global lift). */
+/* The Truth — provocation lines over the burning-city oil. The source is now a
+   warm dark chiaroscuro render, so lift it to read (was darkened hard for the
+   old cooler, brighter masterpiece). */
 .section-truth .section-bg-image {
-  opacity: 0.5;
-  filter: sepia(0.32) saturate(1.04) contrast(1.06) brightness(0.78);
+  opacity: 0.92;
+  filter: sepia(0.08) saturate(1.06) contrast(1.0) brightness(1.12);
 }
 
-/* We're Offering You — the Accolade is the brightest source (white gown, lit
-   hall); hold the global lift back so it doesn't blow out against the rest. */
+/* We're Offering You — the knighting oil is now a warm dark render, so give it
+   the standard lift rather than holding it back. */
 .section-become .section-bg-image {
-  filter: sepia(0.14) saturate(1.04) contrast(1.02) brightness(1.03);
+  filter: sepia(0.1) saturate(1.05) contrast(1.0) brightness(1.22);
 }
 
 /* FAQ — St George is a tall portrait; shift the crop down so the dragon at the
@@ -2506,7 +2506,7 @@ button {
   filter: sepia(0.08) saturate(1.08) brightness(1.5) contrast(0.98);
 }
 .section-become .section-side-image {
-  filter: sepia(0.14) saturate(1.04) contrast(1.02) brightness(1.03);
+  filter: sepia(0.1) saturate(1.05) contrast(1.0) brightness(1.22);
 }
 
 /* --- Per-image crops: keep each painting's focal subject in the outer
