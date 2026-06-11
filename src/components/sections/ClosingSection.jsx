@@ -1,5 +1,5 @@
 import { useInView } from '../../hooks/useInView.js'
-import { closingContent, ctaContent } from '../../config/sectionContent.js'
+import { closingContent, ctaContent, brandContent } from '../../config/sectionContent.js'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
 import { useScrollToForm } from '../../hooks/useScrollToForm.js'
 
@@ -12,7 +12,7 @@ export function ClosingSection() {
       <SectionPainting image={closingContent.image} />
       <div className="shell-narrow closing-inner">
         <div className={'reveal closing-head ' + (inView ? 'in-view' : '')}>
-          <img className="logo-mark closing-sigil" src="/images/logo-mark.png" alt="The Order" />
+          <img className="logo-mark closing-sigil" src={brandContent?.logo || '/images/logo-mark.png'} alt="The Order" />
           {closingContent.wordmark && (
             <h2 className="display tooled closing-wordmark">{closingContent.wordmark}</h2>
           )}

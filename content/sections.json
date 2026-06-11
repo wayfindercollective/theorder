@@ -54,8 +54,6 @@
   "application": {
     "eyebrow": "Apply Now",
     "image": "/images/oil-naval.jpg",
-    "heading": "[ Heading ]",
-    "sub": "[ Sub ]",
     "submitButton": "Submit",
     "submittingButton": "Submitting…"
   },
@@ -140,7 +138,6 @@
     "bgImage": null
   },
   "footer": {
-    "restraint": "",
     "email": "info@theorder.global",
     "phone": "",
     "copyright": "© The Order",

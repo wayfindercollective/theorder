@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { HeroFilm } from '../showpiece/HeroFilm.jsx'
-import { heroContent } from '../../config/sectionContent.js'
+import { heroContent, brandContent } from '../../config/sectionContent.js'
 import { useScrollToForm } from '../../hooks/useScrollToForm.js'
 import { DESIGN_V2 } from '../../config/design.js'
 
@@ -33,7 +33,7 @@ export function Hero() {
         <div className="hero-vignette" aria-hidden="true" />
 
         <div className="hero-content shell">
-          <img className="logo-mark hero-logo-mark" src="/images/logo-mark.png" alt="The Order" />
+          <img className="logo-mark hero-logo-mark" src={brandContent?.logo || '/images/logo-mark.png'} alt="The Order" />
 
           {heroContent.eyebrow && (
             <div className="hero-eyebrow eyebrow">

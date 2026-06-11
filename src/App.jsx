@@ -44,7 +44,15 @@ function PublicSite() {
 
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
-    if (window.location.hash) {
+    // Retire the old split-design preview URL: /2 (or ?v=2) is now the only
+    // design, so collapse those URLs back to the canonical "/".
+    const path = window.location.pathname.replace(/\/+$/, '')
+    const params = new URLSearchParams(window.location.search)
+    if (path === '/2' || params.get('v') === '2') {
+      params.delete('v')
+      const qs = params.toString()
+      window.history.replaceState({}, '', '/' + (qs ? '?' + qs : ''))
+    } else if (window.location.hash) {
       window.history.replaceState({}, '', window.location.pathname + window.location.search)
     }
     window.scrollTo(0, 0)

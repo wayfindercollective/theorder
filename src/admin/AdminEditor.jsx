@@ -139,11 +139,14 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
   }, [content, draft])
 
   // Persist draft to localStorage whenever it changes and is actually dirty.
+  // While a restore banner is pending, keep the durable copy even though the
+  // seeded draft reads "clean" — otherwise a refresh before the client clicks
+  // Restore would lose their recovered unsaved edits.
   useEffect(() => {
     if (!draft || !content) return
     if (dirty) writeDraft(draft, baselineFpRef.current)
-    else clearDraft()
-  }, [draft, dirty, content])
+    else if (!restorePrompt) clearDraft()
+  }, [draft, dirty, content, restorePrompt])
 
   // beforeunload guard — block tab close / refresh while dirty.
   useEffect(() => {

@@ -4,6 +4,7 @@ import { SectionPainting } from '../ui/SectionPainting.jsx'
 
 export function EvidenceSection() {
   const { ref, inView } = useInView()
+  const cards = (evidenceContent.cards || []).filter((c) => c.quote && c.quote.trim())
   return (
     <section className="section section-evidence" ref={ref}>
       <SectionPainting image={evidenceContent.image} />
@@ -13,12 +14,14 @@ export function EvidenceSection() {
             <span className="brass-rule" /> {evidenceContent.eyebrow} <span className="brass-rule" />
           </div>
           <h2 className="display section-heading">{evidenceContent.heading}</h2>
-          <p className="restraint evidence-intro">{evidenceContent.intro}</p>
+          {evidenceContent.intro?.trim() && (
+            <p className="restraint evidence-intro">{evidenceContent.intro}</p>
+          )}
           <div className="section-divider" style={{ margin: '2rem auto 3.5rem' }} />
         </div>
 
         <div className={'evidence-grid stagger ' + (inView ? 'in-view' : '')}>
-          {evidenceContent.cards.map((c, i) => (
+          {cards.map((c, i) => (
             <article key={i} className="evidence-card card card-stitched">
               <span className="evidence-mark display engraved">"</span>
               <p className="evidence-quote">{c.quote}</p>

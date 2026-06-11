@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import { brandContent } from '../../config/sectionContent.js'
+
+const LOGO_SRC = brandContent?.logo || '/images/logo-mark.png'
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -23,7 +26,7 @@ export function Header() {
     <header className={'site-header' + (scrolled ? ' is-scrolled' : '')}>
       <div className="shell site-header-inner">
         <a href="#top" className="header-mark" aria-label="The Order">
-          <img className="logo-mark header-logo" src="/images/logo-mark.png" alt="" />
+          <img className="logo-mark header-logo" src={LOGO_SRC} alt="" />
           <span className="display header-wordmark">The Order</span>
         </a>
       </div>

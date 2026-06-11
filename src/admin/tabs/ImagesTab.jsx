@@ -10,13 +10,19 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { humanizeError, listImages, uploadImage } from '../adminApi.js'
 
 const IMAGE_SLOTS = [
-  { key: ['hero', '__heroFilm__'], label: 'Hero — film fallback frame', heroFilm: true },
+  { key: ['hero', '__heroFilm__'], label: 'Hero — background image', heroFilm: true },
   { key: ['truth', 'image'],       label: 'The Truth — landscape (full-bleed)' },
-  { key: ['code', 'image'],        label: 'Who We Are (optional)' },
-  { key: ['become', 'image'],      label: "We're Offering You (full-bleed)" },
+  { key: ['code', 'image'],        label: 'Who We Are — background painting' },
+  { key: ['principles', 'image'],  label: 'The Principles — background painting' },
+  { key: ['become', 'image'],      label: "We're Offering You — background painting" },
+  { key: ['evidence', 'image'],    label: 'Testimonials — background painting' },
+  { key: ['founder', 'portrait'],  label: 'Who Am I — portrait photo (the framed photo of Nico)' },
+  { key: ['founder', 'image'],     label: 'Who Am I — background painting' },
+  { key: ['faq', 'image'],         label: 'Questions a Serious Man Asks — background painting' },
+  { key: ['howWeOperate', 'image'],label: 'How We Operate — background painting' },
+  { key: ['application', 'image'], label: 'Application — background painting' },
+  { key: ['closing', 'image'],     label: 'Closing — background painting' },
   { key: ['considered', 'image'],  label: 'Who Is Considered (hidden section)' },
-  { key: ['application', 'image'], label: 'Application (full-bleed)' },
-  { key: ['founder', 'image'],     label: 'Who Am I / Founder (full-bleed)' },
 ]
 
 function getAt(obj, path) {

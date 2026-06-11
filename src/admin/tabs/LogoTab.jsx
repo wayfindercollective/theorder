@@ -1,9 +1,9 @@
 /**
  * LogoTab — replace the brand mark.
  *
- * v1 keeps the SVG sigil as the default. Uploading a custom logo writes the
- * URL into sections.brand.logo, which the Sigil component reads at render.
- * (Sigil component change to actually consume this is wired in a later pass.)
+ * The default mark (/images/logo-mark.png) is the fallback. Uploading a custom
+ * logo writes the URL into sections.brand.logo, which now drives the logo in
+ * the header, hero, closing, and footer (and the Sigil on the final screen).
  */
 
 import { useRef, useState } from 'react'

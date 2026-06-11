@@ -1,24 +1,17 @@
 /**
- * Design version toggle.
+ * Design layout.
  *
- * The site ships two layouts in one build:
- *   v1 (default) — every section centred, image full-bleed behind the text.
- *   v2 (split)   — five key sections pull the painting to one side (faded at
- *                  its inner edge) with the text in the opposite half.
+ * The site now ships a single layout: the split design, where five key
+ * sections (hero, code, become, faq, howWeOperate) pull the painting to one
+ * side (faded at its inner edge) with the text in the opposite half.
  *
- * v2 is served at the /2 path (vercel.json already rewrites it to index.html)
- * or with a ?v=2 query, so the two designs can be compared side by side. When
- * DESIGN_V2 is false nothing below changes the markup, so v1 is untouched.
+ * This used to be a v1/v2 toggle served at "/" vs "/2". The split design won,
+ * so it is now the only design — DESIGN_V2 is always on. The old /2 (and ?v=2)
+ * URL now redirects to "/" (see App.jsx). The constant name is kept so the
+ * section components don't all have to change.
  */
 
-function detectV2() {
-  if (typeof window === 'undefined') return false
-  const path = window.location.pathname.replace(/\/+$/, '') // tolerate trailing slash
-  const v = new URLSearchParams(window.location.search).get('v')
-  return path === '/2' || v === '2'
-}
-
-export const DESIGN_V2 = detectV2()
+export const DESIGN_V2 = true
 
 /**
  * Which side the painting sits on in v2, per section key. The text takes the
