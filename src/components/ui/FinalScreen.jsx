@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { finalScreenContent } from '../../config/sectionContent.js'
-import { Sigil } from './Sigil.jsx'
+import { brandContent, finalScreenContent } from '../../config/sectionContent.js'
 
 export function FinalScreen() {
   const [stage, setStage] = useState(0)
@@ -14,7 +13,11 @@ export function FinalScreen() {
   return (
     <div className="final-screen">
       <div className={'final-mark' + (stage >= 1 ? ' in' : '')}>
-        <Sigil size={96} variant="full" />
+        <img
+          className="logo-mark final-logo"
+          src={brandContent?.logo || '/images/logo-mark.png'}
+          alt="The Order"
+        />
       </div>
       <h2 className={'final-heading display' + (stage >= 2 ? ' in' : '')}>
         {finalScreenContent.heading}
