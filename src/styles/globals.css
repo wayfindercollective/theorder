@@ -1514,6 +1514,12 @@ button {
   filter: sepia(0.1) saturate(1.05) contrast(1.0) brightness(1.22);
 }
 
+/* Closing — the new Creation render is bright (luminous fresco sky), so hold the
+   global lift back so it sits in the band and the verse stays readable. */
+.section-closing .section-bg-image {
+  filter: sepia(0.06) saturate(1.0) contrast(1.02) brightness(0.82);
+}
+
 /* FAQ — St George is a tall portrait; shift the crop down so the dragon at the
    foot of the painting comes into view, and ease the bottom fade so it isn't
    swallowed by the edge blur. */
