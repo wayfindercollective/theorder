@@ -1225,6 +1225,8 @@ button {
   transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
 }
 .final-mark.in { opacity: 1; transform: scale(1); }
+/* same painted mark as the hero/closing sections, scaled down to sit inside the card */
+.final-logo { height: clamp(140px, 20vw, 220px); margin: 0 auto; opacity: 0.94; }
 
 .final-heading {
   font-size: clamp(1.8rem, 4vw, 2.6rem);
@@ -1518,6 +1520,15 @@ button {
    global lift back so it sits in the band and the verse stays readable. */
 .section-closing .section-bg-image {
   filter: sepia(0.06) saturate(1.0) contrast(1.02) brightness(0.62);
+}
+
+/* Who Am I — the Noronha sunset seascape. A bright, warm sunburst sits behind
+   the text column, so hold brightness well back and ease saturation a touch so
+   it joins the band instead of reading as the hottest, most golden outlier.
+   The sun's centre is crop-shifted down-right, away from the letter. */
+.section-founder .section-bg-image {
+  filter: sepia(0.05) saturate(0.97) contrast(1.02) brightness(0.7);
+  background-position: center 42%;
 }
 
 /* FAQ — St George is a tall portrait; shift the crop down so the dragon at the
@@ -1836,10 +1847,11 @@ button {
 .section-founder .founder-text::before {
   content: '';
   position: absolute;
-  inset: -1.4rem -1.8rem;
+  inset: -1.8rem -2.2rem;
   background: radial-gradient(ellipse at center,
-    rgba(10, 9, 8, 0.72) 0%,
-    rgba(10, 9, 8, 0) 78%);
+    rgba(8, 7, 6, 0.86) 0%,
+    rgba(8, 7, 6, 0.6) 52%,
+    rgba(8, 7, 6, 0) 88%);
   z-index: -1;
   pointer-events: none;
 }
