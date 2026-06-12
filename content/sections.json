@@ -1,4 +1,9 @@
 {
+  "meta": {
+    "title": "The Order",
+    "description": "A brotherhood of men committed to discipline, integrity, and becoming.",
+    "shareImage": "/images/hero-horseman.jpg"
+  },
   "brand": {
     "logo": null
   },
@@ -70,7 +75,7 @@
     ],
     "signature": "- Nico Seedsman",
     "templated": true,
-    "image": null,
+    "image": "/images/oil-founder.jpg",
     "imageAlign": "full"
   },
   "evidence": {
@@ -144,9 +149,9 @@
     "privacyHref": "https://wayfindercollective.io/privacy"
   },
   "finalScreen": {
-    "heading": "[ Final heading ]",
-    "sub": "[ Sub line ]",
-    "begin": "[ Encouragement - italic ]"
+    "heading": "THE ORDER",
+    "sub": "God Wills It",
+    "begin": "[ Encouragement line ]"
   },
   "form": {
     "nameLabel": "Name",

@@ -23,6 +23,7 @@ const IMAGE_SLOTS = [
   { key: ['application', 'image'], label: 'Application — background painting' },
   { key: ['closing', 'image'],     label: 'Closing — background painting' },
   { key: ['considered', 'image'],  label: 'Who Is Considered (hidden section)' },
+  { key: ['meta', 'shareImage'],   label: 'Link preview — share image (shown when the link is shared in messages / social)' },
 ]
 
 function getAt(obj, path) {

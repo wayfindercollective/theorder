@@ -14,6 +14,14 @@ import { MarkdownField } from '../MarkdownField.jsx'
 
 const SECTION_DEFS = [
   {
+    key: 'meta',
+    title: 'Link preview — when the site is shared',
+    fields: [
+      { path: ['meta', 'title'],       label: 'Share title', hint: 'The bold first line in iMessage / WhatsApp / Facebook previews. Also the browser tab title.' },
+      { path: ['meta', 'description'], label: 'Share description', textarea: true, hint: 'The line under the title in link previews, and what Google shows under the site name. One or two sentences. Note: platforms cache previews — a change can take a day to show on links already shared.' },
+    ],
+  },
+  {
     key: 'hero',
     title: 'Hero',
     fields: [
