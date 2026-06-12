@@ -8,11 +8,11 @@
       "subtitle": "",
       "options": [
         {
-          "label": "When I commit, it is done. My word is iron.",
+          "label": "When I commit, it is done. My word is my bond.",
           "value": "I follow through fully when I commit"
         },
         {
-          "label": "I commit — but I need brothers to hold me to it.",
+          "label": "I commit — but I need accountability to hold me to it.",
           "value": "I am committed but sometimes need accountability"
         },
         {
@@ -29,7 +29,7 @@
       "id": "readiness",
       "type": "choice",
       "scored": true,
-      "question": "Are you ready to bring order to your life now?",
+      "question": "Are you ready to bring Order to your life now?",
       "subtitle": "",
       "options": [
         {
@@ -37,7 +37,7 @@
           "value": "I am ready to start now"
         },
         {
-          "label": "I am close — but I need the right path to be made clear.",
+          "label": "I am close — but I need clarity on my path.",
           "value": "I think I am close, I just need clarity on the right path"
         },
         {
@@ -45,7 +45,7 @@
           "value": "I am exploring and trying to understand my options"
         },
         {
-          "label": "I am not ready to change this yet.",
+          "label": "I am not ready to change yet.",
           "value": "I am not ready to change this yet"
         }
       ]
