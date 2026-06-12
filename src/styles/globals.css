@@ -1588,8 +1588,8 @@ button {
   z-index: -1;
   pointer-events: none;
   background: radial-gradient(ellipse 100% 116% at 50% 50%,
-    rgba(8, 7, 6, 0.74) 0%,
-    rgba(8, 7, 6, 0.52) 55%,
+    rgba(8, 7, 6, 0.37) 0%,
+    rgba(8, 7, 6, 0.26) 55%,
     rgba(8, 7, 6, 0) 100%);
 }
 .truth-line {
