@@ -22,6 +22,13 @@ const SECTION_DEFS = [
     ],
   },
   {
+    key: 'brand',
+    title: 'Brand',
+    fields: [
+      { path: ['brand', 'wordmark'], label: 'Wordmark', hint: 'The brand name beside the logo in the top bar. Also used as the logo’s screen-reader text across the page.' },
+    ],
+  },
+  {
     key: 'hero',
     title: 'Hero',
     fields: [
@@ -30,12 +37,14 @@ const SECTION_DEFS = [
       { path: ['hero', 'verseLine'], label: 'Verse line (above CTA)', hint: 'One quiet line between the headline and the button. e.g. Mark 12:30 · Mark 12:31' },
       { path: ['hero', 'cta'],       label: 'CTA button', hint: '2–4 words. Action verb.' },
       { path: ['hero', 'restraint'], label: 'Restraint line (under CTA)', hint: 'One quiet line under the button. Optional — leave blank to hide.' },
+      { path: ['hero', 'scrollLabel'], label: 'Scroll cue', hint: 'Tiny word at the bottom of the hero inviting the visitor to scroll. e.g. Scroll' },
     ],
   },
   {
     key: 'truth',
     title: 'The Truth — provocation',
     fields: [
+      { path: ['truth', 'eyebrow'],     label: 'Numeral / eyebrow', hint: 'Small numeral above the section. e.g. I' },
       { path: ['truth', 'provocation'], label: 'Provocation lines', textarea: true, rows: 7, hint: 'One line per row. Leave a blank row to break into a new stanza. Rendered large, centered, over the landscape image.' },
     ],
   },
@@ -43,6 +52,7 @@ const SECTION_DEFS = [
     key: 'code',
     title: 'Who We Are',
     fields: [
+      { path: ['code', 'eyebrow'],     label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. II' },
       { path: ['code', 'heading'],     label: 'Heading' },
       { path: ['code', 'intro'],       label: 'Intro', markdown: true, previewClass: 'values-intro', hint: 'One or two paragraphs. Separate with a blank line. Optional inline formatting: **bold**, *italic word*, [link](url).' },
       { path: ['code', 'valuesLabel'], label: 'Principles label', hint: 'Small label above the values grid. e.g. The Principles' },
@@ -50,9 +60,17 @@ const SECTION_DEFS = [
     ],
   },
   {
+    key: 'principles',
+    title: 'The Principles wall',
+    fields: [
+      { path: ['principles', 'eyebrow'], label: 'Numeral / eyebrow', hint: 'Small numeral above the values wall. e.g. III. Leave blank to hide. The values themselves are edited under Who We Are.' },
+    ],
+  },
+  {
     key: 'become',
     title: "We're Offering You",
     fields: [
+      { path: ['become', 'eyebrow'],   label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VI' },
       { path: ['become', 'heading'],   label: 'Heading' },
       { path: ['become', 'offerings'], label: 'Offerings', textarea: true, rows: 10, hint: 'One offering per line.' },
       { path: ['become', 'closing'],   label: 'Closing line', hint: 'One line under the list. e.g. I hope that you join us.' },
@@ -62,6 +80,7 @@ const SECTION_DEFS = [
     key: 'considered',
     title: 'Who Is Considered (hidden — fill to re-enable)',
     fields: [
+      { path: ['considered', 'eyebrow'], label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. IV' },
       { path: ['considered', 'heading'], label: 'Heading', hint: '2–4 words. This section is hidden on the site until it has copy and is re-enabled in code.' },
       { path: ['considered', 'for_'],    label: 'Apply if… line', textarea: true, hint: 'Centered, large, parchment colour.' },
       { path: ['considered', 'not'],     label: 'Do not apply if… line', textarea: true, hint: 'Centered, large, faded grey to contrast with the line above.' },
@@ -74,6 +93,8 @@ const SECTION_DEFS = [
       { path: ['application', 'eyebrow'],          label: 'Eyebrow', hint: 'Small label at the top of the form card. e.g. Apply Now' },
       { path: ['application', 'submitButton'],     label: 'Submit button text', hint: 'Shown on the final step. e.g. Submit' },
       { path: ['application', 'submittingButton'], label: 'Submit button — while sending', hint: 'Shown briefly after they press submit. e.g. Submitting…' },
+      { path: ['application', 'backButton'],       label: 'Back button text', hint: 'Lets applicants return to the previous question. e.g. ← Back' },
+      { path: ['application', 'stepLabel'],        label: 'Step counter word', hint: 'Renders as e.g. “Step 1 / 3” under the form. Just the word before the numbers.' },
     ],
   },
   {
@@ -88,6 +109,7 @@ const SECTION_DEFS = [
       { path: ['form', 'phoneLabel'],       label: 'Phone — label' },
       { path: ['form', 'phonePlaceholder'], label: 'Phone — placeholder' },
       { path: ['form', 'phoneError'],       label: 'Phone — error message', hint: 'Shown if the number looks invalid.' },
+      { path: ['form', 'countrySearchPlaceholder'], label: 'Country picker — search placeholder', hint: 'Greyed text in the search box of the phone country-code dropdown.' },
       { path: ['consent', 'smsLine'],       label: 'SMS consent line', textarea: true, rows: 4, hint: 'The opt-in text beside the consent checkbox. Legal text — change with care.' },
     ],
   },
@@ -95,6 +117,7 @@ const SECTION_DEFS = [
     key: 'evidence',
     title: 'Testimonials',
     fields: [
+      { path: ['evidence', 'eyebrow'], label: 'Numeral / eyebrow', hint: 'Small numeral above the heading.' },
       { path: ['evidence', 'heading'], label: 'Heading', hint: 'e.g. Testimonials' },
       { path: ['evidence', 'intro'],   label: 'Intro line', textarea: true, hint: 'Optional line under the heading. Leave blank to hide.' },
       { path: ['evidence', 'cards', 0, 'quote'],       label: 'Testimonial 1 — quote', textarea: true, rows: 4, hint: 'The quote. Leave blank to hide this card.' },
@@ -110,8 +133,10 @@ const SECTION_DEFS = [
     title: 'Who Am I (Founder)',
     previewWrap: 'section-founder-preview',
     fields: [
+      { path: ['founder', 'eyebrow'],         label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. V' },
       { path: ['founder', 'heading'],         label: 'Heading', hint: 'Display font, centered.' },
       { path: ['founder', 'placeholderMark'], label: 'Portrait label', hint: 'Caption in the portrait frame until a photo is uploaded. e.g. Nico Seedsman — Afghanistan' },
+      { path: ['founder', 'templatedLabel'],  label: 'Placeholder badge', hint: 'Small corner badge on the portrait frame while no photo is uploaded. Internal marker — e.g. TEMPLATED.' },
       { path: ['founder', 'paragraphs', 0],   label: 'Paragraph 1', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
       { path: ['founder', 'paragraphs', 1],   label: 'Paragraph 2', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
       { path: ['founder', 'paragraphs', 2],   label: 'Paragraph 3', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
@@ -123,6 +148,7 @@ const SECTION_DEFS = [
     key: 'faq',
     title: 'Questions a Serious Man Asks',
     fields: [
+      { path: ['faq', 'eyebrow'],   label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VII' },
       { path: ['faq', 'heading'],   label: 'Heading', hint: 'Display font, centered.' },
       { path: ['faq', 'questions'], label: 'Questions', textarea: true, rows: 9, hint: 'One question per line. Each renders as a numbered reflective line. No answers.' },
     ],
@@ -131,6 +157,7 @@ const SECTION_DEFS = [
     key: 'howWeOperate',
     title: 'How We Operate & What to Expect',
     fields: [
+      { path: ['howWeOperate', 'eyebrow'],       label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VIII' },
       { path: ['howWeOperate', 'heading'],       label: 'Heading' },
       { path: ['howWeOperate', 'paragraphs', 0], label: 'Paragraph 1', textarea: true },
       { path: ['howWeOperate', 'paragraphs', 1], label: 'Paragraph 2', textarea: true },
@@ -167,6 +194,7 @@ const SECTION_DEFS = [
       { path: ['footer', 'email'],       label: 'Contact email', hint: 'Shown as a mailto link at the bottom of the page. e.g. info@theorder.global' },
       { path: ['footer', 'phone'],       label: 'Contact phone', hint: 'Shown as a tel link. Optional — leave blank to hide.' },
       { path: ['footer', 'copyright'],   label: 'Copyright', hint: 'Renders in uppercase monospace, small.' },
+      { path: ['footer', 'privacyLabel'], label: 'Privacy link text', hint: 'The link text at the bottom of the page. Leave blank to hide the link.' },
       { path: ['footer', 'privacyHref'], label: 'Privacy link URL', hint: 'Full https:// URL.' },
     ],
   },

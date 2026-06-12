@@ -4,7 +4,7 @@ export function FooterSection() {
   return (
     <footer className="site-footer">
       <div className="shell footer-inner">
-        <a href="#top" className="footer-mark" aria-label="The Order">
+        <a href="#top" className="footer-mark" aria-label={brandContent?.wordmark || 'The Order'}>
           <img className="logo-mark footer-logo" src={brandContent?.logo || '/images/logo-mark.png'} alt="" />
         </a>
 
@@ -23,12 +23,14 @@ export function FooterSection() {
         )}
 
         <span className="restraint footer-copyright">{footerContent.copyright}</span>
-        <a
-          className="restraint footer-privacy"
-          href={footerContent.privacyHref}
-          target="_blank"
-          rel="noopener noreferrer"
-        >Privacy</a>
+        {(footerContent.privacyLabel ?? 'Privacy') && (
+          <a
+            className="restraint footer-privacy"
+            href={footerContent.privacyHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >{footerContent.privacyLabel ?? 'Privacy'}</a>
+        )}
       </div>
     </footer>
   )

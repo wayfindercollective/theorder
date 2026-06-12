@@ -38,7 +38,7 @@ export function FounderSection() {
               </div>
             )}
             {founderContent.templated && !founderContent.portrait && (
-              <span className="template-flag">TEMPLATED</span>
+              <span className="template-flag">{founderContent.templatedLabel || 'TEMPLATED'}</span>
             )}
           </div>
 

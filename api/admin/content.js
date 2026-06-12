@@ -17,6 +17,29 @@ import { readJsonFile, writeJsonFile } from '../_lib/github.js'
 const SECTIONS_PATH = 'content/sections.json'
 const QUESTIONS_PATH = 'content/questions.json'
 
+// Deep-merge an editor payload over the live file so a save from an admin
+// tab loaded before a deploy can't silently DELETE keys it never knew about
+// (e.g. a new `meta` block or `footer.privacyLabel`). Objects merge
+// recursively; arrays and scalars from the payload replace wholesale —
+// the editor edits whole arrays (questions, paragraphs), never patches them.
+function mergeKeepingUnknown(current, incoming) {
+  if (
+    !current || !incoming ||
+    Array.isArray(current) || Array.isArray(incoming) ||
+    typeof current !== 'object' || typeof incoming !== 'object'
+  ) return incoming
+  const out = { ...current }
+  for (const k of Object.keys(incoming)) {
+    out[k] = mergeKeepingUnknown(current[k], incoming[k])
+  }
+  return out
+}
+
+// Resolver for writeJsonFile: merges against the live JSON from the same
+// read that supplies the write SHA (re-invoked on conflict retry).
+const mergeResolver = (incoming) => (live) =>
+  live ? mergeKeepingUnknown(live, incoming) : incoming
+
 export default async function handler(req, res) {
   const payload = await requireAuth(req, res)
   if (!payload) return
@@ -46,11 +69,11 @@ export default async function handler(req, res) {
     try {
       let wrote = 0
       if (body?.sections) {
-        await writeJsonFile(SECTIONS_PATH, body.sections, 'cms: update sections')
+        await writeJsonFile(SECTIONS_PATH, mergeResolver(body.sections), 'cms: update sections')
         wrote++
       }
       if (body?.questions) {
-        await writeJsonFile(QUESTIONS_PATH, body.questions, 'cms: update questions')
+        await writeJsonFile(QUESTIONS_PATH, mergeResolver(body.questions), 'cms: update questions')
         wrote++
       }
       if (wrote === 0) {

@@ -5,14 +5,16 @@
     "shareImage": "/images/hero-horseman.jpg"
   },
   "brand": {
-    "logo": null
+    "logo": null,
+    "wordmark": "The Order"
   },
   "hero": {
     "eyebrow": "",
     "headline": "THE ORDER",
     "verseLine": "Mark 12:30 · Mark 12:31",
     "restraint": "",
-    "cta": "God wills it - Apply"
+    "cta": "God wills it - Apply",
+    "scrollLabel": "Scroll"
   },
   "heroFilm": {
     "video": null,
@@ -60,7 +62,9 @@
     "eyebrow": "Apply Now",
     "image": "/images/oil-naval.jpg",
     "submitButton": "Submit",
-    "submittingButton": "Submitting…"
+    "submittingButton": "Submitting…",
+    "stepLabel": "Step",
+    "backButton": "← Back"
   },
   "founder": {
     "eyebrow": "V",
@@ -75,6 +79,7 @@
     ],
     "signature": "- Nico Seedsman",
     "templated": true,
+    "templatedLabel": "TEMPLATED",
     "image": "/images/oil-founder.jpg",
     "imageAlign": "full"
   },
@@ -146,7 +151,8 @@
     "email": "info@theorder.global",
     "phone": "",
     "copyright": "© The Order",
-    "privacyHref": "https://wayfindercollective.io/privacy"
+    "privacyHref": "https://wayfindercollective.io/privacy",
+    "privacyLabel": "Privacy"
   },
   "finalScreen": {
     "heading": "THE ORDER",
@@ -161,7 +167,8 @@
     "phoneLabel": "Phone",
     "phonePlaceholder": "Number",
     "emailError": "That email does not look right.",
-    "phoneError": "That number does not look right."
+    "phoneError": "That number does not look right.",
+    "countrySearchPlaceholder": "Search country or code…"
   },
   "consent": {
     "smsLine": "I consent to receive SMS communications from THE ORDER about my application. Message and data rates may apply. Reply STOP to opt out at any time."

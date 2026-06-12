@@ -17,7 +17,7 @@ export function Sigil({ size = 56, variant = 'full', className = '' }) {
     return (
       <img
         src={customLogo}
-        alt="The Order"
+        alt={brandContent?.wordmark || 'The Order'}
         height={size}
         className={`sigil sigil-custom ${className}`.trim()}
         style={{ height: size, width: 'auto' }}

@@ -95,7 +95,7 @@ export function QuestionSlide({
             type="button"
             disabled={submitting}
           >
-            ← Back
+            {applicationCopy.backButton || '← Back'}
           </button>
         )}
         {question.type === 'contact' && (
@@ -210,7 +210,7 @@ function ContactFields({ value, onChange, onSubmit, submitting, canAdvance }) {
               type="text"
               value={countryFilter}
               onChange={(e) => setCountryFilter(e.target.value)}
-              placeholder="Search country or code…"
+              placeholder={formCopy.countrySearchPlaceholder ?? 'Search country or code…'}
               autoFocus
             />
             <div className="phone-list">

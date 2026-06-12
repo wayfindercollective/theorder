@@ -25,9 +25,9 @@ export function Header() {
   return (
     <header className={'site-header' + (scrolled ? ' is-scrolled' : '')}>
       <div className="shell site-header-inner">
-        <a href="#top" className="header-mark" aria-label="The Order">
+        <a href="#top" className="header-mark" aria-label={brandContent?.wordmark || 'The Order'}>
           <img className="logo-mark header-logo" src={LOGO_SRC} alt="" />
-          <span className="display header-wordmark">The Order</span>
+          <span className="display header-wordmark">{brandContent?.wordmark || 'The Order'}</span>
         </a>
       </div>
     </header>

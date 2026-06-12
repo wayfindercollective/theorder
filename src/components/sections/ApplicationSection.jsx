@@ -219,7 +219,7 @@ export function ApplicationSection() {
                 submitting={submitting}
               />
               <div className="application-step restraint" aria-hidden="true">
-                Step {step} / {total}
+                {applicationCopy.stepLabel ?? 'Step'} {step} / {total}
               </div>
             </div>
           </>

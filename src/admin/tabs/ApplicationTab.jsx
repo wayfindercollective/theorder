@@ -112,15 +112,15 @@ export function ApplicationTab({ questions, onChange }) {
             {q.type === 'choice' && (
               <div className="admin-q-toolbar">
                 <button
-                  type="button" className="admin-mini-btn" title="Move up"
+                  type="button" className="admin-mini-btn" title="Move up" aria-label="Move question up"
                   onClick={() => moveQuestion(qi, -1)} disabled={qi === 0}
                 >↑</button>
                 <button
-                  type="button" className="admin-mini-btn" title="Move down"
+                  type="button" className="admin-mini-btn" title="Move down" aria-label="Move question down"
                   onClick={() => moveQuestion(qi, 1)} disabled={qi >= lastChoiceIndex}
                 >↓</button>
                 <button
-                  type="button" className="admin-mini-btn admin-mini-danger" title="Remove question"
+                  type="button" className="admin-mini-btn admin-mini-danger" title="Remove question" aria-label="Remove question"
                   onClick={() => removeQuestion(qi)}
                 >✕</button>
               </div>
@@ -193,15 +193,15 @@ export function ApplicationTab({ questions, onChange }) {
                   />
                   <div className="admin-q-toolbar">
                     <button
-                      type="button" className="admin-mini-btn" title="Move up"
+                      type="button" className="admin-mini-btn" title="Move up" aria-label="Move option up"
                       onClick={() => moveOption(qi, oi, -1)} disabled={oi === 0}
                     >↑</button>
                     <button
-                      type="button" className="admin-mini-btn" title="Move down"
+                      type="button" className="admin-mini-btn" title="Move down" aria-label="Move option down"
                       onClick={() => moveOption(qi, oi, 1)} disabled={oi === (q.options || []).length - 1}
                     >↓</button>
                     <button
-                      type="button" className="admin-mini-btn admin-mini-danger" title="Remove option"
+                      type="button" className="admin-mini-btn admin-mini-danger" title="Remove option" aria-label="Remove option"
                       onClick={() => removeOption(qi, oi)} disabled={(q.options || []).length <= 2}
                     >✕</button>
                   </div>

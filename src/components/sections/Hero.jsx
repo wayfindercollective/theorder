@@ -33,7 +33,7 @@ export function Hero() {
         <div className="hero-vignette" aria-hidden="true" />
 
         <div className="hero-content shell">
-          <img className="logo-mark hero-logo-mark" src={brandContent?.logo || '/images/logo-mark.png'} alt="The Order" />
+          <img className="logo-mark hero-logo-mark" src={brandContent?.logo || '/images/logo-mark.png'} alt={brandContent?.wordmark || 'The Order'} />
 
           {heroContent.eyebrow && (
             <div className="hero-eyebrow eyebrow">
@@ -58,7 +58,7 @@ export function Hero() {
           {!DESIGN_V2 && actions}
 
           <div className="hero-fold-cue" aria-hidden="true">
-            <span className="restraint hero-scroll">Scroll</span>
+            <span className="restraint hero-scroll">{heroContent.scrollLabel ?? 'Scroll'}</span>
             <span className="hero-fold-line" />
           </div>
         </div>
