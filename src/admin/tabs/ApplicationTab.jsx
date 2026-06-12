@@ -1,10 +1,17 @@
 /**
- * ApplicationTab — edit application questions and their on-screen labels.
+ * ApplicationTab — full editor for the application questions.
  *
- * The `value` field on scored questions is the Wayfinder scoring contract
- * (the string the CRM scores on). Those are rendered read-only with a
- * warning. The `label` shown to applicants is freely editable.
+ * Everything is editable: question text, subtitles, answer labels, and the
+ * question/option set itself (add, remove, reorder). The `value` field on
+ * options and the question `id` are the Wayfinder scoring contract (the
+ * strings the CRM scores on / the field names it reads) — those stay locked
+ * behind an explicit unlock toggle so they can't be changed by accident.
+ *
+ * The contact step is pinned last (the form's submit lives on it) and can't
+ * be removed or moved.
  */
+
+import { useState } from 'react'
 
 function setAt(obj, path, value) {
   if (path.length === 0) return value
@@ -21,20 +28,104 @@ function getAt(obj, path) {
   return cur
 }
 
+function moveItem(arr, from, to) {
+  const next = [...arr]
+  const [item] = next.splice(from, 1)
+  next.splice(to, 0, item)
+  return next
+}
+
+function nextQuestionId(qs) {
+  const taken = new Set(qs.map((q) => q.id))
+  let n = qs.length
+  while (taken.has(`question${n}`)) n++
+  return `question${n}`
+}
+
 export function ApplicationTab({ questions, onChange }) {
   const qs = questions?.questions || []
+  const [unlocked, setUnlocked] = useState(false)
   const update = (path, value) => onChange((cur) => setAt(cur, path, value))
+  const updateList = (fn) => onChange((cur) => ({ ...cur, questions: fn(cur.questions || []) }))
+
+  // The contact step is pinned to the end — choice questions can only move
+  // within the range above it.
+  const lastChoiceIndex = qs.reduce((acc, q, i) => (q.type === 'choice' ? i : acc), -1)
+
+  const addOption = (qi) => updateList((list) =>
+    list.map((q, i) => i === qi
+      ? { ...q, options: [...(q.options || []), { label: '', value: '' }] }
+      : q))
+
+  const removeOption = (qi, oi) => updateList((list) =>
+    list.map((q, i) => i === qi
+      ? { ...q, options: (q.options || []).filter((_, j) => j !== oi) }
+      : q))
+
+  const moveOption = (qi, oi, dir) => updateList((list) =>
+    list.map((q, i) => i === qi
+      ? { ...q, options: moveItem(q.options || [], oi, oi + dir) }
+      : q))
+
+  const addQuestion = () => updateList((list) => {
+    const q = {
+      id: nextQuestionId(list),
+      type: 'choice',
+      scored: true,
+      question: '',
+      subtitle: '',
+      options: [
+        { label: '', value: '' },
+        { label: '', value: '' },
+      ],
+    }
+    // Insert before the contact step (or at the end if there isn't one).
+    const contactIdx = list.findIndex((x) => x.type === 'contact')
+    const next = [...list]
+    next.splice(contactIdx === -1 ? next.length : contactIdx, 0, q)
+    return next
+  })
+
+  const removeQuestion = (qi) => {
+    const q = qs[qi]
+    const name = q?.question?.trim() ? `“${q.question.trim()}”` : `Q${qi + 1}`
+    if (!window.confirm(`Remove question ${name} and all its answer options?`)) return
+    updateList((list) => list.filter((_, i) => i !== qi))
+  }
+
+  const moveQuestion = (qi, dir) => updateList((list) => moveItem(list, qi, qi + dir))
 
   return (
     <div className="admin-tab-pane">
       <p className="restraint admin-tab-intro">
-        Edit the question text and answer labels. The scoring values (right column on
-        choice questions) are the contract with the CRM — do not change.
+        Edit the questions and answer options applicants see. The scoring values and
+        field IDs are the contract with the CRM — they stay locked unless you unlock
+        them below, and changing them changes how leads are scored.
       </p>
 
       {qs.map((q, qi) => (
-        <section key={q.id} className="admin-section-block">
-          <h2 className="admin-section-title display">Q{qi + 1} — {q.id}</h2>
+        <section key={qi} className="admin-section-block">
+          <div className="admin-q-header">
+            <h2 className="admin-section-title display">
+              Q{qi + 1} — {q.id}{q.type === 'contact' ? ' (contact step)' : ''}
+            </h2>
+            {q.type === 'choice' && (
+              <div className="admin-q-toolbar">
+                <button
+                  type="button" className="admin-mini-btn" title="Move up"
+                  onClick={() => moveQuestion(qi, -1)} disabled={qi === 0}
+                >↑</button>
+                <button
+                  type="button" className="admin-mini-btn" title="Move down"
+                  onClick={() => moveQuestion(qi, 1)} disabled={qi >= lastChoiceIndex}
+                >↓</button>
+                <button
+                  type="button" className="admin-mini-btn admin-mini-danger" title="Remove question"
+                  onClick={() => removeQuestion(qi)}
+                >✕</button>
+              </div>
+            )}
+          </div>
 
           <div className="admin-fields">
             <label className="admin-field">
@@ -58,42 +149,100 @@ export function ApplicationTab({ questions, onChange }) {
               />
               <span className="admin-field-hint">Smaller line under the question. Renders italic. Leave blank to hide.</span>
             </label>
+
+            {q.type === 'choice' && unlocked && (
+              <label className="admin-field">
+                <span className="admin-field-label">Field ID (CRM contract)</span>
+                <input
+                  className="input-field admin-option-value admin-value-unlocked"
+                  type="text"
+                  value={getAt(questions, ['questions', qi, 'id']) ?? ''}
+                  onChange={(e) => update(['questions', qi, 'id'], e.target.value)}
+                />
+                <span className="admin-field-hint">The field name this answer is sent under. Must match the Wayfinder funnel.</span>
+              </label>
+            )}
           </div>
 
-          {q.type === 'choice' && q.options && (
+          {q.type === 'choice' && (
             <div className="admin-options">
               <div className="admin-options-header">
                 <span className="admin-field-label">Answer options</span>
-                <span className="admin-options-hint">left: label shown · right: scoring value (locked)</span>
+                <span className="admin-options-hint">
+                  left: label shown · right: scoring value {unlocked ? '(unlocked)' : '(locked)'}
+                </span>
               </div>
-              {q.options.map((opt, oi) => (
-                <div key={oi} className="admin-option-row">
+              {(q.options || []).map((opt, oi) => (
+                <div key={oi} className="admin-option-row admin-option-row-managed">
                   <input
                     className="input-field admin-option-label"
                     type="text"
+                    placeholder="Answer shown to the applicant"
                     value={getAt(questions, ['questions', qi, 'options', oi, 'label']) ?? ''}
                     onChange={(e) => update(['questions', qi, 'options', oi, 'label'], e.target.value)}
                   />
                   <input
-                    className="input-field admin-option-value"
+                    className={'input-field admin-option-value' + (unlocked ? ' admin-value-unlocked' : '')}
                     type="text"
-                    value={opt.value}
-                    readOnly
-                    tabIndex={-1}
-                    title="Scoring value — do not change"
+                    placeholder={unlocked ? 'Scoring value sent to the CRM' : 'Scoring value (locked)'}
+                    value={getAt(questions, ['questions', qi, 'options', oi, 'value']) ?? ''}
+                    readOnly={!unlocked}
+                    tabIndex={unlocked ? 0 : -1}
+                    title={unlocked ? 'Scoring value sent to the CRM' : 'Scoring value — unlock below to edit'}
+                    onChange={(e) => update(['questions', qi, 'options', oi, 'value'], e.target.value)}
                   />
+                  <div className="admin-q-toolbar">
+                    <button
+                      type="button" className="admin-mini-btn" title="Move up"
+                      onClick={() => moveOption(qi, oi, -1)} disabled={oi === 0}
+                    >↑</button>
+                    <button
+                      type="button" className="admin-mini-btn" title="Move down"
+                      onClick={() => moveOption(qi, oi, 1)} disabled={oi === (q.options || []).length - 1}
+                    >↓</button>
+                    <button
+                      type="button" className="admin-mini-btn admin-mini-danger" title="Remove option"
+                      onClick={() => removeOption(qi, oi)} disabled={(q.options || []).length <= 2}
+                    >✕</button>
+                  </div>
                 </div>
               ))}
+              <div>
+                <button type="button" className="admin-add-btn" onClick={() => addOption(qi)}>
+                  + Add answer option
+                </button>
+                {unlocked
+                  ? null
+                  : <span className="admin-field-hint admin-add-hint">New options need a scoring value — unlock below to set it.</span>}
+              </div>
             </div>
           )}
 
           {q.type === 'contact' && (
             <p className="restraint admin-tab-intro">
-              (Contact step — name, email, phone, SMS consent. No additional fields here.)
+              (Contact step — name, email, phone, SMS consent. Field labels and messages
+              are edited under Sections → “Application form — field labels &amp; messages”.)
             </p>
           )}
         </section>
       ))}
+
+      <div className="admin-q-footer">
+        <button type="button" className="admin-add-btn" onClick={addQuestion}>
+          + Add question
+        </button>
+        <label className="admin-unlock">
+          <input
+            type="checkbox"
+            checked={unlocked}
+            onChange={(e) => setUnlocked(e.target.checked)}
+          />
+          <span>
+            Unlock scoring values &amp; field IDs — <strong>changes how leads are scored.</strong>{' '}
+            Only edit these in step with the Wayfinder funnel.
+          </span>
+        </label>
+      </div>
     </div>
   )
 }

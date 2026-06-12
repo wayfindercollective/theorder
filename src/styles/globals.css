@@ -2132,12 +2132,110 @@ button {
   gap: 0.6rem;
 }
 
+/* With per-option controls (move / remove) a third, fixed column appears. */
+.admin-option-row-managed {
+  grid-template-columns: 2fr 1fr auto;
+  align-items: center;
+}
+
 .admin-option-value {
   color: var(--ash);
   background: rgba(10, 9, 8, 0.5);
   cursor: not-allowed;
   font-family: var(--font-mono);
   font-size: 0.85rem;
+}
+
+.admin-value-unlocked {
+  color: var(--parchment);
+  cursor: text;
+  border-color: var(--brass-deep);
+}
+
+/* Question / option management controls */
+
+.admin-q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-q-toolbar {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.admin-mini-btn {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ash);
+  background: transparent;
+  border: 1px solid var(--iron);
+  cursor: pointer;
+}
+.admin-mini-btn:hover:not(:disabled) {
+  color: var(--parchment);
+  border-color: var(--brass-deep);
+}
+.admin-mini-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.admin-mini-danger:hover:not(:disabled) {
+  color: #c0392b;
+  border-color: #c0392b;
+}
+
+.admin-add-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-light);
+  background: transparent;
+  border: 1px dashed var(--brass-deep);
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+}
+.admin-add-btn:hover {
+  color: var(--parchment);
+  border-style: solid;
+}
+
+.admin-add-hint {
+  margin-left: 0.8rem;
+}
+
+.admin-q-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: flex-start;
+}
+
+.admin-unlock {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  color: var(--ash);
+  letter-spacing: 0.04em;
+  max-width: 56ch;
+  cursor: pointer;
+}
+.admin-unlock input {
+  margin-top: 0.25rem;
+  accent-color: var(--brass-deep);
+}
+.admin-unlock strong {
+  color: var(--brass-light);
 }
 
 /* Image rows */
@@ -2502,6 +2600,7 @@ button {
   .admin-image-thumb { width: 100%; height: 140px; }
   .admin-image-actions { flex-direction: row; flex-wrap: wrap; }
   .admin-option-row { grid-template-columns: 1fr; }
+  .admin-option-row-managed { grid-template-columns: 1fr auto; }
   .admin-floating-save {
     left: 1rem;
     right: 1rem;

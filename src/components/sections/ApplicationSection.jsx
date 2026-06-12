@@ -29,11 +29,17 @@ function buildPayload(formData) {
   // Scored answers — sent BOTH flat (Jeff-funnel handler) AND nested in
   // `responses` (current Wayfinder OS handler). Whichever the funnel reads
   // wins; the other is harmless rawResponses noise. See WAYFINDER_WIRING.md.
+  // The four legacy field names are always present (Wayfinder scoring
+  // contract); any further choice questions added via the CMS ride along
+  // under their own id.
   const responses = {
     mainChallenge: formData.mainChallenge || '',
     commitment: formData.commitment || '',
     readiness: formData.readiness || '',
     income: formData.income || '',
+  }
+  for (const q of questions) {
+    if (q.type === 'choice') responses[q.id] = formData[q.id] || ''
   }
 
   return {

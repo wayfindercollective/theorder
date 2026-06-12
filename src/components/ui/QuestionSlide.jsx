@@ -63,9 +63,9 @@ export function QuestionSlide({
 
       {question.type === 'choice' && (
         <div className="qs-choices">
-          {question.options.map((opt, i) => (
+          {(question.options || []).map((opt, i) => (
             <button
-              key={opt.value}
+              key={i}
               className={'choice' + (value === opt.value ? ' selected' : '')}
               onClick={() => handleChoice(opt.value)}
               type="button"
