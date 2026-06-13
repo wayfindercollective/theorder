@@ -1528,7 +1528,7 @@ button {
    The sun's centre is crop-shifted down-right, away from the letter. */
 .section-founder .section-bg-image {
   filter: sepia(0.05) saturate(0.97) contrast(1.02) brightness(0.7);
-  background-position: center 42%;
+  background-position: center 70%;
 }
 
 /* FAQ — St George is a tall portrait; shift the crop down so the dragon at the
