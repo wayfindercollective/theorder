@@ -1442,6 +1442,21 @@ button {
   object-position: center 35%;
   background: #000;
 }
+/* In fullscreen the tile crop no longer applies — show the whole frame
+   (letterboxed) instead of the head-only cover crop. Separate rules so an
+   unknown prefix doesn't invalidate the others. */
+.evidence-video:fullscreen {
+  object-fit: contain;
+  object-position: center;
+}
+.evidence-video:-webkit-full-screen {
+  object-fit: contain;
+  object-position: center;
+}
+.evidence-video:-moz-full-screen {
+  object-fit: contain;
+  object-position: center;
+}
 .evidence-video-title {
   position: absolute;
   left: 0;
