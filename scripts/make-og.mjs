@@ -39,8 +39,8 @@ async function main() {
     .toBuffer()
   const { height: H } = await sharp(background).metadata()
 
-  // Shield in the upper-left, over the sky, clear of the horse and rider.
-  const MARK_HEIGHT = Math.round(H * 0.3) // ≈ 30% of canvas height
+  // Shield anchored in the upper-left, over the sky.
+  const MARK_HEIGHT = Math.round(H * 0.6) // ≈ 60% of canvas height
   const MARK_LEFT = Math.round(W * 0.06)
   const MARK_TOP = Math.round(H * 0.05)
 
