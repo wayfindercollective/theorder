@@ -185,10 +185,10 @@ button {
   right: 0;
   -webkit-mask-image:
     linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+    linear-gradient(to bottom, transparent 0%, black 23%, black 77%, transparent 100%);
   mask-image:
     linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+    linear-gradient(to bottom, transparent 0%, black 23%, black 77%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
@@ -197,10 +197,10 @@ button {
   left: 0;
   -webkit-mask-image:
     linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+    linear-gradient(to bottom, transparent 0%, black 23%, black 77%, transparent 100%);
   mask-image:
     linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+    linear-gradient(to bottom, transparent 0%, black 23%, black 77%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
@@ -383,19 +383,42 @@ button {
     0 8px 24px -10px rgba(166, 136, 74, 0.35);
 }
 
+/* Hover: the sword is drawn — the brass floods to blood-red, the button lifts
+   and swells, and a red glow blooms around it so there's no doubt it's the
+   thing to press. */
 .btn-primary:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.035);
+  color: var(--parchment);
+  border-color: var(--cordovan-light);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
-    0 14px 32px -10px rgba(166, 136, 74, 0.55);
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(122, 42, 38, 0.55),
+    0 14px 34px -8px rgba(140, 28, 24, 0.7),
+    0 0 36px -4px rgba(176, 46, 40, 0.72);
 }
 
-.btn-primary:active { transform: translateY(0); }
+.btn-primary:active { transform: translateY(-1px) scale(1.01); }
+
+/* Blood wash — a cordovan fill painted over the brushed brass, faded in on
+   hover. Sits above the button's brass background but below the lettering and
+   the blade-glint (both ::before and ::after are z-index:-1; source order puts
+   the glint on top), so the glint still streaks across the red. */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, #a83430 0%, var(--cordovan) 55%, #3d1411 100%);
+  opacity: 0;
+  transition: opacity 360ms var(--ease-order);
+}
+.btn-primary:hover::before { opacity: 1; }
 
 /* CTA shine — a blade-glint sweep. A narrow specular highlight rides
    left → right across the brushed brass, the way light runs down a sword
-   as it's drawn. Idle: one slow glint roughly every 7s. Hover: a single
+   as it's drawn. Idle: one slow glint roughly every 1.75s. Hover: a single
    deliberate draw. Painted under the label (z-index:-1) so the lettering
    stays crisp; clipped to the button by overflow:hidden. The
    prefers-reduced-motion block disables it automatically. */
@@ -417,11 +440,11 @@ button {
     rgba(255, 250, 236, 0.75) 50%,
     rgba(255, 250, 236, 0) 65%);
   transform: skewX(-18deg) translateX(-220%);
-  animation: bladeGlint 7s var(--ease-order) infinite;
+  animation: bladeGlint 1.75s var(--ease-order) infinite;
 }
 @keyframes bladeGlint {
   0%   { transform: skewX(-18deg) translateX(-220%); }
-  14%  { transform: skewX(-18deg) translateX(320%); }
+  56%  { transform: skewX(-18deg) translateX(320%); }
   100% { transform: skewX(-18deg) translateX(320%); }
 }
 .btn-primary:hover::after {
@@ -1487,6 +1510,15 @@ button {
 .stagger.in-view > *:nth-child(8)  { opacity: 1; transform: translateY(0); transition-delay: 1400ms; }
 .stagger.in-view > *:nth-child(9)  { opacity: 1; transform: translateY(0); transition-delay: 1600ms; }
 .stagger.in-view > *:nth-child(10) { opacity: 1; transform: translateY(0); transition-delay: 1800ms; }
+/* Lists longer than 10 (e.g. the 12 offerings in "We're Offering You") need
+   their own delays — without these, items 11+ fall through to the catch-all
+   below with NO delay and pop in before the staggered ones. */
+.stagger.in-view > *:nth-child(11) { opacity: 1; transform: translateY(0); transition-delay: 2000ms; }
+.stagger.in-view > *:nth-child(12) { opacity: 1; transform: translateY(0); transition-delay: 2200ms; }
+.stagger.in-view > *:nth-child(13) { opacity: 1; transform: translateY(0); transition-delay: 2400ms; }
+.stagger.in-view > *:nth-child(14) { opacity: 1; transform: translateY(0); transition-delay: 2600ms; }
+.stagger.in-view > *:nth-child(15) { opacity: 1; transform: translateY(0); transition-delay: 2800ms; }
+.stagger.in-view > *:nth-child(16) { opacity: 1; transform: translateY(0); transition-delay: 3000ms; }
 .stagger.in-view > * { opacity: 1; transform: translateY(0); }
 
 /* Hero — verse line between headline and CTA */
@@ -2718,13 +2750,14 @@ button {
     right: auto;
     width: 50%;
     top: 0;
-    bottom: 0;
+    /* Reserve the bottom strip for the scroll cue so the centred group (incl.
+       the CTA and its glow) never overlaps it — the content centres in the
+       space ABOVE this line, the cue lives below it. */
+    bottom: clamp(6rem, 12vh, 9rem);
     justify-content: center;
     gap: clamp(1rem, 2.4vh, 1.6rem);
     padding-top: 0;
-    /* CTA now flows inside this column; leave room at the bottom so the centred
-       group clears the scroll cue anchored at the foot. */
-    padding-bottom: clamp(3.5rem, 8vh, 6rem);
+    padding-bottom: clamp(0.3rem, 1vh, 0.8rem);
     padding-left: clamp(1.5rem, 5vw, 5rem);
     padding-right: 1.5rem;
   }
@@ -2732,6 +2765,8 @@ button {
     left: 0;
     right: auto;
     width: 50%;
+    /* sit low, inside the strip reserved above, clear of the CTA's glow */
+    bottom: 2rem;
     /* match hero-content's padding so the scroll cue centres on the same
        vertical axis as the logo, headline, verse and CTA */
     padding-left: clamp(1.5rem, 5vw, 5rem);
@@ -2769,4 +2804,32 @@ button {
   /* "We're Offering You" full-bleed crop on mobile: shift right off the bright
      white gown so the kneeling knight is the visible figure, not the woman. */
   .section-become .section-side-image { background-position: 60% 50%; }
+}
+
+/* ============================================================
+   TEXT PLATES — fully transparent (most sections).
+   Each painted section used to carry a translucent dark plate behind
+   its text (a soft radial scrim). Per request, those read as fully
+   transparent now: the words ride directly on the painting with only
+   their relief text-shadow — no visible box. The ::before pseudo-
+   elements stay (positioning intact) but paint nothing.
+
+   EXCEPTIONS — The Principles and Who Am I (Founder) keep their plates:
+   both lay light text over the brightest paintings (the gold library
+   ceiling, the sunset seascape) and wash out without the scrim, so they
+   are deliberately left OUT of this list. To bring another section's
+   plate back, drop its selector here; to drop one, add it.
+   This sits last so it wins over every earlier plate rule.
+   ============================================================ */
+.truth-provocation::before,
+.section-code .code-inner::before,
+.section-become .shell::before,
+.section-evidence .shell::before,
+.section-faq .shell-narrow::before,
+.section-how .shell-narrow::before,
+.section-closing .shell-narrow::before,
+.design-split .shell::before,
+.design-split .shell-narrow::before,
+.design-split .code-inner::before {
+  background: none;
 }

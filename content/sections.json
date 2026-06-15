@@ -26,7 +26,7 @@
   },
   "truth": {
     "eyebrow": "I",
-    "provocation": "Are you sick?\nAnd tired?\nAnd disgusted?\nAnd disappointed?\n\nHave you had enough yet?\nAre you sufficiently unsatisfied, men?",
+    "provocation": "Are you **sick?**\nAnd **tired?**\nAnd **disgusted?**\nAnd **disappointed?**\n\nHave you had **enough yet?**\nAre you sufficiently **unsatisfied, men?**",
     "image": "/images/truth-destruction.jpg",
     "imageAlign": "full"
   },
