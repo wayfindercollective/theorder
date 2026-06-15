@@ -1377,6 +1377,12 @@ button {
 .section-evidence .section-bg-image {
   background-position: center;
   transform: translateY(-14%);
+  /* The -14% lift drags the painting's edge-fade mask up off the section's top
+     edge, which would clip the top fade into a hard line. Shift the fade-in down
+     by the same 14% so the seam still fades from black at the real top edge
+     (the bottom fade lands behind the tiles, so it can stay put). */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 14%, #000 calc(14% + var(--edge-fade)), #000 calc(100% - var(--edge-fade)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 14%, #000 calc(14% + var(--edge-fade)), #000 calc(100% - var(--edge-fade)), transparent 100%);
 }
 /* trim the section's bottom padding so the tiles can sit at the very bottom */
 .section-evidence { padding-bottom: clamp(0.5rem, 1vw, 1rem); }
