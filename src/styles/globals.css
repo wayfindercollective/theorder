@@ -1361,7 +1361,14 @@ button {
 /* Pin the testimonial tiles to the bottom of the section so the soldiers'
    faces and bodies read clearly above them: the shell fills the section height
    with the heading at top and the tiles pushed down by an auto top margin. */
-.section-evidence .section-bg-image { background-position: center 48%; }
+/* The painting is only ~8% taller than a landscape viewport under cover, so
+   background-position can barely move it. Lift the whole layer instead to bring
+   the men up above the tiles — the dark this reveals at the bottom sits behind
+   the tiles, and the top simply clips against the section's overflow:hidden. */
+.section-evidence .section-bg-image {
+  background-position: center;
+  transform: translateY(-14%);
+}
 /* trim the section's bottom padding so the tiles can sit at the very bottom */
 .section-evidence { padding-bottom: clamp(0.5rem, 1vw, 1rem); }
 .section-evidence > .shell {
@@ -1380,6 +1387,8 @@ button {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
+  /* bottom-align tiles so a taller video tile doesn't stretch the text tiles */
+  align-items: end;
 }
 @media (max-width: 900px) {
   .evidence-grid { grid-template-columns: 1fr; }
@@ -1389,8 +1398,11 @@ button {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  min-height: 220px;
   position: relative;
+  /* every testimonial tile shares the same footprint as the video tile */
+  justify-self: center;
+  width: min(100%, 227px);
+  aspect-ratio: 2 / 3;
 }
 .evidence-mark {
   font-size: 3.5rem;
@@ -1408,6 +1420,82 @@ button {
 .evidence-attr {
   color: var(--ash);
   font-size: 0.78rem;
+}
+/* A testimonial card can hold a video instead of a text quote. The video fills
+   the whole tile (no card background or stitching shows), cropped so the
+   speaker's head reads centred; the title is laid over the bottom of the clip.
+   Height is capped so the painting behind the tiles stays visible above them. */
+.evidence-card-video {
+  /* inherits the shared tile footprint from .evidence-card; the video fills it
+     edge-to-edge (no card padding/background) so more of the clip shows */
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--iron);
+}
+.evidence-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* nudge this if Tony's head isn't centred — lower % shows more of the top */
+  object-position: center 35%;
+  background: #000;
+}
+.evidence-video-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  /* extra bottom padding keeps the caption clear of the video's control bar */
+  padding: 1rem 0.9rem 2.85rem;
+  color: var(--parchment);
+  text-align: center;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  /* legible over the video without a dark fade on the tile's bottom edge */
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.85);
+  /* let clicks pass through to the video controls underneath */
+  pointer-events: none;
+}
+/* Big centred play affordance shown over the muted autoplay preview. Clicking
+   it (anywhere on the tile) restarts the clip from the top with sound. */
+.evidence-video-play {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.evidence-video-play-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid var(--brass);
+  background: rgba(0, 0, 0, 0.42);
+  box-shadow: 0 0 28px rgba(0, 0, 0, 0.55);
+  transition: transform 240ms var(--ease-order), background 240ms var(--ease-order);
+}
+.evidence-video-play:hover .evidence-video-play-ring,
+.evidence-video-play:focus-visible .evidence-video-play-ring {
+  transform: scale(1.08);
+  background: rgba(0, 0, 0, 0.62);
+}
+.evidence-video-play svg {
+  width: 26px;
+  height: 26px;
+  fill: var(--brass);
+  margin-left: 3px; /* optically centre the triangle in the ring */
 }
 .template-note {
   text-align: center;

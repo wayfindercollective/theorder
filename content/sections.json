@@ -92,7 +92,9 @@
     "templated": true,
     "cards": [
       {
-        "quote": "Testimony pending.",
+        "video": "/testimonials/Tony.mp4",
+        "title": "Tony — Entrepreneur, coach and real estate developer",
+        "quote": "",
         "attribution": ""
       },
       {

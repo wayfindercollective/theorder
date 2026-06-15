@@ -1,0 +1,306 @@
+/* ============================================================
+   /presentations — slide-deck builder
+   Reuses The Order's material system (vars from globals.css) and the
+   section painting machinery; adds the editor chrome, 16:9 stages, and
+   the black text box.
+   ============================================================ */
+
+/* ---- Editor shell ---- */
+.pres-editor {
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-deep);
+}
+
+.pres-manager {
+  min-height: 100svh;
+  background: var(--bg-deep);
+}
+
+/* ---- Top toolbar (editor + manager) ---- */
+.pres-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid rgba(166, 136, 74, 0.25);
+  z-index: 20;
+}
+
+.pres-title-input {
+  flex: 1;
+  max-width: 440px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: var(--parchment);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  padding: 4px 0;
+}
+.pres-title-input:focus { outline: none; border-bottom-color: var(--brass); }
+
+.pres-toolbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.pres-toolbar-error { color: var(--cordovan-light); font-family: var(--font-mono); font-size: 0.72rem; }
+
+/* ---- Buttons ---- */
+.pres-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  padding: 8px 14px;
+  border: 1px solid rgba(166, 136, 74, 0.4);
+  border-radius: 3px;
+  background: transparent;
+  transition: all 180ms var(--ease-order);
+}
+.pres-btn:hover:not(:disabled) { border-color: var(--brass); color: var(--brass-light); }
+.pres-btn:disabled { opacity: 0.5; cursor: default; }
+.pres-btn-primary { background: var(--brass); color: var(--bg-deep); border-color: var(--brass); }
+.pres-btn-primary:hover:not(:disabled) { background: var(--brass-light); color: var(--bg-deep); }
+.pres-btn-ghost { border-color: transparent; }
+.pres-danger:hover:not(:disabled) { color: var(--cordovan-light); border-color: var(--cordovan-light); }
+
+/* ---- Manager list ---- */
+.pres-manager-body { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
+.pres-manager-error { margin-bottom: 16px; }
+.pres-deck-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.pres-deck-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(166, 136, 74, 0.2);
+  border-radius: 5px;
+  transition: border-color 180ms var(--ease-order);
+}
+.pres-deck-card:hover { border-color: rgba(166, 136, 74, 0.45); }
+.pres-deck-open { flex: 1; text-align: left; display: flex; flex-direction: column; gap: 4px; background: transparent; }
+.pres-deck-title { font-size: 1.2rem; color: var(--parchment); letter-spacing: 0.03em; }
+.pres-deck-meta { font-size: 0.68rem; }
+.pres-deck-actions { display: flex; gap: 6px; }
+.pres-empty { text-align: center; padding: 60px 0; display: flex; flex-direction: column; gap: 18px; align-items: center; }
+
+/* ---- Deck scroll + pages ---- */
+.pres-deck {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  background: #000;
+}
+
+.pres-page {
+  container-type: size;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  background: #000;
+}
+.pres-add-page { scroll-snap-align: start; }
+
+/* ---- 16:9 stage (largest 16:9 box fitting inside the page) ---- */
+.pres-stage {
+  position: relative;
+  overflow: hidden;
+  container-type: inline-size;
+  aspect-ratio: 16 / 9;
+  width: min(100cqw, calc(100cqh * 16 / 9));
+}
+/* Neutralise the public .section base layout when reused on a stage. */
+.pres-stage.section {
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  display: block;
+}
+
+/* ---- Hero (fixed first slide) ---- */
+.pres-hero {
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pres-hero-veil {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(8, 6, 4, 0.55) 100%),
+    linear-gradient(180deg, rgba(8, 6, 4, 0.45), transparent 28%, transparent 72%, rgba(8, 6, 4, 0.55));
+}
+.pres-hero-content {
+  position: relative; z-index: 2;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  padding: 2rem;
+}
+.pres-hero-logo { width: clamp(56px, 11cqw, 120px); margin-bottom: 0.4rem; }
+
+/* ---- The black text box ---- */
+.pres-box {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  background: rgba(8, 7, 6, 0.82);
+  border: 1px solid rgba(166, 136, 74, 0.5);
+  box-shadow:
+    0 12px 44px -14px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  color: var(--parchment);
+  padding: clamp(0.5rem, 1.6cqw, 1.6rem);
+}
+.pres-box.is-present { box-shadow: 0 12px 44px -16px rgba(0, 0, 0, 0.8); }
+
+.pres-box-content { display: flex; flex-direction: column; gap: 0.45em; width: 100%; height: 100%; overflow: hidden; }
+
+.pres-h {
+  font-family: var(--font-display);
+  color: var(--parchment);
+  letter-spacing: 0.04em;
+  line-height: 1.12;
+  margin: 0;
+}
+.pres-b {
+  color: var(--parchment);
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: var(--font-body);
+}
+
+/* editable fields share the rendered look exactly */
+.pres-h-input, .pres-b-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  width: 100%;
+  resize: none;
+  padding: 0;
+  field-sizing: content;
+}
+.pres-b-input { flex: 1; min-height: 1.5em; }
+.pres-h-input::placeholder, .pres-b-input::placeholder { color: var(--ash); }
+
+/* box drag-move toolbar (edit only) */
+.pres-box-toolbar {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 6px);
+  display: flex; gap: 6px; align-items: center;
+  padding: 5px 7px;
+  background: rgba(12, 10, 8, 0.97);
+  border: 1px solid rgba(166, 136, 74, 0.4);
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms var(--ease-order);
+  z-index: 8;
+  white-space: nowrap;
+}
+.pres-box:hover .pres-box-toolbar,
+.pres-box:focus-within .pres-box-toolbar { opacity: 1; pointer-events: auto; }
+
+.pres-box-toolbar button {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--parchment-mute);
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  line-height: 1;
+}
+.pres-box-toolbar button:hover { color: var(--parchment); border-color: rgba(166, 136, 74, 0.4); }
+.pres-box-toolbar button.on { color: var(--bg-deep); background: var(--brass); border-color: var(--brass); }
+.pres-tb-group {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 0 6px;
+  border-right: 1px solid rgba(166, 136, 74, 0.2);
+}
+.pres-tb-group:last-child { border-right: none; }
+.pres-tb-group em { font-style: normal; font-size: 10px; color: var(--ash); margin-right: 2px; text-transform: uppercase; letter-spacing: 0.08em; }
+.pres-box-grip { cursor: grab; color: var(--brass); padding: 0 4px; font-size: 13px; }
+.pres-box-grip:active { cursor: grabbing; }
+
+.pres-box-resize {
+  position: absolute;
+  right: -5px; bottom: -5px;
+  width: 14px; height: 14px;
+  cursor: nwse-resize;
+  background: var(--brass);
+  border: 2px solid var(--bg-deep);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 160ms var(--ease-order);
+  z-index: 9;
+}
+.pres-box:hover .pres-box-resize { opacity: 0.9; }
+
+/* ---- Per-slide tools (edit only) ---- */
+.pres-slide-tools {
+  position: absolute;
+  top: 10px; right: 10px;
+  display: flex; gap: 6px; align-items: center;
+  padding: 4px 7px;
+  background: rgba(12, 10, 8, 0.9);
+  border: 1px solid rgba(166, 136, 74, 0.35);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 160ms var(--ease-order);
+  z-index: 10;
+}
+.pres-stage:hover .pres-slide-tools { opacity: 1; }
+.pres-slide-tools button, .pres-slide-drag {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--parchment-mute);
+  padding: 2px 6px;
+  line-height: 1;
+}
+.pres-slide-tools button:hover:not(:disabled) { color: var(--parchment); }
+.pres-slide-tools button:disabled { opacity: 0.35; cursor: default; }
+.pres-slide-num { font-family: var(--font-mono); font-size: 11px; color: var(--brass); padding-right: 4px; }
+.pres-slide-del:hover { color: var(--cordovan-light); }
+.pres-slide-drag { cursor: grab; }
+.pres-slide-drag:active { cursor: grabbing; }
+
+/* ---- Add slide ---- */
+.pres-add-btn {
+  font-family: var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass-light);
+  border: 1px dashed rgba(166, 136, 74, 0.5);
+  border-radius: 4px;
+  padding: 18px 40px;
+  font-size: 0.8rem;
+  background: transparent;
+  transition: all 200ms var(--ease-order);
+}
+.pres-add-btn:hover { color: var(--parchment); border-color: var(--brass); background: rgba(166, 136, 74, 0.08); }
+
+/* ---- Present mode ---- */
+.pres-exit {
+  position: fixed;
+  top: 10px; right: 12px;
+  z-index: 50;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  color: var(--parchment);
+  background: rgba(12, 10, 8, 0.6);
+  border: 1px solid rgba(166, 136, 74, 0.3);
+  border-radius: 3px;
+  padding: 6px 10px;
+  opacity: 0.2;
+  transition: opacity 160ms var(--ease-order);
+}
+.pres-exit:hover { opacity: 1; }

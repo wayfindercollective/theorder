@@ -21,9 +21,15 @@ import { DESIGN_V2 } from './config/design.js'
 
 // Lazy-load admin so public visitors never download it.
 const AdminApp = lazy(() => import('./admin/AdminApp.jsx'))
+// Lazy-load the presentations builder for the same reason.
+const PresentationsApp = lazy(() => import('./presentations/PresentationsApp.jsx'))
 
 function isAdminRoute() {
   return typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+}
+
+function isPresentationsRoute() {
+  return typeof window !== 'undefined' && window.location.pathname.startsWith('/presentations')
 }
 
 function isPendingLeadsAdmin() {
@@ -35,6 +41,14 @@ function AdminRoot() {
   return (
     <Suspense fallback={<div className="admin-loading"><p className="restraint">Loading editor…</p></div>}>
       <AdminApp />
+    </Suspense>
+  )
+}
+
+function PresentationsRoot() {
+  return (
+    <Suspense fallback={<div className="admin-loading"><p className="restraint">Loading presentations…</p></div>}>
+      <PresentationsApp />
     </Suspense>
   )
 }
@@ -91,6 +105,7 @@ function PublicSite() {
 
 export default function App() {
   if (isAdminRoute()) return <AdminRoot />
+  if (isPresentationsRoute()) return <PresentationsRoot />
   if (isPendingLeadsAdmin()) return <PendingLeadsAdmin />
   return <PublicSite />
 }

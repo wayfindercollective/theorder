@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export function AdminLogin({ onLogin, loading, error }) {
+export function AdminLogin({ onLogin, loading, error, eyebrow = 'The Order Admin', title = 'Enter the Council.' }) {
   const [password, setPassword] = useState('')
 
   const submit = (e) => {
@@ -16,9 +16,9 @@ export function AdminLogin({ onLogin, loading, error }) {
         <span className="nail-br" />
 
         <div className="eyebrow admin-login-eyebrow">
-          <span className="brass-rule" /> The Order Admin <span className="brass-rule" />
+          <span className="brass-rule" /> {eyebrow} <span className="brass-rule" />
         </div>
-        <h1 className="display admin-login-title">Enter the Council.</h1>
+        <h1 className="display admin-login-title">{title}</h1>
 
         <label className="qs-field admin-login-field">
           <span className="qs-label">Password</span>

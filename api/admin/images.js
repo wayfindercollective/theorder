@@ -11,10 +11,7 @@
 
 import { list, del } from '@vercel/blob'
 import { requireAuth } from '../_lib/auth.js'
-
-function getBlobToken() {
-  return process.env.IMAGES_BLOB_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN || ''
-}
+import { getBlobToken } from '../_lib/blob.js'
 
 export default async function handler(req, res) {
   const payload = await requireAuth(req, res)

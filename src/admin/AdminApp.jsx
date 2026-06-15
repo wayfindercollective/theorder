@@ -3,29 +3,24 @@
  * Owns: token state, content load, save state, session-expiry timer.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   clearToken,
   fetchContent,
   getToken,
-  getTokenExpiryMs,
   humanizeError,
   login as apiLogin,
   saveContent,
 } from './adminApi.js'
 import { AdminLogin } from './AdminLogin.jsx'
 import { AdminEditor } from './AdminEditor.jsx'
-
-const EXPIRY_WARN_MS = 5 * 60 * 1000
+import { useSessionExpiry } from '../lib/useSessionExpiry.js'
 
 export default function AdminApp() {
   const [authed, setAuthed] = useState(() => !!getToken())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [content, setContent] = useState(null)
-  const [expiryWarning, setExpiryWarning] = useState('')
-  const warnTimerRef = useRef(null)
-  const expiryTimerRef = useRef(null)
 
   const signOut = useCallback(() => {
     clearToken()
@@ -33,41 +28,8 @@ export default function AdminApp() {
     setContent(null)
   }, [])
 
-  // Schedule session-expiry warning + auto-redirect based on JWT exp.
-  useEffect(() => {
-    clearTimeout(warnTimerRef.current)
-    clearTimeout(expiryTimerRef.current)
-    setExpiryWarning('')
-    if (!authed) return
-
-    const expMs = getTokenExpiryMs()
-    if (!expMs) return
-    const now = Date.now()
-    const untilExp = expMs - now
-    if (untilExp <= 0) {
-      signOut()
-      return
-    }
-
-    const untilWarn = untilExp - EXPIRY_WARN_MS
-    if (untilWarn > 0) {
-      warnTimerRef.current = setTimeout(() => {
-        setExpiryWarning('Your session expires in under 5 minutes — save now and sign in again to extend.')
-      }, untilWarn)
-    } else {
-      // Already inside the warn window
-      setExpiryWarning('Your session expires in under 5 minutes — save now and sign in again to extend.')
-    }
-    expiryTimerRef.current = setTimeout(() => {
-      setExpiryWarning('')
-      signOut()
-    }, untilExp)
-
-    return () => {
-      clearTimeout(warnTimerRef.current)
-      clearTimeout(expiryTimerRef.current)
-    }
-  }, [authed, signOut])
+  // Session-expiry warning + auto sign-out, shared with the presentations app.
+  const expiryWarning = useSessionExpiry(authed, signOut)
 
   const load = useCallback(async () => {
     setLoading(true)

@@ -15,6 +15,7 @@
 
 import { put } from '@vercel/blob'
 import { requireAuth } from '../_lib/auth.js'
+import { getBlobToken } from '../_lib/blob.js'
 
 export const config = {
   api: {
@@ -32,16 +33,6 @@ async function readRawBody(req) {
   const chunks = []
   for await (const chunk of req) chunks.push(chunk)
   return Buffer.concat(chunks)
-}
-
-/**
- * Token resolution order:
- *   1. IMAGES_BLOB_READ_WRITE_TOKEN  — the public store, prefixed when an old
- *      private store still uses the default name on the project
- *   2. BLOB_READ_WRITE_TOKEN         — the default name, if no prefix needed
- */
-function getBlobToken() {
-  return process.env.IMAGES_BLOB_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN || ''
 }
 
 export default async function handler(req, res) {
