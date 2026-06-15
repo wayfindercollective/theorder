@@ -40,6 +40,13 @@
   --hairline: 1px;
   --max-w: 1180px;
   --reading-w: 680px;
+
+  /* Section edge fade — the soft blur each painting melts into top & bottom so
+     one section blends into the next. A FIXED physical distance (not a % of the
+     section) so every seam blurs identically no matter how tall the section or
+     image is. Used by both full-bleed (.section-bg-image) and split
+     (.section-side-image) paintings. */
+  --edge-fade: clamp(120px, 22vh, 280px);
 }
 
 @theme inline {
@@ -185,10 +192,10 @@ button {
   right: 0;
   -webkit-mask-image:
     linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, black 23%, black 77%, transparent 100%);
+    linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
   mask-image:
     linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, black 23%, black 77%, transparent 100%);
+    linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
@@ -197,10 +204,10 @@ button {
   left: 0;
   -webkit-mask-image:
     linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, black 23%, black 77%, transparent 100%);
+    linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
   mask-image:
     linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, black 23%, black 77%, transparent 100%);
+    linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
@@ -220,9 +227,11 @@ button {
      scene actually reads, with only a faint unifying glaze on top */
   filter: sepia(0.08) saturate(1.08) contrast(0.97) brightness(1.36);
   /* fade the top and bottom of every photo into the dark so the sections
-     melt into one another — the whole scroll reads as one continuous canvas */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 23%, #000 77%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 23%, #000 77%, transparent 100%);
+     melt into one another — the whole scroll reads as one continuous canvas.
+     Fixed-distance fade (--edge-fade) keeps every seam identical regardless of
+     section height. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
 }
 
 /* Mobile: side images become full-bleed soft vignette so text stays readable */
@@ -1667,12 +1676,10 @@ button {
 }
 
 /* FAQ — St George is a tall portrait; shift the crop down so the dragon at the
-   foot of the painting comes into view, and ease the bottom fade so it isn't
-   swallowed by the edge blur. */
+   foot of the painting comes into view. The bottom fade now uses the shared
+   --edge-fade like every other section, so the seam matches the rest. */
 .section-faq .section-bg-image {
   background-position: center 82%;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 23%, #000 93%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 23%, #000 93%, transparent 100%);
 }
 
 /* Who We Are — round-table image behind the manifesto. Bring the scene
