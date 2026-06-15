@@ -383,7 +383,10 @@ button {
 }
 
 .btn-primary {
-  color: var(--bg-deep);
+  color: #060504;
+  /* heavier weight so the label reads clearly against the brass (the loaded
+     mono only went to 500 before — 600 is now loaded for this) */
+  font-weight: 600;
   background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 50%, var(--brass-deep) 100%);
   border: 1px solid var(--brass);
   box-shadow:
@@ -896,6 +899,14 @@ button {
   max-width: 18ch;
   margin: 0 auto;
   animation: riseIn 1500ms var(--ease-order) 400ms both;
+  /* THE ORDER sits over the brightest part of the horseman oil — back the
+     parchment letters with a deep oil-shadow halo (plus the faint gold relief)
+     so they read clearly on desktop and mobile without losing the painted feel. */
+  text-shadow:
+    0 -1px 0 rgba(196, 164, 95, 0.22),
+    0 2px 3px rgba(0, 0, 0, 0.7),
+    0 6px 26px rgba(0, 0, 0, 0.82),
+    0 0 54px rgba(0, 0, 0, 0.6);
 }
 
 .hero-actions {
@@ -1938,6 +1949,10 @@ button {
   margin-top: 1.4rem;
   font-size: clamp(2rem, 6vw, 3.6rem);
   letter-spacing: 0.18em;
+  text-shadow:
+    0 -1px 0 rgba(196, 164, 95, 0.22),
+    0 2px 3px rgba(0, 0, 0, 0.65),
+    0 6px 26px rgba(0, 0, 0, 0.78);
 }
 .closing-verses {
   display: flex;
