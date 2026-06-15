@@ -40,7 +40,7 @@ async function main() {
   const { height: H } = await sharp(background).metadata()
 
   // Shield anchored in the upper-left, over the sky.
-  const MARK_HEIGHT = Math.round(H * 0.6) // ≈ 60% of canvas height
+  const MARK_HEIGHT = Math.round(H * 0.4) // ≈ 40% of canvas height
   const MARK_LEFT = Math.round(W * 0.06)
   const MARK_TOP = Math.round(H * 0.05)
 
