@@ -2055,6 +2055,21 @@ button {
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
 }
 
+/* Closing citations (Mark 12:30 / Mark 12:31) — bright parchment-white over the
+   warm Creation-of-Adam ground (brass-on-gold and black-on-gold both washed out).
+   Larger and bolder than the default ref, with a strong layered dark shadow that
+   carves the white letters out of the painting's bright golden patches. */
+.section-closing .closing-ref {
+  font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: #f6f0e3;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.95),
+    0 2px 9px rgba(0, 0, 0, 0.78),
+    0 0 20px rgba(0, 0, 0, 0.6);
+}
+
 .section-evidence .section-heading,
 .section-evidence .evidence-intro,
 .section-faq .section-heading,
@@ -2068,14 +2083,25 @@ button {
 
 /* The Principles — the library oil is far brighter than the rest of the set, so
    don't pile the global brightness-lift onto it (it's already bright), and lay a
-   stronger dark plate behind the gold values so they read over it. */
+   stronger dark plate behind the gold values so they read over it.
+   The hall's vanishing archway sits a touch right of the image's true centre, so
+   a cover-image's background-position can't pan it on a full-width viewport (the
+   width is already filled). Over-scale a hair and translate left so the central
+   corridor lines up under the middle column. Brightness eased back so the gold
+   words win the contrast. */
 .section-principles .section-bg-image {
-  filter: sepia(0.08) saturate(1.04) contrast(1.01) brightness(1.34);
+  transform: scale(1.08) translateX(-2.8%);
+  transform-origin: center;
+  filter: sepia(0.08) saturate(1.04) contrast(1.01) brightness(1.18);
 }
+/* Reach the plate further out and hold it darker through ~85% so the bottom rows
+   (CELEBRATION, FAMILY, HOSPITALITY, THEOSIS…) stay covered, not just the centre. */
 .section-principles .shell::before {
-  background: radial-gradient(ellipse at center,
-    rgba(6, 5, 4, 0.88) 0%,
-    rgba(6, 5, 4, 0.7) 58%,
+  inset: -2.2rem -1.4rem;
+  background: radial-gradient(ellipse 82% 90% at center,
+    rgba(6, 5, 4, 0.9) 0%,
+    rgba(6, 5, 4, 0.84) 55%,
+    rgba(6, 5, 4, 0.6) 83%,
     rgba(6, 5, 4, 0) 100%);
 }
 
