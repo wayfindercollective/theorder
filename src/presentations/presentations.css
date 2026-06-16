@@ -351,3 +351,26 @@
   transition: opacity 160ms var(--ease-order);
 }
 .pres-exit:hover { opacity: 1; }
+
+/* ============================================================
+   APPENDED CYCLE PAINTINGS (slots 12–17) — see siteImages.js `pres-*`.
+   These six don't exist on the public site, so they carry their own
+   tonal grade + focal crop here. Brightness holds were measured against
+   the site's own full-bleed oils (post-grade luma band ≈ 50) and are
+   easy to eyeball-tune. Top/bottom fade + canvas-weave/vignette come
+   free from the shared .section-bg-image / .section-side-image machinery.
+   Scoped to .section-pres-* (only present on slide stages), so nothing
+   here can touch the live site. The grade overrides the global lift
+   (brightness 1.36), which would blow these already-lit oils out.
+   ============================================================ */
+.section-pres-soldier .section-bg-image { filter: sepia(0.06) saturate(1.03) contrast(1.00) brightness(0.93); background-position: center 55%; }
+.section-pres-squad   .section-bg-image { filter: sepia(0.06) saturate(1.03) contrast(1.00) brightness(0.86); background-position: center 32%; }
+.section-pres-base    .section-bg-image { filter: sepia(0.06) saturate(1.02) contrast(1.00) brightness(1.05); background-position: center; }
+.section-pres-dog     .section-bg-image { filter: sepia(0.06) saturate(1.04) contrast(1.00) brightness(1.31); background-position: center 42%; }
+.section-pres-blade   .section-bg-image { filter: sepia(0.06) saturate(1.03) contrast(1.00) brightness(0.99); background-position: center; }
+
+/* Sentinel — the tall standing-operator portrait. Image fills the right 58% (box
+   on the left, like the hero); that slot crops the 0.52 portrait to an upper-body
+   framing, so bias the crop up to keep his head + weapon in frame. */
+.section-pres-sentinel .section-side-image       { filter: sepia(0.06) saturate(1.04) contrast(1.00) brightness(1.28); }
+.section-pres-sentinel .section-side-image-right { background-position: center 22%; }

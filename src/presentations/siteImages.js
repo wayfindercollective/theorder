@@ -10,6 +10,12 @@
  *
  * Note the `how` entry: splitSides keys it as `howWeOperate` but its CSS class
  * is `section-how`, so alignKey and sectionClass are stored separately.
+ *
+ * The first 11 entries mirror the live site (and follow CMS image swaps). The
+ * final six (`pres-*`) are presentation-only paintings appended to the cycle so a
+ * deck runs through 17 images before repeating; they are hard-coded and decoupled
+ * from the site, so a future CMS swap never touches them. Existing saved slides
+ * store a fixed siteImageIndex, so appending here never disturbs old decks.
  */
 import data from '../../content/sections.json'
 import { sectionAlign } from '../config/design.js'
@@ -29,6 +35,21 @@ const DEFS = [
   { key: 'how',         alignKey: 'howWeOperate', sectionClass: 'section-how',        src: data.howWeOperate?.image, imageAlign: data.howWeOperate?.imageAlign, box: { xPct: 52, yPct: 26, wPct: 42, hPct: 52 } },
   { key: 'application', alignKey: 'application', sectionClass: 'section-application', src: data.application?.image,  imageAlign: data.application?.imageAlign,  box: { xPct: 28, yPct: 30, wPct: 44, hPct: 44 } },
   { key: 'closing',     alignKey: 'closing',     sectionClass: 'section-closing',     src: data.closing?.image,     imageAlign: data.closing?.imageAlign,     box: { xPct: 27, yPct: 36, wPct: 46, hPct: 32 } },
+
+  // --- Presentation-only extras, appended AFTER the 11 site mirrors so a deck
+  //     cycles through 17 paintings before it repeats. These are DECOUPLED from
+  //     sections.json: their src + align are hard-coded here (not read from the
+  //     CMS, not in design.js splitSides), so a future image swap on the public
+  //     site only ever reorders/replaces the first 11 — these six always sit at
+  //     the tail in this fixed order. `align` is explicit: 'full' for landscapes,
+  //     'right' for the standing-operator portrait (box falls on the left). Grade
+  //     + crop for each live in presentations.css, keyed by sectionClass. ---
+  { key: 'pres-soldier',  alignKey: null, sectionClass: 'section-pres-soldier',  src: '/images/pres-soldier.jpg',  imageAlign: null, align: 'full',  box: { xPct: 52, yPct: 14, wPct: 44, hPct: 34 } },
+  { key: 'pres-squad',    alignKey: null, sectionClass: 'section-pres-squad',    src: '/images/pres-squad.jpg',    imageAlign: null, align: 'full',  box: { xPct: 27, yPct: 58, wPct: 46, hPct: 30 } },
+  { key: 'pres-base',     alignKey: null, sectionClass: 'section-pres-base',     src: '/images/pres-base.jpg',     imageAlign: null, align: 'full',  box: { xPct: 28, yPct: 10, wPct: 44, hPct: 28 } },
+  { key: 'pres-dog',      alignKey: null, sectionClass: 'section-pres-dog',      src: '/images/pres-dog.jpg',      imageAlign: null, align: 'full',  box: { xPct: 5,  yPct: 30, wPct: 40, hPct: 42 } },
+  { key: 'pres-blade',    alignKey: null, sectionClass: 'section-pres-blade',    src: '/images/pres-blade.jpg',    imageAlign: null, align: 'full',  box: { xPct: 27, yPct: 12, wPct: 46, hPct: 30 } },
+  { key: 'pres-sentinel', alignKey: null, sectionClass: 'section-pres-sentinel', src: '/images/pres-sentinel.jpg', imageAlign: null, align: 'right', box: { xPct: 6,  yPct: 30, wPct: 40, hPct: 42 } },
 ]
 
 export const SITE_IMAGES = DEFS.map((d) => ({
@@ -36,7 +57,8 @@ export const SITE_IMAGES = DEFS.map((d) => ({
   alignKey: d.alignKey,
   sectionClass: d.sectionClass,
   src: d.src,
-  align: sectionAlign(d.alignKey, d.imageAlign || 'full'),
+  // Appended extras carry an explicit `align`; site mirrors derive it from design.js.
+  align: d.align ?? sectionAlign(d.alignKey, d.imageAlign || 'full'),
   defaultBox: d.box,
 }))
 
