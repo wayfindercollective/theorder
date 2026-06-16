@@ -11,7 +11,8 @@ export function PresHero() {
   const heroImg = SITE_IMAGES[0].src
   const logo = brandContent?.logo || '/images/logo-mark.png'
   return (
-    <div className="pres-stage pres-hero" style={{ backgroundImage: `url(${heroImg})` }}>
+    <div className="pres-stage pres-hero">
+      <div className="pres-hero-bg" style={{ backgroundImage: `url(${heroImg})` }} aria-hidden="true" />
       <div className="pres-hero-veil" aria-hidden="true" />
       <div className="pres-hero-content">
         <img className="logo-mark pres-hero-logo" src={logo} alt={brandContent?.wordmark || 'The Order'} />

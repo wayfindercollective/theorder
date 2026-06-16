@@ -122,42 +122,47 @@
 }
 
 /* ---- Hero (fixed first slide) ---- */
-/* Mirrors the live split hero: painting fills the stage (rider to the right),
-   logo + wordmark + verse sit LEFT-aligned in the left half. No CTA / cue / header. */
-.pres-hero {
+/* Mirrors the live split hero exactly: painting masked to the RIGHT 56% (faded
+   on its inner edge, rider in frame), the left stays dark, and the logo +
+   wordmark + verse sit as a CENTRED column in the left half. No CTA / cue / header. */
+.pres-hero { background: var(--bg-deep); }
+.pres-hero-bg {
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
+  width: 56%;
+  z-index: 0;
   background-size: cover;
-  background-position: center;
+  background-position: center 42%;
+  -webkit-mask-image: linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%);
 }
 .pres-hero-veil {
-  position: absolute; inset: 0; z-index: 1;
-  background:
-    /* darken the left half where the text sits, so the wordmark + verse read */
-    linear-gradient(90deg, rgba(8, 6, 4, 0.74) 0%, rgba(8, 6, 4, 0.4) 38%, transparent 64%),
-    linear-gradient(180deg, rgba(8, 6, 4, 0.4) 0%, transparent 26%, transparent 74%, rgba(8, 6, 4, 0.5) 100%);
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(8, 6, 4, 0.45) 0%, transparent 22%, transparent 76%, rgba(8, 6, 4, 0.5) 100%);
 }
 .pres-hero-content {
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 56%;
+  width: 50%;
   z-index: 2;
-  text-align: left;
+  text-align: center;
   display: flex; flex-direction: column;
-  align-items: flex-start; justify-content: center;
-  gap: clamp(0.5rem, 2cqh, 1.5rem);
-  padding: 0 clamp(1rem, 5cqw, 4rem);
+  align-items: center; justify-content: center;
+  gap: clamp(0.8rem, 2.4cqw, 1.6rem);
+  padding: 0 clamp(1rem, 4cqw, 4rem);
 }
-.pres-hero-logo { height: clamp(64px, 24cqh, 200px); width: auto; margin: 0 0 0.4rem; }
+.pres-hero-logo { height: clamp(110px, 17cqw, 280px); width: auto; margin: 0 0 0.4rem; }
 .pres-hero .hero-eyebrow { margin: 0; }
 .pres-hero .hero-headline {
   margin: 0;
-  font-size: clamp(1.6rem, 7cqw, 5.4rem);
+  font-size: clamp(1.8rem, 8cqw, 6.2rem);
   line-height: 0.98;
   max-width: none;
 }
 .pres-hero .hero-verse {
   margin: 0;
-  font-size: clamp(0.55rem, 1.5cqw, 1.15rem);
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+  font-size: clamp(0.75rem, 1.6cqw, 1.15rem);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
 }
 
 /* ---- The black text box ---- */
