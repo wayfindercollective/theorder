@@ -4,6 +4,7 @@ import { ApplicationTab } from './tabs/ApplicationTab.jsx'
 import { ImagesTab } from './tabs/ImagesTab.jsx'
 import { LogoTab } from './tabs/LogoTab.jsx'
 import { LibraryTab } from './tabs/LibraryTab.jsx'
+import { EmailSignatureTab } from './tabs/EmailSignatureTab.jsx'
 import { getDeployStatus, humanizeError } from './adminApi.js'
 
 const TABS = [
@@ -12,6 +13,7 @@ const TABS = [
   { id: 'images',      label: 'Images' },
   { id: 'library',     label: 'Library' },
   { id: 'logo',        label: 'Logo' },
+  { id: 'signature',   label: 'Email Signature' },
 ]
 
 const DRAFT_KEY = 'order_admin_draft_v1'
@@ -255,6 +257,7 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
         {tab === 'images'      && <ImagesTab      sections={draft.sections} onChange={updateSections} />}
         {tab === 'library'     && <LibraryTab     sections={draft.sections} />}
         {tab === 'logo'        && <LogoTab        sections={draft.sections} onChange={updateSections} />}
+        {tab === 'signature'   && <EmailSignatureTab sections={draft.sections} />}
       </main>
 
       {dirty && (

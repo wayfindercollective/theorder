@@ -2279,6 +2279,64 @@ button {
   margin: 0;
 }
 
+/* ── Email Signature tab ─────────────────────────────────────────────────── */
+
+/* White "email body" frame so the signature previews on its real background. */
+.sig-email-frame {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 26px 24px;
+  overflow-x: auto;
+}
+
+.sig-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sig-status {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+.sig-status-ok { color: var(--brass-light); }
+.sig-status-fail { color: var(--cordovan-light); }
+
+.sig-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.sig-tab {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--iron);
+  background: transparent;
+  color: var(--ash);
+  cursor: pointer;
+}
+.sig-tab.active {
+  background: var(--bg-leather);
+  border-color: var(--brass-deep);
+  color: var(--parchment);
+}
+
+.sig-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--parchment-mute);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.sig-steps li { margin-bottom: 0.4rem; }
+.sig-steps b { color: var(--parchment); }
+
 .admin-fields {
   display: flex;
   flex-direction: column;
