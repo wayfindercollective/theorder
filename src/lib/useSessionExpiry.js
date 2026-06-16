@@ -5,12 +5,13 @@
  * `onExpire` is called once the token is past expiry.
  */
 import { useEffect, useRef, useState } from 'react'
-import { getTokenExpiryMs } from '../admin/adminApi.js'
+import { getTokenExpiryMs as adminTokenExpiryMs } from '../admin/adminApi.js'
 
 const EXPIRY_WARN_MS = 5 * 60 * 1000
 const WARN_MSG = 'Your session expires in under 5 minutes — save now and sign in again to extend.'
 
-export function useSessionExpiry(active, onExpire) {
+// `getExpiryMs` lets each area read its OWN token's expiry (admin vs presentations).
+export function useSessionExpiry(active, onExpire, getExpiryMs = adminTokenExpiryMs) {
   const [warning, setWarning] = useState('')
   const warnRef = useRef(null)
   const expiryRef = useRef(null)
@@ -21,7 +22,7 @@ export function useSessionExpiry(active, onExpire) {
     setWarning('')
     if (!active) return
 
-    const expMs = getTokenExpiryMs()
+    const expMs = getExpiryMs()
     if (!expMs) return
     const untilExp = expMs - Date.now()
     if (untilExp <= 0) {
@@ -44,7 +45,7 @@ export function useSessionExpiry(active, onExpire) {
       clearTimeout(warnRef.current)
       clearTimeout(expiryRef.current)
     }
-  }, [active, onExpire])
+  }, [active, onExpire, getExpiryMs])
 
   return warning
 }

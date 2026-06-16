@@ -3,7 +3,7 @@
  * manager or editor. Lazy-loaded from App.jsx so the public site never ships it.
  */
 import { useCallback, useState } from 'react'
-import { getToken, clearToken, login as apiLogin, humanizeError } from '../admin/adminApi.js'
+import { getToken, clearToken, login as apiLogin, humanizeError, getTokenExpiryMs } from './presentationsApi.js'
 import { AdminLogin } from '../admin/AdminLogin.jsx'
 import { useSessionExpiry } from '../lib/useSessionExpiry.js'
 import { DeckManager } from './DeckManager.jsx'
@@ -24,7 +24,7 @@ export default function PresentationsApp() {
     setDraftNew(null)
   }, [])
 
-  const expiryWarning = useSessionExpiry(authed, signOut)
+  const expiryWarning = useSessionExpiry(authed, signOut, getTokenExpiryMs)
 
   const onLogin = useCallback(async (password) => {
     setError('')
