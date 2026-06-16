@@ -133,8 +133,17 @@
   z-index: 0;
   background-size: cover;
   background-position: center 42%;
-  -webkit-mask-image: linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%);
-  mask-image: linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%);
+  /* Fade the inner (left) edge AND the top/bottom (shared --edge-fade), composited
+     so the painting melts into the dark on every edge — like the live hero — instead
+     of ending in a hard line at the bottom of the stage. */
+  -webkit-mask-image:
+    linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+  mask-image:
+    linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 .pres-hero-veil {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
