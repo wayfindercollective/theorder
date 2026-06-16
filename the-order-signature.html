@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Order — Email Signature</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #0a0908;
+    color: #e8e0d0;
+    font-family: 'EB Garamond', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px 80px;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; }
+  h1 {
+    font-family: Georgia, serif;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 18px;
+    color: #c4a45f;
+    margin: 0 0 4px;
+  }
+  .sub { color: #7a7468; font-size: 14px; margin: 0 0 32px; }
+  .card {
+    background: #171513;
+    border: 1px solid #2a2420;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .card h2 {
+    font-family: Georgia, serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #a6884a;
+    margin: 0 0 16px;
+  }
+  label { display: block; font-size: 12px; color: #c2b9a6; margin: 0 0 6px; letter-spacing: 0.04em; }
+  .field { margin-bottom: 16px; }
+  input[type="text"] {
+    width: 100%;
+    background: #0e0c0a;
+    border: 1px solid #3a342e;
+    border-radius: 6px;
+    color: #e8e0d0;
+    font-family: Georgia, serif;
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+  input[type="text"]:focus { outline: none; border-color: #a6884a; }
+
+  /* The white "email" preview frame */
+  .email-frame {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 28px 26px;
+    color: #1a1a1a;
+  }
+
+  .btnrow { display: flex; gap: 12px; align-items: center; margin-top: 4px; }
+  button {
+    background: linear-gradient(180deg, #c4a45f 0%, #a6884a 60%, #7d6635 100%);
+    color: #1a120a;
+    border: none;
+    border-radius: 6px;
+    font-family: Georgia, serif;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+    font-size: 14px;
+    padding: 11px 22px;
+    cursor: pointer;
+  }
+  button:active { transform: translateY(1px); }
+  .status { font-size: 13px; color: #8fae74; min-height: 18px; }
+
+  ol { padding-left: 20px; line-height: 1.7; color: #c2b9a6; font-size: 14px; }
+  ol li { margin-bottom: 8px; }
+  ol b { color: #e8e0d0; }
+  .note { font-size: 13px; color: #7a7468; line-height: 1.6; margin-top: 12px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab {
+    font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 7px 14px; border-radius: 20px; cursor: pointer;
+    border: 1px solid #3a342e; color: #c2b9a6; background: transparent;
+  }
+  .tab.active { background: #2a1f1a; border-color: #a6884a; color: #e8e0d0; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>The Order — Email Signature</h1>
+  <p class="sub">Type your name and role, copy, then paste into Apple Mail. That's it.</p>
+
+  <!-- STEP 1 -->
+  <div class="card">
+    <h2>1 · Your details</h2>
+    <div class="field">
+      <label for="name">Name</label>
+      <input type="text" id="name" value="Nico Seedsman" />
+    </div>
+    <div class="field">
+      <label for="role">Role</label>
+      <input type="text" id="role" value="CEO and Founder" />
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card">
+    <h2>2 · Preview</h2>
+    <div class="email-frame">
+      <!-- ===== THE SIGNATURE (this exact block gets copied) ===== -->
+      <div id="signature"></div>
+      <!-- ===== /SIGNATURE ===== -->
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card">
+    <h2>3 · Copy &amp; install</h2>
+    <div class="btnrow">
+      <button id="copyBtn" type="button">Copy signature</button>
+      <span class="status" id="status"></span>
+    </div>
+
+    <div class="tabs" style="margin-top:22px;">
+      <button class="tab active" data-tab="mac">On a Mac</button>
+      <button class="tab" data-tab="ios">On iPhone / iPad</button>
+    </div>
+
+    <div class="panel active" id="panel-mac">
+      <ol>
+        <li>Click <b>Copy signature</b> above.</li>
+        <li>Open <b>Mail</b> &rarr; menu bar &rarr; <b>Mail &rarr; Settings</b> &rarr; <b>Signatures</b> tab.</li>
+        <li>Select your <b>theorder.global account</b> on the left, then click <b>+</b> to add a signature and name it "The Order".</li>
+        <li><b>Important:</b> uncheck <b>"Always match my default message font"</b> (bottom of the window) so the formatting is kept.</li>
+        <li>Click into the right-hand box, select any placeholder text, and <b>paste</b> (Cmd+V). The logo and layout will appear.</li>
+        <li>At the bottom, set the <b>Choose Signature</b> dropdown to "The Order" so it's used automatically.</li>
+      </ol>
+    </div>
+
+    <div class="panel" id="panel-ios">
+      <ol>
+        <li>Email yourself this signature first: paste it into a message from your Mac, or click <b>Copy signature</b> on the phone if you opened this page there.</li>
+        <li>On the phone, open the email and <b>copy</b> the signature (tap &amp; hold &rarr; Select All &rarr; Copy).</li>
+        <li>Go to <b>Settings &rarr; Apps &rarr; Mail &rarr; Signature</b> (older iOS: <b>Settings &rarr; Mail &rarr; Signature</b>).</li>
+        <li>Choose <b>Per Account</b>, tap the box for the theorder.global account, and <b>paste</b>. iOS keeps the logo and formatting when pasted.</li>
+      </ol>
+    </div>
+
+    <p class="note">The logo loads from the live website, so it always displays correctly for the people you email. Keep an internet connection the first time the signature is shown.</p>
+  </div>
+
+</div>
+
+<script>
+  // Public, always-on URL for the crest (served from theorder.global).
+  var LOGO_URL = "https://www.theorder.global/images/logo-mark.png";
+
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  // Email-safe, table-based signature with inline styles only.
+  function buildSignature(name, role){
+    name = esc(name || "");
+    role = esc(role || "");
+    return ''
+    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:Georgia,\'Times New Roman\',serif;">'
+    +   '<tr>'
+    +     '<td style="vertical-align:middle;padding:0 18px 0 0;border-right:1px solid #d9cfb8;">'
+    +       '<img src="' + LOGO_URL + '" alt="The Order" width="52" height="107" style="display:block;width:52px;height:107px;border:0;outline:none;" />'
+    +     '</td>'
+    +     '<td style="vertical-align:middle;padding:0 0 0 18px;">'
+    +       '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:17px;font-weight:bold;color:#1a1a1a;line-height:1.2;">' + name + '</div>'
+    +       '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:13px;color:#6b6b6b;letter-spacing:0.03em;padding-top:2px;">' + role + '</div>'
+    +       '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:13px;font-weight:bold;letter-spacing:0.22em;text-transform:uppercase;color:#7d6635;padding-top:12px;">THE&nbsp;ORDER</div>'
+    +       '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:12px;padding-top:3px;"><a href="https://www.theorder.global" style="color:#8a8a8a;text-decoration:none;">theorder.global</a></div>'
+    +     '</td>'
+    +   '</tr>'
+    + '</table>';
+  }
+
+  var nameEl = document.getElementById('name');
+  var roleEl = document.getElementById('role');
+  var sigEl  = document.getElementById('signature');
+
+  function render(){ sigEl.innerHTML = buildSignature(nameEl.value, roleEl.value); }
+  nameEl.addEventListener('input', render);
+  roleEl.addEventListener('input', render);
+  render();
+
+  // Copy the rendered signature as rich HTML.
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    var status = document.getElementById('status');
+    var done = function(ok){ status.textContent = ok ? "✓ Copied — now paste into Mail." : "Couldn't auto-copy. Select the preview manually and press Cmd+C."; };
+
+    // Preferred: select the node and copy (keeps rich HTML for Mail).
+    try {
+      var range = document.createRange();
+      range.selectNode(sigEl);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      var ok = document.execCommand('copy');
+      sel.removeAllRanges();
+      if (ok) { done(true); return; }
+    } catch (e) {}
+
+    // Fallback: modern clipboard API with explicit HTML.
+    if (navigator.clipboard && window.ClipboardItem) {
+      var html = sigEl.innerHTML;
+      var item = new ClipboardItem({
+        "text/html": new Blob([html], {type:"text/html"}),
+        "text/plain": new Blob([sigEl.innerText], {type:"text/plain"})
+      });
+      navigator.clipboard.write([item]).then(function(){ done(true); }, function(){ done(false); });
+    } else {
+      done(false);
+    }
+  });
+
+  // Tab switching for install instructions.
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+      document.querySelectorAll('.panel').forEach(function(x){ x.classList.remove('active'); });
+      t.classList.add('active');
+      document.getElementById('panel-' + t.getAttribute('data-tab')).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
