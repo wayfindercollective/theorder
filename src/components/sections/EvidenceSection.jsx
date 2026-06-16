@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useInView } from '../../hooks/useInView.js'
 import { evidenceContent } from '../../config/sectionContent.js'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
+import { renderRich, richText } from '../../lib/richtext.js'
 
 /**
  * A video testimonial. It autoplays muted on a loop so it visibly reads as a
@@ -78,9 +79,9 @@ export function EvidenceSection() {
           <div className="eyebrow">
             <span className="brass-rule" /> {evidenceContent.eyebrow} <span className="brass-rule" />
           </div>
-          <h2 className="display section-heading">{evidenceContent.heading}</h2>
-          {evidenceContent.intro?.trim() && (
-            <p className="restraint evidence-intro">{evidenceContent.intro}</p>
+          <h2 className="display section-heading" dangerouslySetInnerHTML={renderRich(evidenceContent.heading)} />
+          {richText(evidenceContent.intro) && (
+            <p className="restraint evidence-intro" dangerouslySetInnerHTML={renderRich(evidenceContent.intro)} />
           )}
           <div className="section-divider" style={{ margin: '2rem auto 3.5rem' }} />
         </div>

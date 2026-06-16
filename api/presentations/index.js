@@ -24,6 +24,11 @@ import { randomUUID } from 'node:crypto'
 import { list, put, del } from '@vercel/blob'
 import { requireAuth } from '../_lib/auth.js'
 import { getBlobToken } from '../_lib/blob.js'
+import { sanitizeInline } from '../_lib/sanitizeRich.js'
+import { richText } from '../../src/lib/richtext.js'
+
+const MAX_HEADING_TEXT = 200
+const MAX_BODY_TEXT = 5000
 
 const PREFIX = 'presentations/'
 // Upper bound for the siteImageIndex clamp. Mirrors SITE_IMAGES.length in
@@ -58,8 +63,9 @@ function sanitizeSlide(s) {
   return {
     id: typeof s?.id === 'string' && s.id ? s.id.slice(0, 64) : randomUUID(),
     siteImageIndex: clampInt(s?.siteImageIndex, 0, MAX_IMAGE_INDEX, 0),
-    heading: str(s?.heading, 200),
-    body: str(s?.body, 5000),
+    // rich text, sanitised to the inline allowlist (empty → '')
+    heading: sanitizeInline(s?.heading),
+    body: sanitizeInline(s?.body),
     box: {
       xPct: clampNum(b.xPct, 0, 100, 8),
       yPct: clampNum(b.yPct, 0, 100, 60),
@@ -72,6 +78,16 @@ function sanitizeSlide(s) {
       headingPx: clampInt(b.headingPx, 12, 200, 40),
       bodyPx: clampInt(b.bodyPx, 12, 200, 20),
     },
+  }
+}
+
+// Sanitise rich fields on the way OUT too, so any pre-rich deck or out-of-band
+// Blob edit can never reach present mode's dangerouslySetInnerHTML unsanitised.
+function sanitizeDeckForRead(deck) {
+  if (!deck || !Array.isArray(deck.slides)) return deck
+  return {
+    ...deck,
+    slides: deck.slides.map((s) => ({ ...s, heading: sanitizeInline(s?.heading), body: sanitizeInline(s?.body) })),
   }
 }
 
@@ -108,14 +124,14 @@ export default async function handler(req, res) {
         if (!UUID_RE.test(String(id))) return res.status(400).json({ error: 'bad id' })
         const blob = await resolveBlob(token, id)
         if (!blob) return res.status(404).json({ error: 'not found' })
-        return res.status(200).json({ deck: await fetchDeck(blob) })
+        return res.status(200).json({ deck: sanitizeDeckForRead(await fetchDeck(blob)) })
       }
       const decks = []
       let cursor
       do {
         const page = await list({ prefix: PREFIX, cursor, limit: 1000, token })
         for (const b of page.blobs || []) {
-          try { decks.push(await fetchDeck(b)) } catch { /* skip unreadable */ }
+          try { decks.push(sanitizeDeckForRead(await fetchDeck(b))) } catch { /* skip unreadable */ }
         }
         cursor = page.cursor
       } while (cursor)
@@ -139,6 +155,12 @@ export default async function handler(req, res) {
     const slides = Array.isArray(body?.slides)
       ? body.slides.slice(0, MAX_SLIDES).map(sanitizeSlide)
       : []
+    // Limit by visible text length (never truncate HTML — that would cut a tag).
+    for (const s of slides) {
+      if (richText(s.heading).length > MAX_HEADING_TEXT || richText(s.body).length > MAX_BODY_TEXT) {
+        return res.status(400).json({ error: 'slide text too long' })
+      }
+    }
     const title = str(body?.title, 120).trim() || 'Untitled Presentation'
     let cursor = clampInt(body?.cursor, 0, 1e9, slides.length + 1)
     const now = new Date().toISOString()

@@ -13,6 +13,7 @@
 
 import { requireAuth } from '../_lib/auth.js'
 import { readJsonFile, writeJsonFile } from '../_lib/github.js'
+import { sanitizeRichSections } from '../_lib/sanitizeRich.js'
 
 const SECTIONS_PATH = 'content/sections.json'
 const QUESTIONS_PATH = 'content/questions.json'
@@ -34,11 +35,6 @@ function mergeKeepingUnknown(current, incoming) {
   }
   return out
 }
-
-// Resolver for writeJsonFile: merges against the live JSON from the same
-// read that supplies the write SHA (re-invoked on conflict retry).
-const mergeResolver = (incoming) => (live) =>
-  live ? mergeKeepingUnknown(live, incoming) : incoming
 
 export default async function handler(req, res) {
   const payload = await requireAuth(req, res)
@@ -66,20 +62,33 @@ export default async function handler(req, res) {
     }
     // Serialize the writes — two concurrent commits to the same branch
     // race against each other and one will hit a stale-SHA conflict.
+    // Resolvers merge against the freshest live JSON (re-invoked on conflict
+    // retry); the sections resolver also sanitises rich fields so only clean
+    // HTML is ever committed. We capture the final written objects to return
+    // them — the editor then reflects exactly what was stored.
     try {
       let wrote = 0
+      let savedSections
+      let savedQuestions
       if (body?.sections) {
-        await writeJsonFile(SECTIONS_PATH, mergeResolver(body.sections), 'cms: update sections')
+        await writeJsonFile(SECTIONS_PATH, (live) => {
+          const merged = live ? mergeKeepingUnknown(live, body.sections) : body.sections
+          savedSections = sanitizeRichSections(merged)
+          return savedSections
+        }, 'cms: update sections')
         wrote++
       }
       if (body?.questions) {
-        await writeJsonFile(QUESTIONS_PATH, mergeResolver(body.questions), 'cms: update questions')
+        await writeJsonFile(QUESTIONS_PATH, (live) => {
+          savedQuestions = live ? mergeKeepingUnknown(live, body.questions) : body.questions
+          return savedQuestions
+        }, 'cms: update questions')
         wrote++
       }
       if (wrote === 0) {
         return res.status(400).json({ error: 'nothing to save' })
       }
-      return res.status(200).json({ ok: true })
+      return res.status(200).json({ ok: true, sections: savedSections, questions: savedQuestions })
     } catch (err) {
       return res.status(500).json({ error: err?.message || 'write failed' })
     }

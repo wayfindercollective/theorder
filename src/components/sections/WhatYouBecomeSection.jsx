@@ -3,6 +3,7 @@ import { becomeContent } from '../../config/sectionContent.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
 import { sectionAlign } from '../../config/design.js'
+import { renderRich } from '../../lib/richtext.js'
 
 export function WhatYouBecomeSection() {
   const { ref, inView } = useInView()
@@ -20,9 +21,7 @@ export function WhatYouBecomeSection() {
           <div className="eyebrow">
             <span className="brass-rule" /> {becomeContent.eyebrow} <span className="brass-rule" />
           </div>
-          <h2 className="display section-heading become-heading">
-            {becomeContent.heading}
-          </h2>
+          <h2 className="display section-heading become-heading" dangerouslySetInnerHTML={renderRich(becomeContent.heading)} />
           <div className="section-divider" style={{ margin: '2rem auto 3rem' }} />
         </div>
 
@@ -33,9 +32,7 @@ export function WhatYouBecomeSection() {
         </ul>
 
         {becomeContent.closing && (
-          <p className={'offering-closing display reveal ' + (inView ? 'in-view' : '')}>
-            {becomeContent.closing}
-          </p>
+          <p className={'offering-closing display reveal ' + (inView ? 'in-view' : '')} dangerouslySetInnerHTML={renderRich(becomeContent.closing)} />
         )}
 
         <CtaButton location="afterOfferings" className={'reveal ' + (inView ? 'in-view' : '')} />

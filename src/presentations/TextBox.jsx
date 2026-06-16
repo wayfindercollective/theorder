@@ -11,6 +11,9 @@
  * In Present mode: no controls/handles; a box left entirely empty renders nothing.
  */
 import { useRef } from 'react'
+import { RichText } from '../components/ui/RichText.jsx'
+import { isRichEmpty } from '../lib/richtext.js'
+import { renderPresent } from './renderPresent.js'
 
 const REF_W = 1280 // reference stage width at which *Px are literal pixels
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
@@ -20,7 +23,7 @@ const ALIGN_LABEL = { left: 'L', center: 'C', right: 'R' }
 export function TextBox({ slide, present, onChange, onBoxChange }) {
   const ref = useRef(null)
   const b = slide.box
-  const empty = !slide.heading.trim() && !slide.body.trim()
+  const empty = isRichEmpty(slide.heading) && isRichEmpty(slide.body)
   if (present && empty) return null
 
   const stageRect = () => ref.current?.parentElement?.getBoundingClientRect()
@@ -128,25 +131,26 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
       <div className="pres-box-content">
         {present ? (
           <>
-            {slide.heading.trim() && <h2 className="pres-h display" style={headStyle}>{slide.heading}</h2>}
-            {slide.body.trim() && <p className="pres-b" style={bodyStyle}>{slide.body}</p>}
+            {!isRichEmpty(slide.heading) && <h2 className="pres-h display" style={headStyle} dangerouslySetInnerHTML={renderPresent(slide.heading)} />}
+            {!isRichEmpty(slide.body) && <p className="pres-b" style={bodyStyle} dangerouslySetInnerHTML={renderPresent(slide.body)} />}
           </>
         ) : (
           <>
-            <textarea
-              className="pres-h pres-h-input display"
-              style={headStyle}
+            <RichText
+              mode="heading"
               value={slide.heading}
+              baseStyle={headStyle}
               placeholder="Heading"
-              rows={1}
-              onChange={(e) => onChange({ heading: e.target.value })}
+              className="pres-rt pres-rt-h display"
+              onChange={(v) => onChange({ heading: v })}
             />
-            <textarea
-              className="pres-b pres-b-input"
-              style={bodyStyle}
+            <RichText
+              mode="inline"
               value={slide.body}
+              baseStyle={bodyStyle}
               placeholder="Body…"
-              onChange={(e) => onChange({ body: e.target.value })}
+              className="pres-rt pres-rt-b"
+              onChange={(v) => onChange({ body: v })}
             />
           </>
         )}

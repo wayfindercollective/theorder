@@ -1,10 +1,12 @@
 import { useInView } from '../../hooks/useInView.js'
 import { truthContent } from '../../config/sectionContent.js'
-import { mdInline } from '../../lib/markdown.js'
+import { renderRich, richText } from '../../lib/richtext.js'
 
 export function TheTruthSection() {
   const { ref, inView } = useInView()
-  const lines = (truthContent.provocation || '').split('\n')
+  const lines = Array.isArray(truthContent.provocation)
+    ? truthContent.provocation
+    : String(truthContent.provocation || '').split('\n')
   const isFull = truthContent.imageAlign === 'full'
   return (
     <section className="section section-truth" ref={ref}>
@@ -26,8 +28,8 @@ export function TheTruthSection() {
 
         <div className={'stagger truth-provocation ' + (inView ? 'in-view' : '')}>
           {lines.map((line, i) =>
-            line.trim() ? (
-              <p key={i} className="truth-line display tooled" dangerouslySetInnerHTML={mdInline(line)} />
+            richText(line) ? (
+              <p key={i} className="truth-line display tooled" dangerouslySetInnerHTML={renderRich(line)} />
             ) : (
               <span key={i} className="truth-gap" aria-hidden="true" />
             )

@@ -191,6 +191,21 @@
 .pres-box.is-present { box-shadow: 0 12px 44px -16px rgba(0, 0, 0, 0.8); }
 
 .pres-box-content { display: flex; flex-direction: column; gap: 0.45em; width: 100%; height: 100%; overflow: hidden; }
+/* In edit mode let the rich-text floating toolbars escape the box; present clips. */
+.pres-box:not(.is-present) .pres-box-content { overflow: visible; }
+
+/* RichText editor inside a slide box — base size/alignment come from baseStyle. */
+.pres-rt { position: relative; width: 100%; }
+.pres-rt-b { flex: 1 1 auto; min-height: 1.4em; }
+.pres-rt .rt-content { width: 100%; }
+.pres-rt-h .rt-content .ProseMirror {
+  font-family: var(--font-display); color: var(--parchment);
+  letter-spacing: 0.04em; line-height: 1.12;
+}
+.pres-rt-b .rt-content .ProseMirror {
+  font-family: var(--font-body); color: var(--parchment); line-height: 1.5;
+}
+.pres-rt .rt-placeholder { color: var(--ash); }
 
 .pres-h {
   font-family: var(--font-display);

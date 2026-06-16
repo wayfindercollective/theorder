@@ -3,6 +3,7 @@ import { faqContent } from '../../config/sectionContent.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
 import { sectionAlign } from '../../config/design.js'
+import { renderRich } from '../../lib/richtext.js'
 
 export function FAQSection() {
   const { ref, inView } = useInView()
@@ -20,7 +21,7 @@ export function FAQSection() {
           <div className="eyebrow">
             <span className="brass-rule" /> {faqContent.eyebrow} <span className="brass-rule" />
           </div>
-          <h2 className="display section-heading">{faqContent.heading}</h2>
+          <h2 className="display section-heading" dangerouslySetInnerHTML={renderRich(faqContent.heading)} />
           <div className="section-divider" style={{ margin: '2rem auto 3rem' }} />
         </div>
 

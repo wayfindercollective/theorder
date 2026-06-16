@@ -11,7 +11,9 @@ import { PresHero } from './PresHero.jsx'
 import { Slide } from './Slide.jsx'
 
 const newId = () => crypto.randomUUID()
-const draftKey = (id) => `pres_draft_${id}`
+// v2: rich-text drafts. The version suffix invalidates any stale pre-rich draft
+// (plain-text era) so it can't be restored and rendered as HTML.
+const draftKey = (id) => `pres_draft_v2_${id}`
 
 // Compare two decks ignoring server-owned timestamps, to tell whether a saved
 // localStorage draft holds genuinely unsaved edits versus the server copy.

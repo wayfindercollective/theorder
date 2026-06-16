@@ -1,6 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { codeContent } from '../../config/sectionContent.js'
-import { mdHtml } from '../../lib/markdown.js'
+import { renderRich } from '../../lib/richtext.js'
 import { sectionAlign } from '../../config/design.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
 
@@ -27,10 +27,10 @@ export function TheCodeSection() {
           <div className="eyebrow">
             <span className="brass-rule" /> {codeContent.eyebrow} <span className="brass-rule" />
           </div>
-          <h2 className="display section-heading">{codeContent.heading}</h2>
+          <h2 className="display section-heading" dangerouslySetInnerHTML={renderRich(codeContent.heading)} />
           <div className="section-divider" style={{ margin: '1.8rem auto 2.2rem' }} />
           {codeContent.intro && (
-            <div className="values-intro" dangerouslySetInnerHTML={mdHtml(codeContent.intro)} />
+            <div className="values-intro" dangerouslySetInnerHTML={renderRich(codeContent.intro)} />
           )}
           <CtaButton location="afterWhoWeAre" className={'reveal ' + (inView ? 'in-view' : '')} />
         </div>

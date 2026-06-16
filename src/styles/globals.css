@@ -610,6 +610,61 @@ button {
   font-style: italic;
 }
 
+/* ============================================================
+   RICH TEXT EDITOR (TipTap) — /admin + /presentations editing UI.
+   The public site renders the stored HTML directly; these styles
+   only dress the editor. The library loads only in those lazy
+   chunks, never on the public site.
+   ============================================================ */
+.rt { position: relative; }
+.rt-content-wrap { position: relative; }
+.rt-content .ProseMirror { outline: none; white-space: pre-wrap; word-break: break-word; }
+.rt-placeholder {
+  position: absolute; left: 0; top: 0;
+  pointer-events: none; color: var(--ash); opacity: 0.75; font-style: italic;
+}
+.rt-toolbar {
+  position: absolute; left: 0; bottom: calc(100% + 4px);
+  display: flex; gap: 3px; align-items: center;
+  padding: 4px 5px;
+  background: rgba(12, 10, 8, 0.97);
+  border: 1px solid rgba(166, 136, 74, 0.4);
+  border-radius: 4px;
+  z-index: 30;
+  opacity: 0; pointer-events: none;
+  transition: opacity 120ms var(--ease-order);
+}
+.rt:hover .rt-toolbar, .rt.is-focused .rt-toolbar { opacity: 1; pointer-events: auto; }
+.rt-toolbar button {
+  font-family: var(--font-mono); font-size: 12px; line-height: 1;
+  color: var(--parchment-mute); padding: 4px 7px;
+  border: 1px solid transparent; border-radius: 3px; background: transparent;
+}
+.rt-toolbar button:hover { color: var(--parchment); border-color: rgba(166, 136, 74, 0.4); }
+.rt-toolbar button.on { color: var(--bg-deep); background: var(--brass); border-color: var(--brass); }
+.rt-sep { width: 1px; height: 14px; background: rgba(166, 136, 74, 0.3); margin: 0 2px; }
+
+/* Admin: the editor looks like an input field. */
+.admin-rich { margin-top: 1.7rem; }   /* room for the floating toolbar above */
+.admin-rich .rt-content {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  transition: border-color 280ms var(--ease-order);
+}
+.admin-rich.is-focused .rt-content {
+  border-color: var(--brass);
+  background: var(--bg-leather);
+  box-shadow: 0 0 0 3px rgba(166, 136, 74, 0.15);
+}
+.admin-rich .rt-placeholder { left: 1.2rem; top: 1rem; }
+.admin-rich-italic .rt-content { font-style: italic; }
+
 /* progress bar */
 .progress-track {
   width: 100%;

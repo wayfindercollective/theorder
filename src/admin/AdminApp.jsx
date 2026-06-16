@@ -69,8 +69,12 @@ export default function AdminApp() {
     setError('')
     setLoading(true)
     try {
-      await saveContent(next)
-      setContent(next)
+      const saved = await saveContent(next)
+      // Reflect exactly what the server stored (rich fields come back sanitised).
+      setContent({
+        sections: saved?.sections ?? next.sections,
+        questions: saved?.questions ?? next.questions,
+      })
       return { ok: true }
     } catch (err) {
       const human = humanizeError(err)

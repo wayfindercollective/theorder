@@ -1,6 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { founderContent } from '../../config/sectionContent.js'
-import { mdInline } from '../../lib/markdown.js'
+import { renderRich } from '../../lib/richtext.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
 
 export function FounderSection() {
@@ -19,7 +19,7 @@ export function FounderSection() {
           <div className="eyebrow">
             <span className="brass-rule" /> {founderContent.eyebrow} <span className="brass-rule" />
           </div>
-          <h2 className="display section-heading">{founderContent.heading}</h2>
+          <h2 className="display section-heading" dangerouslySetInnerHTML={renderRich(founderContent.heading)} />
           <div className="section-divider" style={{ margin: '2rem auto 3.5rem' }} />
         </div>
 
@@ -44,7 +44,7 @@ export function FounderSection() {
 
           <div className="founder-text">
             {founderContent.paragraphs.map((p, i) => (
-              <p key={i} className="founder-p" dangerouslySetInnerHTML={mdInline(p)} />
+              <p key={i} className="founder-p" dangerouslySetInnerHTML={renderRich(p)} />
             ))}
             <p className="founder-signature display">{founderContent.signature}</p>
           </div>

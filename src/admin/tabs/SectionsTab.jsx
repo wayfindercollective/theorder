@@ -11,6 +11,8 @@
  */
 
 import { MarkdownField } from '../MarkdownField.jsx'
+import { RichText } from '../../components/ui/RichText.jsx'
+import { richModeForPath } from '../../lib/richtext.js'
 
 const SECTION_DEFS = [
   {
@@ -241,6 +243,27 @@ export function SectionsTab({ sections, onChange }) {
             {sec.fields.map((f) => {
               const value = getAt(sections, f.path) ?? ''
               const id = sec.key + '-' + f.path.join('-')
+
+              const richMode = richModeForPath(f.path)
+              if (richMode) {
+                const raw = getAt(sections, f.path)
+                const richValue = richMode === 'lines'
+                  ? (Array.isArray(raw) ? raw : (typeof raw === 'string' && raw ? raw.split('\n') : []))
+                  : (raw ?? '')
+                return (
+                  <label key={id} className="admin-field">
+                    <span className="admin-field-label">{f.label}</span>
+                    <RichText
+                      value={richValue}
+                      mode={richMode}
+                      withLink
+                      onChange={(v) => update(f.path, v)}
+                      className={'admin-rich' + (f.italic ? ' admin-rich-italic' : '')}
+                    />
+                    {f.hint && <span className="admin-field-hint">{f.hint}</span>}
+                  </label>
+                )
+              }
 
               if (f.markdown) {
                 return (
