@@ -1,7 +1,8 @@
 /**
- * The black text box on a slide — one heading + body, drag-to-move, resize, font
- * size, box alignment (L/C/R), text alignment (L/C/R). Plain text only (inputs/
- * textareas → React text nodes; no contentEditable/HTML, so no XSS or rich-paste).
+ * The black text box on a slide — one heading + body. Heading and body each have
+ * their OWN size and alignment (independent of each other); the box itself has a
+ * position (L/C/R + free drag) and resize. Plain text only (inputs/textareas →
+ * React text nodes; no contentEditable/HTML, so no XSS or rich-paste).
  *
  * Geometry is stored as % of the slide stage, and font sizes scale with the
  * stage width via container-query units (cqw), so a box lands identically on the
@@ -77,37 +78,46 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
 
   const bumpFont = (key, delta) => onBoxChange({ [key]: clamp(b[key] + delta, 12, 200) })
 
+  // Heading and body align independently. Fall back to the old shared `textAlign`
+  // for decks saved before the split.
+  const headingAlign = b.headingAlign ?? b.textAlign ?? 'left'
+  const bodyAlign = b.bodyAlign ?? b.textAlign ?? 'left'
+
   const style = { left: `${b.xPct}%`, top: `${b.yPct}%`, width: `${b.wPct}%`, height: `${b.hPct}%` }
-  const headStyle = { fontSize: cqw(b.headingPx), textAlign: b.textAlign }
-  const bodyStyle = { fontSize: cqw(b.bodyPx), textAlign: b.textAlign }
+  const headStyle = { fontSize: cqw(b.headingPx), textAlign: headingAlign }
+  const bodyStyle = { fontSize: cqw(b.bodyPx), textAlign: bodyAlign }
 
   return (
     <div ref={ref} className={`pres-box${present ? ' is-present' : ''}`} style={style}>
       {!present && (
         <div className="pres-box-toolbar" onPointerDown={(e) => e.stopPropagation()}>
           <span className="pres-box-grip" onPointerDown={startMove} title="Drag to move">✛</span>
-          <span className="pres-tb-group" title="Heading size">
-            <button type="button" onClick={() => bumpFont('headingPx', -2)}>A−</button>
-            <em>H</em>
-            <button type="button" onClick={() => bumpFont('headingPx', 2)}>A+</button>
+          <span className="pres-tb-group" title="Heading — size & alignment">
+            <em>Head</em>
+            <button type="button" onClick={() => bumpFont('headingPx', -2)} title="Smaller">A−</button>
+            <button type="button" onClick={() => bumpFont('headingPx', 2)} title="Bigger">A+</button>
+            <i className="pres-tb-sep" />
+            {['left', 'center', 'right'].map((a) => (
+              <button key={a} type="button" className={headingAlign === a ? 'on' : ''} onClick={() => onBoxChange({ headingAlign: a })}>
+                {ALIGN_LABEL[a]}
+              </button>
+            ))}
           </span>
-          <span className="pres-tb-group" title="Body size">
-            <button type="button" onClick={() => bumpFont('bodyPx', -2)}>A−</button>
-            <em>B</em>
-            <button type="button" onClick={() => bumpFont('bodyPx', 2)}>A+</button>
+          <span className="pres-tb-group" title="Body — size & alignment">
+            <em>Body</em>
+            <button type="button" onClick={() => bumpFont('bodyPx', -2)} title="Smaller">A−</button>
+            <button type="button" onClick={() => bumpFont('bodyPx', 2)} title="Bigger">A+</button>
+            <i className="pres-tb-sep" />
+            {['left', 'center', 'right'].map((a) => (
+              <button key={a} type="button" className={bodyAlign === a ? 'on' : ''} onClick={() => onBoxChange({ bodyAlign: a })}>
+                {ALIGN_LABEL[a]}
+              </button>
+            ))}
           </span>
           <span className="pres-tb-group" title="Box position (left / centre / right)">
             <em>Box</em>
             {['left', 'center', 'right'].map((a) => (
               <button key={a} type="button" className={b.boxAlign === a ? 'on' : ''} onClick={() => setBoxAlign(a)}>
-                {ALIGN_LABEL[a]}
-              </button>
-            ))}
-          </span>
-          <span className="pres-tb-group" title="Text alignment (left / centre / right)">
-            <em>Text</em>
-            {['left', 'center', 'right'].map((a) => (
-              <button key={a} type="button" className={b.textAlign === a ? 'on' : ''} onClick={() => onBoxChange({ textAlign: a })}>
                 {ALIGN_LABEL[a]}
               </button>
             ))}

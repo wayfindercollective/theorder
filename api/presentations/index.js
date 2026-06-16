@@ -66,7 +66,9 @@ function sanitizeSlide(s) {
       wPct: clampNum(b.wPct, 5, 100, 46),
       hPct: clampNum(b.hPct, 5, 100, 30),
       boxAlign: align(b.boxAlign),
-      textAlign: align(b.textAlign),
+      // Heading and body align independently; migrate old shared `textAlign`.
+      headingAlign: align(b.headingAlign ?? b.textAlign),
+      bodyAlign: align(b.bodyAlign ?? b.textAlign),
       headingPx: clampInt(b.headingPx, 12, 200, 40),
       bodyPx: clampInt(b.bodyPx, 12, 200, 20),
     },

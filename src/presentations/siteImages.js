@@ -68,7 +68,8 @@ export function blankSlideForIndex(index, idgen) {
     box: {
       ...img.defaultBox,
       boxAlign: sides.boxAlign,
-      textAlign: sides.textAlign,
+      headingAlign: sides.textAlign,
+      bodyAlign: sides.textAlign,
       headingPx: 40,
       bodyPx: 20,
     },

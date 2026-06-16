@@ -30,6 +30,7 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
   const [saving, setSaving] = useState(false)
   const [savedTick, setSavedTick] = useState(false)
   const [present, setPresent] = useState(false)
+  const [scrollToId, setScrollToId] = useState(null)
   const deckRef = useRef(null)
   const dragIndex = useRef(null)
   // Bumped on every edit; lets save() detect edits that landed mid-request.
@@ -84,6 +85,15 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
     return () => window.removeEventListener('beforeunload', h)
   }, [dirty])
 
+  // After adding a slide, scroll it into view so the new page appears right in
+  // front of the user (the Add button then sits one page below it).
+  useEffect(() => {
+    if (!scrollToId) return
+    const el = deckRef.current?.querySelector(`[data-page-id="${scrollToId}"]`)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setScrollToId(null)
+  }, [scrollToId])
+
   const update = useCallback((fn) => {
     revRef.current += 1
     setDeck((d) => (d ? fn(d) : d))
@@ -97,11 +107,11 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
   const onBoxChange = useCallback((sid, boxChanges) =>
     update((d) => ({ ...d, slides: d.slides.map((s) => (s.id === sid ? { ...s, box: { ...s.box, ...boxChanges } } : s)) })), [update])
 
-  const addSlide = () => update((d) => ({
-    ...d,
-    cursor: d.cursor + 1,
-    slides: [...d.slides, blankSlideForIndex(d.cursor, newId)],
-  }))
+  const addSlide = () => {
+    const slide = blankSlideForIndex(deck.cursor, newId)
+    update((d) => ({ ...d, cursor: d.cursor + 1, slides: [...d.slides, slide] }))
+    setScrollToId(slide.id)
+  }
 
   const deleteSlide = (sid) => {
     if (!window.confirm('Delete this slide?')) return
@@ -210,6 +220,7 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
           <div
             key={slide.id}
             className="pres-page"
+            data-page-id={slide.id}
             onDragOver={present ? undefined : (e) => e.preventDefault()}
             onDrop={present ? undefined : (e) => {
               e.preventDefault()
