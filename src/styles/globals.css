@@ -42,11 +42,13 @@
   --reading-w: 680px;
 
   /* Section edge fade — the soft blur each painting melts into top & bottom so
-     one section blends into the next. A FIXED physical distance (not a % of the
-     section) so every seam blurs identically no matter how tall the section or
-     image is. Used by both full-bleed (.section-bg-image) and split
-     (.section-side-image) paintings. */
-  --edge-fade: clamp(120px, 22vh, 280px);
+     one section blends into the next. A FIXED physical distance (not vh/%) so
+     every seam blurs IDENTICALLY no matter the viewport: the old clamp(…22vh…)
+     made the band shrink on short (mobile) viewports and grow on tall (desktop)
+     ones, so mobile seams read as harder lines than desktop. A constant px keeps
+     desktop and mobile identical. Used by both full-bleed (.section-bg-image) and
+     split (.section-side-image) paintings. */
+  --edge-fade: 220px;
 }
 
 @theme inline {
@@ -234,7 +236,10 @@ button {
   mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
 }
 
-/* Mobile: side images become full-bleed soft vignette so text stays readable */
+/* Mobile: split paintings become full-bleed and dim so text stays readable —
+   but they must seam IDENTICALLY to the full-bleed sections, so they fade top &
+   bottom over the same --edge-fade (not a radial vignette, which fades in a
+   different elliptical shape and made split-section seams look unlike the rest). */
 @media (max-width: 900px) {
   .section-side-image {
     width: 100%;
@@ -242,8 +247,10 @@ button {
   }
   .section-side-image-right,
   .section-side-image-left {
-    -webkit-mask-image: radial-gradient(ellipse at center, black 35%, transparent 90%);
-    mask-image: radial-gradient(ellipse at center, black 35%, transparent 90%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+    -webkit-mask-composite: source-over;
+    mask-composite: add;
   }
 }
 
@@ -1708,10 +1715,17 @@ button {
 /* Hero — verse line between headline and CTA */
 .hero-verse {
   margin-top: 1.4rem;
-  color: var(--brass-light);
-  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  /* A brighter, lighter gold than brass-light: gold-on-gold over the warm tan
+     painting was the real problem, so lift the colour AND carve it out with a
+     strong layered dark shadow. */
+  color: #ecd9a0;
+  font-size: clamp(1rem, 1.7vw, 1.18rem);
   letter-spacing: 0.3em;
   text-transform: uppercase;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 2px 10px rgba(0, 0, 0, 0.85),
+    0 0 24px rgba(0, 0, 0, 0.6);
   animation: fadeIn 1400ms var(--ease-order) 700ms both;
 }
 
@@ -2137,26 +2151,31 @@ button {
 }
 
 /* The Principles — the library oil is far brighter than the rest of the set, so
-   don't pile the global brightness-lift onto it (it's already bright), and lay a
-   stronger dark plate behind the gold values so they read over it.
+   don't pile the global brightness-lift onto it (it's already bright). Brightness
+   eased back so the gold words win the contrast.
    The hall's vanishing archway sits a touch right of the image's true centre, so
-   a cover-image's background-position can't pan it on a full-width viewport (the
-   width is already filled). Over-scale a hair and translate left so the central
-   corridor lines up under the middle column. Brightness eased back so the gold
-   words win the contrast. */
+   pan it left to sit under the middle column. Do this by widening the layer
+   HORIZONTALLY ONLY (left/right negative) plus a horizontal translate — never
+   scale(): a scale stretches the layer vertically too, lifting its top edge-fade
+   up off the section so overflow:hidden clips it into a hard seam line above.
+   Width + a horizontal translate leave the top & bottom seam fade flush. */
 .section-principles .section-bg-image {
-  transform: scale(1.08) translateX(-2.8%);
+  left: -5%;
+  right: -5%;
+  transform: translateX(-2.6%);
   transform-origin: center;
   filter: sepia(0.08) saturate(1.04) contrast(1.01) brightness(1.18);
 }
-/* Reach the plate further out and hold it darker through ~85% so the bottom rows
-   (CELEBRATION, FAMILY, HOSPITALITY, THEOSIS…) stay covered, not just the centre. */
+/* Feather the plate edge: a gradual multi-stop fall-off (not a 2-stop ramp) and
+   a slightly larger inset push the fade-out past the words, so the plate melts
+   into the library with no perceptible boundary — same core darkness as before. */
 .section-principles .shell::before {
-  inset: -2.2rem -1.4rem;
-  background: radial-gradient(ellipse 82% 90% at center,
-    rgba(6, 5, 4, 0.9) 0%,
-    rgba(6, 5, 4, 0.84) 55%,
-    rgba(6, 5, 4, 0.6) 83%,
+  inset: -2.2rem -1.8rem;
+  background: radial-gradient(ellipse at center,
+    rgba(6, 5, 4, 0.86) 0%,
+    rgba(6, 5, 4, 0.68) 46%,
+    rgba(6, 5, 4, 0.36) 70%,
+    rgba(6, 5, 4, 0.12) 87%,
     rgba(6, 5, 4, 0) 100%);
 }
 
