@@ -13,7 +13,7 @@
 
 import { useRef, useState } from 'react'
 
-const LOCKUP_URL = 'https://www.theorder.global/images/signature-lockup.png'
+const LOCKUP_URL = 'https://www.theorder.global/images/signature-lockup-dark.png'
 const SERIF = "Georgia,'Times New Roman',serif"
 
 export function EmailSignatureTab() {
@@ -93,36 +93,38 @@ export function EmailSignatureTab() {
         <div className="sig-email-frame">
           {/* This exact node gets copied. Email-safe: table + inline styles. */}
           <div ref={sigRef}>
-            <table
-              cellPadding="0"
-              cellSpacing="0"
-              border="0"
-              role="presentation"
-              style={{ borderCollapse: 'collapse', fontFamily: SERIF }}
-            >
+            <table cellPadding="0" cellSpacing="0" border="0" role="presentation" style={{ borderCollapse: 'collapse' }}>
               <tbody>
                 <tr>
-                  <td style={{ verticalAlign: 'middle', padding: '0 20px 0 0', borderRight: '1px solid #d9cfb8' }}>
-                    <img
-                      src={LOCKUP_URL}
-                      alt="The Order"
-                      width="226"
-                      height="55"
-                      style={{ display: 'block', width: '226px', height: '55px', border: 0, outline: 'none' }}
-                    />
-                  </td>
-                  <td style={{ verticalAlign: 'middle', padding: '0 0 0 20px' }}>
-                    <div style={{ fontFamily: SERIF, fontSize: '18px', fontWeight: 'bold', color: '#1a1a1a', lineHeight: 1.2 }}>
-                      {name}
-                    </div>
-                    <div style={{ fontFamily: SERIF, fontSize: '13px', color: '#6b6b6b', letterSpacing: '0.03em', paddingTop: '3px' }}>
-                      {role}
-                    </div>
-                    <div style={{ fontFamily: SERIF, fontSize: '12px', paddingTop: '8px' }}>
-                      <a href="https://www.theorder.global" style={{ color: '#7d6635', textDecoration: 'none' }}>
-                        theorder.global
-                      </a>
-                    </div>
+                  <td bgcolor="#0a0908" style={{ backgroundColor: '#0a0908', padding: '18px 24px', borderRadius: '8px' }}>
+                    <table cellPadding="0" cellSpacing="0" border="0" role="presentation" style={{ borderCollapse: 'collapse', fontFamily: SERIF }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ verticalAlign: 'middle', padding: '0 22px 0 0', borderRight: '1px solid #4a3f2e' }}>
+                            <img
+                              src={LOCKUP_URL}
+                              alt="The Order"
+                              width="226"
+                              height="55"
+                              style={{ display: 'block', width: '226px', height: '55px', border: 0, outline: 'none' }}
+                            />
+                          </td>
+                          <td style={{ verticalAlign: 'middle', padding: '0 0 0 22px' }}>
+                            <div style={{ fontFamily: SERIF, fontSize: '18px', fontWeight: 'bold', color: '#f2ead8', lineHeight: 1.2 }}>
+                              {name}
+                            </div>
+                            <div style={{ fontFamily: SERIF, fontSize: '13px', color: '#c2b9a6', letterSpacing: '0.03em', paddingTop: '3px' }}>
+                              {role}
+                            </div>
+                            <div style={{ fontFamily: SERIF, fontSize: '12px', paddingTop: '8px' }}>
+                              <a href="https://www.theorder.global" style={{ color: '#c4a45f', textDecoration: 'none' }}>
+                                theorder.global
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </td>
                 </tr>
               </tbody>

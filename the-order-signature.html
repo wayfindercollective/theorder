@@ -173,27 +173,35 @@
 
 <script>
   // Public, always-on URL for the horizontal lockup (served from theorder.global).
-  var LOCKUP_URL = "https://www.theorder.global/images/signature-lockup.png";
+  // The "-dark" variant has a cream wordmark for the dark signature plate.
+  var LOCKUP_URL = "https://www.theorder.global/images/signature-lockup-dark.png";
   var SERIF = "Georgia,'Times New Roman',serif";
 
   function esc(s){
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
-  // Email-safe, table-based signature with inline styles only.
+  // Email-safe, table-based signature with inline styles only. Dark plate,
+  // cream lockup, light text + gold link.
   function buildSignature(name, role){
     name = esc(name || "");
     role = esc(role || "");
     return ''
-    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + SERIF + ';">'
+    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
     +   '<tr>'
-    +     '<td style="vertical-align:middle;padding:0 20px 0 0;border-right:1px solid #d9cfb8;">'
-    +       '<img src="' + LOCKUP_URL + '" alt="The Order" width="226" height="55" style="display:block;width:226px;height:55px;border:0;outline:none;" />'
-    +     '</td>'
-    +     '<td style="vertical-align:middle;padding:0 0 0 20px;">'
-    +       '<div style="font-family:' + SERIF + ';font-size:18px;font-weight:bold;color:#1a1a1a;line-height:1.2;">' + name + '</div>'
-    +       '<div style="font-family:' + SERIF + ';font-size:13px;color:#6b6b6b;letter-spacing:0.03em;padding-top:3px;">' + role + '</div>'
-    +       '<div style="font-family:' + SERIF + ';font-size:12px;padding-top:8px;"><a href="https://www.theorder.global" style="color:#7d6635;text-decoration:none;">theorder.global</a></div>'
+    +     '<td bgcolor="#0a0908" style="background-color:#0a0908;padding:18px 24px;border-radius:8px;">'
+    +       '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + SERIF + ';">'
+    +         '<tr>'
+    +           '<td style="vertical-align:middle;padding:0 22px 0 0;border-right:1px solid #4a3f2e;">'
+    +             '<img src="' + LOCKUP_URL + '" alt="The Order" width="226" height="55" style="display:block;width:226px;height:55px;border:0;outline:none;" />'
+    +           '</td>'
+    +           '<td style="vertical-align:middle;padding:0 0 0 22px;">'
+    +             '<div style="font-family:' + SERIF + ';font-size:18px;font-weight:bold;color:#f2ead8;line-height:1.2;">' + name + '</div>'
+    +             '<div style="font-family:' + SERIF + ';font-size:13px;color:#c2b9a6;letter-spacing:0.03em;padding-top:3px;">' + role + '</div>'
+    +             '<div style="font-family:' + SERIF + ';font-size:12px;padding-top:8px;"><a href="https://www.theorder.global" style="color:#c4a45f;text-decoration:none;">theorder.global</a></div>'
+    +           '</td>'
+    +         '</tr>'
+    +       '</table>'
     +     '</td>'
     +   '</tr>'
     + '</table>';
