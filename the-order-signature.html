@@ -142,7 +142,7 @@
         <li>Open <b>Mail</b> &rarr; menu bar &rarr; <b>Mail &rarr; Settings</b> &rarr; <b>Signatures</b> tab.</li>
         <li>Select your <b>theorder.global account</b> on the left, then click <b>+</b> to add a signature and name it "The Order".</li>
         <li><b>Important:</b> uncheck <b>"Always match my default message font"</b> (bottom of the window) so the formatting is kept.</li>
-        <li>Click into the right-hand box, select any placeholder text, and <b>paste</b> (Cmd+V). The lockup and details will appear.</li>
+        <li>Click into the right-hand box, select any placeholder text, and <b>paste</b> (Cmd+V). The badge and details will appear.</li>
         <li>At the bottom, set the <b>Choose Signature</b> dropdown to "The Order" so it's used automatically.</li>
       </ol>
     </div>
@@ -152,7 +152,7 @@
         <li>Click <b>Copy signature</b> above.</li>
         <li>In Gmail, open <b>Settings</b> (gear icon) &rarr; <b>See all settings</b> &rarr; <b>General</b> tab.</li>
         <li>Scroll to <b>Signature</b> &rarr; <b>Create new</b>, name it "The Order".</li>
-        <li>Click into the signature box and <b>paste</b> (Cmd+V / Ctrl+V) — the lockup and details come through.</li>
+        <li>Click into the signature box and <b>paste</b> (Cmd+V / Ctrl+V) — the badge and details come through.</li>
         <li>Under <b>Signature defaults</b>, set it for new emails (and replies if you want), then <b>Save Changes</b> at the bottom.</li>
       </ol>
     </div>
@@ -166,43 +166,37 @@
       </ol>
     </div>
 
-    <p class="note">The lockup loads from the live website, so it always displays correctly for the people you email. Keep an internet connection the first time the signature is shown.</p>
+    <p class="note">The badge loads from the live website, so it always displays correctly for the people you email. Keep an internet connection the first time the signature is shown.</p>
   </div>
 
 </div>
 
 <script>
-  // Public, always-on URL for the horizontal lockup (served from theorder.global).
-  // The "-dark" variant has a cream wordmark for the dark signature plate.
-  var LOCKUP_URL = "https://www.theorder.global/images/signature-lockup-dark.png";
+  // Public, always-on URL for the logo badge (served from theorder.global).
+  // The badge carries its own dark background, so it renders correctly on any
+  // email background and never depends on a bg colour surviving.
+  var BADGE_URL = "https://www.theorder.global/images/signature-badge.png";
   var SERIF = "Georgia,'Times New Roman',serif";
 
   function esc(s){
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
-  // Email-safe, table-based signature with inline styles only. Dark plate,
-  // cream lockup, light text + gold link.
+  // Email-safe, table-based signature with inline styles only. Self-contained
+  // dark badge + dark editable text — nothing depends on a background colour.
   function buildSignature(name, role){
     name = esc(name || "");
     role = esc(role || "");
     return ''
-    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
+    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + SERIF + ';">'
     +   '<tr>'
-    +     '<td bgcolor="#0a0908" style="background-color:#0a0908;padding:18px 24px;border-radius:8px;">'
-    +       '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + SERIF + ';">'
-    +         '<tr>'
-    +           '<td style="vertical-align:middle;padding:0 22px 0 0;">'
-    +             '<img src="' + LOCKUP_URL + '" alt="The Order" width="226" height="55" style="display:block;width:226px;height:55px;border:0;outline:none;-ms-interpolation-mode:bicubic;" />'
-    +           '</td>'
-    +           '<td style="width:1px;background-color:#4a3f2e;font-size:1px;line-height:1px;">&nbsp;</td>'
-    +           '<td style="vertical-align:middle;padding:0 0 0 22px;">'
-    +             '<div style="font-family:' + SERIF + ';font-size:18px;font-weight:bold;color:#f2ead8;line-height:1.2;">' + name + '</div>'
-    +             '<div style="font-family:' + SERIF + ';font-size:13px;color:#c2b9a6;letter-spacing:0.03em;padding-top:3px;">' + role + '</div>'
-    +             '<div style="font-family:' + SERIF + ';font-size:12px;padding-top:8px;"><a href="https://www.theorder.global" style="color:#c4a45f;text-decoration:none;">theorder.global</a></div>'
-    +           '</td>'
-    +         '</tr>'
-    +       '</table>'
+    +     '<td style="vertical-align:middle;padding:0 22px 0 0;">'
+    +       '<img src="' + BADGE_URL + '" alt="The Order" width="262" height="83" style="display:block;width:262px;height:83px;border:0;outline:none;-ms-interpolation-mode:bicubic;" />'
+    +     '</td>'
+    +     '<td style="vertical-align:middle;">'
+    +       '<div style="font-family:' + SERIF + ';font-size:18px;font-weight:bold;color:#1a1a1a;line-height:1.2;">' + name + '</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:13px;color:#4a4a4a;letter-spacing:0.03em;padding-top:3px;">' + role + '</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:12px;padding-top:8px;"><a href="https://www.theorder.global" style="color:#7d6635;text-decoration:none;">theorder.global</a></div>'
     +     '</td>'
     +   '</tr>'
     + '</table>';

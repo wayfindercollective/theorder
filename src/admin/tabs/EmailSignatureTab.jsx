@@ -5,15 +5,17 @@
  * and role, see a live preview, and copy an email-safe (table + inline-style)
  * signature ready to paste into Apple Mail, Gmail, Outlook, etc.
  *
- * Layout: a horizontal "crest + THE ORDER" lockup on the left, then the
- * person's name / role / website to the right. The lockup is a pre-rendered
- * PNG (real Cinzel wordmark) served from the live site, so it displays
- * identically for every recipient and in every client — no web fonts needed.
+ * Layout: a self-contained dark logo BADGE on the left (crest + cream Cinzel
+ * wordmark on its own black rounded plate, baked into a PNG), then the person's
+ * name / role / website in DARK text to the right. Because the badge carries
+ * its own background and the text is dark, nothing depends on the email keeping
+ * a background colour — so it can't be "stripped into invisibility" the way a
+ * full dark-plate signature can (e.g. in Outlook).
  */
 
 import { useRef, useState } from 'react'
 
-const LOCKUP_URL = 'https://www.theorder.global/images/signature-lockup-dark.png'
+const BADGE_URL = 'https://www.theorder.global/images/signature-badge.png'
 const SERIF = "Georgia,'Times New Roman',serif"
 
 export function EmailSignatureTab() {
@@ -93,39 +95,30 @@ export function EmailSignatureTab() {
         <div className="sig-email-frame">
           {/* This exact node gets copied. Email-safe: table + inline styles. */}
           <div ref={sigRef}>
-            <table cellPadding="0" cellSpacing="0" border="0" role="presentation" style={{ borderCollapse: 'collapse' }}>
+            <table cellPadding="0" cellSpacing="0" border="0" role="presentation" style={{ borderCollapse: 'collapse', fontFamily: SERIF }}>
               <tbody>
                 <tr>
-                  <td bgcolor="#0a0908" style={{ backgroundColor: '#0a0908', padding: '18px 24px', borderRadius: '8px' }}>
-                    <table cellPadding="0" cellSpacing="0" border="0" role="presentation" style={{ borderCollapse: 'collapse', fontFamily: SERIF }}>
-                      <tbody>
-                        <tr>
-                          <td style={{ verticalAlign: 'middle', padding: '0 22px 0 0' }}>
-                            <img
-                              src={LOCKUP_URL}
-                              alt="The Order"
-                              width="226"
-                              height="55"
-                              style={{ display: 'block', width: '226px', height: '55px', border: 0, outline: 'none', msInterpolationMode: 'bicubic' }}
-                            />
-                          </td>
-                          <td style={{ width: '1px', backgroundColor: '#4a3f2e', fontSize: '1px', lineHeight: '1px' }}>{' '}</td>
-                          <td style={{ verticalAlign: 'middle', padding: '0 0 0 22px' }}>
-                            <div style={{ fontFamily: SERIF, fontSize: '18px', fontWeight: 'bold', color: '#f2ead8', lineHeight: 1.2 }}>
-                              {name}
-                            </div>
-                            <div style={{ fontFamily: SERIF, fontSize: '13px', color: '#c2b9a6', letterSpacing: '0.03em', paddingTop: '3px' }}>
-                              {role}
-                            </div>
-                            <div style={{ fontFamily: SERIF, fontSize: '12px', paddingTop: '8px' }}>
-                              <a href="https://www.theorder.global" style={{ color: '#c4a45f', textDecoration: 'none' }}>
-                                theorder.global
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <td style={{ verticalAlign: 'middle', padding: '0 22px 0 0' }}>
+                    <img
+                      src={BADGE_URL}
+                      alt="The Order"
+                      width="262"
+                      height="83"
+                      style={{ display: 'block', width: '262px', height: '83px', border: 0, outline: 'none', msInterpolationMode: 'bicubic' }}
+                    />
+                  </td>
+                  <td style={{ verticalAlign: 'middle' }}>
+                    <div style={{ fontFamily: SERIF, fontSize: '18px', fontWeight: 'bold', color: '#1a1a1a', lineHeight: 1.2 }}>
+                      {name}
+                    </div>
+                    <div style={{ fontFamily: SERIF, fontSize: '13px', color: '#4a4a4a', letterSpacing: '0.03em', paddingTop: '3px' }}>
+                      {role}
+                    </div>
+                    <div style={{ fontFamily: SERIF, fontSize: '12px', paddingTop: '8px' }}>
+                      <a href="https://www.theorder.global" style={{ color: '#7d6635', textDecoration: 'none' }}>
+                        theorder.global
+                      </a>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -155,7 +148,7 @@ export function EmailSignatureTab() {
             <li>Open <b>Mail</b> → menu bar → <b>Mail → Settings</b> → <b>Signatures</b> tab.</li>
             <li>Select the <b>theorder.global account</b> on the left, click <b>+</b> to add a signature, and name it “The Order”.</li>
             <li><b>Important:</b> uncheck <b>“Always match my default message font”</b> (bottom of the window) so the formatting is kept.</li>
-            <li>Click into the right-hand box, select any placeholder text, and <b>paste</b> (⌘V). The lockup and details appear.</li>
+            <li>Click into the right-hand box, select any placeholder text, and <b>paste</b> (⌘V). The badge and details appear.</li>
             <li>At the bottom, set the <b>Choose Signature</b> dropdown to “The Order” so it’s used automatically.</li>
           </ol>
         )}
@@ -165,7 +158,7 @@ export function EmailSignatureTab() {
             <li>Click <b>Copy signature</b> above.</li>
             <li>In Gmail, open <b>Settings</b> (gear icon) → <b>See all settings</b> → <b>General</b> tab.</li>
             <li>Scroll to <b>Signature</b> → <b>Create new</b>, name it “The Order”.</li>
-            <li>Click into the signature box and <b>paste</b> (⌘V / Ctrl+V) — the lockup and details come through.</li>
+            <li>Click into the signature box and <b>paste</b> (⌘V / Ctrl+V) — the badge and details come through.</li>
             <li>Under <b>Signature defaults</b>, set it for new emails (and replies if you want), then <b>Save Changes</b> at the bottom.</li>
           </ol>
         )}
@@ -175,12 +168,12 @@ export function EmailSignatureTab() {
             <li>Email yourself this signature: paste it into a message from a Mac/Gmail, or click <b>Copy signature</b> if you opened the admin on the phone.</li>
             <li>Open that email on the phone and <b>copy</b> the signature (tap &amp; hold → Select All → Copy).</li>
             <li>Go to <b>Settings → Apps → Mail → Signature</b> (older iOS: <b>Settings → Mail → Signature</b>).</li>
-            <li>Choose <b>Per Account</b>, tap the box for the theorder.global account, and <b>paste</b>. iOS keeps the lockup and formatting.</li>
+            <li>Choose <b>Per Account</b>, tap the box for the theorder.global account, and <b>paste</b>. iOS keeps the badge and formatting.</li>
           </ol>
         )}
 
         <p className="admin-field-hint">
-          The lockup loads from the live site, so it always displays for the people you email.
+          The badge loads from the live site, so it always displays for the people you email.
         </p>
       </section>
     </div>
