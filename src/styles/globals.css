@@ -1549,10 +1549,14 @@ button {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  /* Anchor the FIRST line (the name) at a fixed height so it sits at the same
+     spot on every tile; longer captions grow downward into the space below
+     rather than creeping up off the name line. 67% keeps even a 3-line caption
+     clear of the video's control bar. */
+  top: 67%;
+  bottom: auto;
   margin: 0;
-  /* extra bottom padding keeps the caption clear of the video's control bar */
-  padding: 1rem 0.9rem 2.85rem;
+  padding: 0 0.9rem;
   color: var(--parchment);
   text-align: center;
   font-style: italic;
