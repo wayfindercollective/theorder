@@ -55,8 +55,8 @@
   "become": {
     "eyebrow": "VI",
     "heading": "We're Offering You",
-    "offerings": "Transformation\nJoy\nBrotherhood\nTribe\nWarrior Code\nSavagery\nAdventure\nCourage\nResilience\nMentoring\nPurpose\nProsperity ",
-    "closing": "I hope that you join us.",
+    "offerings": "Transformation\nJoy\nBrotherhood\nTribe\nWarrior Code\nSavagery\nAdventure\nCourage\nResilience\nProsperity\nPurpose\nMentoring ",
+    "closing": "I hope that you join us",
     "image": "/images/oil-become.jpg",
     "imageAlign": "full"
   },
