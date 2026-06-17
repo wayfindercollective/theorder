@@ -373,4 +373,4 @@
    on the left, like the hero); that slot crops the 0.52 portrait to an upper-body
    framing, so bias the crop up to keep his head + weapon in frame. */
 .section-pres-sentinel .section-side-image       { filter: sepia(0.06) saturate(1.04) contrast(1.00) brightness(1.28); }
-.section-pres-sentinel .section-side-image-right { background-position: center 22%; }
+.section-pres-sentinel .section-side-image-right { background-position: center 14%; }
