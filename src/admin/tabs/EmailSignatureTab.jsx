@@ -100,15 +100,16 @@ export function EmailSignatureTab() {
                     <table cellPadding="0" cellSpacing="0" border="0" role="presentation" style={{ borderCollapse: 'collapse', fontFamily: SERIF }}>
                       <tbody>
                         <tr>
-                          <td style={{ verticalAlign: 'middle', padding: '0 22px 0 0', borderRight: '1px solid #4a3f2e' }}>
+                          <td style={{ verticalAlign: 'middle', padding: '0 22px 0 0' }}>
                             <img
                               src={LOCKUP_URL}
                               alt="The Order"
                               width="226"
                               height="55"
-                              style={{ display: 'block', width: '226px', height: '55px', border: 0, outline: 'none' }}
+                              style={{ display: 'block', width: '226px', height: '55px', border: 0, outline: 'none', msInterpolationMode: 'bicubic' }}
                             />
                           </td>
+                          <td style={{ width: '1px', backgroundColor: '#4a3f2e', fontSize: '1px', lineHeight: '1px' }}>{' '}</td>
                           <td style={{ verticalAlign: 'middle', padding: '0 0 0 22px' }}>
                             <div style={{ fontFamily: SERIF, fontSize: '18px', fontWeight: 'bold', color: '#f2ead8', lineHeight: 1.2 }}>
                               {name}
