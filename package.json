@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "crop:saturday": "node scripts/crop-saturday.mjs",
-    "migrate:images": "node scripts/migrate-images-to-blob.mjs"
+    "migrate:images": "node scripts/migrate-images-to-blob.mjs",
+    "make:signature-lockup": "node scripts/make-signature-lockup.mjs"
   },
   "dependencies": {
     "@octokit/rest": "^21.0.2",

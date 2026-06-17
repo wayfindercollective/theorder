@@ -1,44 +1,33 @@
 /**
- * EmailSignatureTab — generate a branded Apple Mail signature.
+ * EmailSignatureTab — generate a branded email signature.
  *
  * This tab is a standalone tool: it does NOT edit the CMS draft. Type a name
  * and role, see a live preview, and copy an email-safe (table + inline-style)
- * signature ready to paste into Apple Mail.
+ * signature ready to paste into Apple Mail, Gmail, Outlook, etc.
  *
- * The crest is referenced by an ABSOLUTE, public URL so it displays for every
- * recipient. If a custom brand logo has been uploaded on the Logo tab, that is
- * used instead (absolutized against the production origin).
+ * Layout: a horizontal "crest + THE ORDER" lockup on the left, then the
+ * person's name / role / website to the right. The lockup is a pre-rendered
+ * PNG (real Cinzel wordmark) served from the live site, so it displays
+ * identically for every recipient and in every client — no web fonts needed.
  */
 
 import { useRef, useState } from 'react'
 
-const PROD_ORIGIN = 'https://www.theorder.global'
-const DEFAULT_LOGO = PROD_ORIGIN + '/images/logo-mark.png'
+const LOCKUP_URL = 'https://www.theorder.global/images/signature-lockup.png'
+const SERIF = "Georgia,'Times New Roman',serif"
 
-// Turn whatever the brand logo is into a publicly reachable absolute URL.
-// Relative paths get the production origin; blob:/data: (mid-upload) fall back.
-function absolutizeLogo(src) {
-  if (typeof src === 'string') {
-    if (/^https?:\/\//i.test(src)) return src
-    if (src.startsWith('/')) return PROD_ORIGIN + src
-  }
-  return DEFAULT_LOGO
-}
-
-export function EmailSignatureTab({ sections }) {
+export function EmailSignatureTab() {
   const [name, setName] = useState('Nico Seedsman')
   const [role, setRole] = useState('CEO and Founder')
   const [copied, setCopied] = useState('')
   const [platform, setPlatform] = useState('mac')
   const sigRef = useRef(null)
 
-  const logoUrl = absolutizeLogo(sections?.brand?.logo)
-
   const copy = async () => {
     const node = sigRef.current
     if (!node) return
     // Preferred path: select the rendered node and copy → keeps the image +
-    // formatting as rich HTML, which is what Apple Mail pastes.
+    // formatting as rich HTML, which is what mail clients paste.
     try {
       const range = document.createRange()
       range.selectNode(node)
@@ -68,8 +57,9 @@ export function EmailSignatureTab({ sections }) {
   return (
     <div className="admin-tab-pane">
       <p className="restraint admin-tab-intro">
-        Generate a branded Apple Mail signature. Enter a name and role, copy, then paste into
-        Mail. Send a new team member to this tab and they can make their own the same way.
+        Generate a branded email signature for Apple Mail, Gmail, Outlook — anything. Enter a name
+        and role, copy, then paste into your mail settings. Send a new team member to this tab and
+        they can make their own the same way.
       </p>
 
       {/* 1 — details */}
@@ -108,31 +98,28 @@ export function EmailSignatureTab({ sections }) {
               cellSpacing="0"
               border="0"
               role="presentation"
-              style={{ borderCollapse: 'collapse', fontFamily: "Georgia,'Times New Roman',serif" }}
+              style={{ borderCollapse: 'collapse', fontFamily: SERIF }}
             >
               <tbody>
                 <tr>
-                  <td style={{ verticalAlign: 'middle', padding: '0 18px 0 0', borderRight: '1px solid #d9cfb8' }}>
+                  <td style={{ verticalAlign: 'middle', padding: '0 20px 0 0', borderRight: '1px solid #d9cfb8' }}>
                     <img
-                      src={logoUrl}
+                      src={LOCKUP_URL}
                       alt="The Order"
-                      width="52"
-                      height="107"
-                      style={{ display: 'block', width: '52px', height: '107px', border: 0, outline: 'none' }}
+                      width="226"
+                      height="55"
+                      style={{ display: 'block', width: '226px', height: '55px', border: 0, outline: 'none' }}
                     />
                   </td>
-                  <td style={{ verticalAlign: 'middle', padding: '0 0 0 18px' }}>
-                    <div style={{ fontFamily: "Georgia,'Times New Roman',serif", fontSize: '17px', fontWeight: 'bold', color: '#1a1a1a', lineHeight: 1.2 }}>
+                  <td style={{ verticalAlign: 'middle', padding: '0 0 0 20px' }}>
+                    <div style={{ fontFamily: SERIF, fontSize: '18px', fontWeight: 'bold', color: '#1a1a1a', lineHeight: 1.2 }}>
                       {name}
                     </div>
-                    <div style={{ fontFamily: "Georgia,'Times New Roman',serif", fontSize: '13px', color: '#6b6b6b', letterSpacing: '0.03em', paddingTop: '2px' }}>
+                    <div style={{ fontFamily: SERIF, fontSize: '13px', color: '#6b6b6b', letterSpacing: '0.03em', paddingTop: '3px' }}>
                       {role}
                     </div>
-                    <div style={{ fontFamily: "Georgia,'Times New Roman',serif", fontSize: '13px', fontWeight: 'bold', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#7d6635', paddingTop: '12px' }}>
-                      THE&nbsp;ORDER
-                    </div>
-                    <div style={{ fontFamily: "Georgia,'Times New Roman',serif", fontSize: '12px', paddingTop: '3px' }}>
-                      <a href="https://www.theorder.global" style={{ color: '#8a8a8a', textDecoration: 'none' }}>
+                    <div style={{ fontFamily: SERIF, fontSize: '12px', paddingTop: '8px' }}>
+                      <a href="https://www.theorder.global" style={{ color: '#7d6635', textDecoration: 'none' }}>
                         theorder.global
                       </a>
                     </div>
@@ -149,35 +136,48 @@ export function EmailSignatureTab({ sections }) {
         <h2 className="admin-section-title display">Copy &amp; install</h2>
         <div className="sig-copy-row">
           <button type="button" className="btn btn-primary" onClick={copy}>Copy signature</button>
-          {copied === 'ok' && <span className="sig-status sig-status-ok">✓ Copied — now paste into Mail.</span>}
-          {copied === 'fail' && <span className="sig-status sig-status-fail">Couldn’t auto-copy. Select the preview above and press ⌘C.</span>}
+          {copied === 'ok' && <span className="sig-status sig-status-ok">✓ Copied — now paste into your mail settings.</span>}
+          {copied === 'fail' && <span className="sig-status sig-status-fail">Couldn’t auto-copy. Select the preview above and press ⌘C / Ctrl+C.</span>}
         </div>
 
         <div className="sig-tabs">
-          <button type="button" className={'sig-tab' + (platform === 'mac' ? ' active' : '')} onClick={() => setPlatform('mac')}>On a Mac</button>
-          <button type="button" className={'sig-tab' + (platform === 'ios' ? ' active' : '')} onClick={() => setPlatform('ios')}>On iPhone / iPad</button>
+          <button type="button" className={'sig-tab' + (platform === 'mac' ? ' active' : '')} onClick={() => setPlatform('mac')}>Apple Mail (Mac)</button>
+          <button type="button" className={'sig-tab' + (platform === 'gmail' ? ' active' : '')} onClick={() => setPlatform('gmail')}>Gmail</button>
+          <button type="button" className={'sig-tab' + (platform === 'ios' ? ' active' : '')} onClick={() => setPlatform('ios')}>iPhone / iPad</button>
         </div>
 
-        {platform === 'mac' ? (
+        {platform === 'mac' && (
           <ol className="sig-steps">
             <li>Click <b>Copy signature</b> above.</li>
             <li>Open <b>Mail</b> → menu bar → <b>Mail → Settings</b> → <b>Signatures</b> tab.</li>
             <li>Select the <b>theorder.global account</b> on the left, click <b>+</b> to add a signature, and name it “The Order”.</li>
             <li><b>Important:</b> uncheck <b>“Always match my default message font”</b> (bottom of the window) so the formatting is kept.</li>
-            <li>Click into the right-hand box, select any placeholder text, and <b>paste</b> (⌘V). The logo and layout appear.</li>
+            <li>Click into the right-hand box, select any placeholder text, and <b>paste</b> (⌘V). The lockup and details appear.</li>
             <li>At the bottom, set the <b>Choose Signature</b> dropdown to “The Order” so it’s used automatically.</li>
           </ol>
-        ) : (
+        )}
+
+        {platform === 'gmail' && (
           <ol className="sig-steps">
-            <li>Email yourself this signature: paste it into a message from a Mac, or click <b>Copy signature</b> if you opened the admin on the phone.</li>
+            <li>Click <b>Copy signature</b> above.</li>
+            <li>In Gmail, open <b>Settings</b> (gear icon) → <b>See all settings</b> → <b>General</b> tab.</li>
+            <li>Scroll to <b>Signature</b> → <b>Create new</b>, name it “The Order”.</li>
+            <li>Click into the signature box and <b>paste</b> (⌘V / Ctrl+V) — the lockup and details come through.</li>
+            <li>Under <b>Signature defaults</b>, set it for new emails (and replies if you want), then <b>Save Changes</b> at the bottom.</li>
+          </ol>
+        )}
+
+        {platform === 'ios' && (
+          <ol className="sig-steps">
+            <li>Email yourself this signature: paste it into a message from a Mac/Gmail, or click <b>Copy signature</b> if you opened the admin on the phone.</li>
             <li>Open that email on the phone and <b>copy</b> the signature (tap &amp; hold → Select All → Copy).</li>
             <li>Go to <b>Settings → Apps → Mail → Signature</b> (older iOS: <b>Settings → Mail → Signature</b>).</li>
-            <li>Choose <b>Per Account</b>, tap the box for the theorder.global account, and <b>paste</b>. iOS keeps the logo and formatting.</li>
+            <li>Choose <b>Per Account</b>, tap the box for the theorder.global account, and <b>paste</b>. iOS keeps the lockup and formatting.</li>
           </ol>
         )}
 
         <p className="admin-field-hint">
-          The logo loads from the live site, so it always displays for the people you email.
+          The lockup loads from the live site, so it always displays for the people you email.
         </p>
       </section>
     </div>

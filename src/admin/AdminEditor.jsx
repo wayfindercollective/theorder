@@ -257,7 +257,7 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
         {tab === 'images'      && <ImagesTab      sections={draft.sections} onChange={updateSections} />}
         {tab === 'library'     && <LibraryTab     sections={draft.sections} />}
         {tab === 'logo'        && <LogoTab        sections={draft.sections} onChange={updateSections} />}
-        {tab === 'signature'   && <EmailSignatureTab sections={draft.sections} />}
+        {tab === 'signature'   && <EmailSignatureTab />}
       </main>
 
       {dirty && (
