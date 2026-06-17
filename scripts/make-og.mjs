@@ -89,8 +89,11 @@ async function main() {
   const shieldCx = MARK_LEFT + markMeta.width / 2
   const shieldBottom = MARK_TOP + markMeta.height
 
-  // Wordmark, centred under the shield on the same vertical axis.
-  const TEXT_W = Math.round(markMeta.width * 1.04) // ≈ shield width
+  // Wordmark, centred under the shield on the same vertical axis. With the
+  // shield pinned in the corner, the widest the centred text can be is set by
+  // its left edge reaching the canvas — so size it to that limit (max fit).
+  const EDGE_MARGIN = Math.round(W * 0.0085)
+  const TEXT_W = Math.round(2 * (shieldCx - EDGE_MARGIN))
   const GAP = Math.round(H * 0.018)
   const textBuf = await sharp(await renderWordmark({ fill: PARCHMENT }))
     .resize({ width: TEXT_W })
