@@ -2132,14 +2132,22 @@ button {
    warm Creation-of-Adam ground (brass-on-gold and black-on-gold both washed out).
    Larger and bolder than the default ref, with a strong layered dark shadow that
    carves the white letters out of the painting's bright golden patches. */
-/* Both citations (Mark 12:30 / 12:31): plain black letters, no glow or shadow —
-   trialling whether unadorned black reads more cleanly over the painting. */
+/* Mark 12:30 / 12:31 citations — small type over a busy bright painting, so the
+   reliable fix is high luminance contrast (bright white) carved out by a strong
+   layered dark moat: a tight ring reads on the light gold patches, the soft outer
+   halo reads on the dark ones. Bolder + larger than the body, which (with the mono
+   uppercase) sets it apart from the soft italic verses without a box or outline. */
 .section-closing .closing-ref {
-  font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
   font-weight: 600;
   letter-spacing: 0.3em;
-  color: #0a0806;
-  text-shadow: none;
+  color: #fcf9f3;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.95),
+    0 0 3px rgba(0, 0, 0, 0.92),
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 0 9px rgba(0, 0, 0, 0.7),
+    0 0 18px rgba(0, 0, 0, 0.5);
 }
 
 .section-evidence .section-heading,
