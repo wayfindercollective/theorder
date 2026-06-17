@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-const SITE_ORIGIN = 'https://theorder.global'
+const SITE_ORIGIN = 'https://www.theorder.global'
 
 /**
  * Inject the CMS-editable share metadata (content/sections.json → meta) into
