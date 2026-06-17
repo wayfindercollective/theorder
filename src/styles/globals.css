@@ -2128,11 +2128,12 @@ button {
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
 }
 
-/* Mark 12:30 / 12:31 citations — plain black letters, no glow or shadow
-   (the dark, understated look that sits quietly in the painting). */
+/* Mark 12:30 / 12:31 citations — plain black, no glow, but at the same prominence
+   as the white version had: matched size + a heavier 700 weight so the black reads
+   just as bold without a halo carrying it. */
 .section-closing .closing-ref {
-  font-size: clamp(0.95rem, 1.5vw, 1.15rem);
-  font-weight: 600;
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: 700;
   letter-spacing: 0.3em;
   color: #0a0806;
   text-shadow: none;
