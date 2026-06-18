@@ -130,8 +130,10 @@ const SECTION_DEFS = [
       { path: ['evidence', 'cards', 1, 'title'],       label: 'Testimonial 2 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
       { path: ['evidence', 'cards', 1, 'quote'],       label: 'Testimonial 2 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
       { path: ['evidence', 'cards', 1, 'attribution'], label: 'Testimonial 2 — name (text fallback)' },
-      { path: ['evidence', 'cards', 2, 'quote'],       label: 'Testimonial 3 — quote', textarea: true, rows: 4, hint: 'The quote. Leave blank to hide this card.' },
-      { path: ['evidence', 'cards', 2, 'attribution'], label: 'Testimonial 3 — name' },
+      { path: ['evidence', 'cards', 2, 'video'],       label: 'Testimonial 3 — video', hint: 'Path to a video file in /public, e.g. /testimonials/testimonial-3.mp4. When set, this card plays the video instead of a text quote.' },
+      { path: ['evidence', 'cards', 2, 'title'],       label: 'Testimonial 3 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
+      { path: ['evidence', 'cards', 2, 'quote'],       label: 'Testimonial 3 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
+      { path: ['evidence', 'cards', 2, 'attribution'], label: 'Testimonial 3 — name (text fallback)' },
     ],
   },
   {
