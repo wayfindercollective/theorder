@@ -1,15 +1,14 @@
 /**
  * make-og.mjs — build the link-preview (Open Graph) share image.
  *
- * Composites the templar shield mark onto the horseman painting, kept in the
- * painting's native portrait shape (no vertical crop, so the horse's head
- * stays in frame). Slack/iMessage/WhatsApp show the tall image as-is.
+ * Mirrors the site hero: a squarer crop of the horseman painting (shield over
+ * the sky, horse to the lower-right), the templar shield centred, and the
+ * "THE ORDER" wordmark large + centred beneath it, overlapping the horse a
+ * little — matching the on-site lockup proportions.
  *
- * The shield sits in the upper-left over the sky, with the "THE ORDER"
- * wordmark centred directly beneath it (sharing the shield's vertical axis).
  * The wordmark is drawn from the real Cinzel Medium outlines (the site's
- * display face) so it matches the on-site style, with a soft shadow + a
- * radial darken so the mark + text read against the golden sky.
+ * display face) with a soft shadow; an edge vignette + bottom scrim add depth
+ * and keep the mark + text readable.
  *
  * Sources:
  *   public/images/hero-horseman.jpg   (background painting, portrait)
@@ -35,10 +34,26 @@ const MARK = join(IMG, 'logo-mark.png')
 const FONT = join(ROOT, 'assets', 'fonts', 'Cinzel-Medium.ttf')
 const OUT = join(IMG, 'og-share.jpg')
 
-const W = 1200 // output width; height follows the painting's portrait ratio
+// --- canvas (squarish, like the hero crop) ---
+const W = 1200
+const H = 1024
+// How much of the painting's excess height to trim from the TOP (0 = top-
+// aligned/maximum sky, 0.5 = centred). Low value drops the horse so the shield
+// sits over clear sky.
+const CROP_TOP_BIAS = 0.14
+// Shift the whole lockup (shield + wordmark) off-centre. Negative = left.
+const LATERAL_SHIFT_FRAC = -0.045
+
+// --- shield (over the sky) ---
+const SHIELD_H_FRAC = 0.34 // shield height ÷ canvas height
+const SHIELD_CENTER_Y_FRAC = 0.31 // vertical centre of the shield
+
+// --- wordmark (overlapping the horse) ---
 const WORDMARK = 'THE ORDER'
+const TEXT_W_FRAC = 0.52 // wordmark width ÷ canvas width
+const TEXT_CENTER_Y_FRAC = 0.6 // vertical centre of the wordmark
 const PARCHMENT = '#e8e0d0' // matches --parchment, the site's heading colour
-const LETTER_SPACING = 0.06 // em (site uses 0.04; opened up slightly for small previews)
+const LETTER_SPACING = 0.06 // em (site uses 0.04; opened up slightly for previews)
 
 const fontBuf = readFileSync(FONT)
 const font = opentype.parse(fontBuf.buffer.slice(fontBuf.byteOffset, fontBuf.byteOffset + fontBuf.byteLength))
@@ -68,65 +83,58 @@ async function renderWordmark({ fill, blur = 0 }) {
 }
 
 async function main() {
-  // Whole painting scaled to width — no crop, so nothing (incl. the horse's
-  // head) is cut off. Pulled a touch darker for the dark-oil-painting feel.
-  const background = await sharp(BG)
-    .resize({ width: W })
-    .modulate({ brightness: 0.92 })
+  // Painting scaled to width, then cropped to the squarer canvas with a top
+  // bias so the horse drops low and the shield gets clear sky above. Slight
+  // darken for the oil feel.
+  const scaled = await sharp(BG).resize({ width: W }).toBuffer()
+  const scaledH = (await sharp(scaled).metadata()).height
+  const cropTop = Math.round((scaledH - H) * CROP_TOP_BIAS)
+  const background = await sharp(scaled)
+    .extract({ left: 0, top: cropTop, width: W, height: H })
+    .modulate({ brightness: 0.95 })
     .toBuffer()
-  const { height: H } = await sharp(background).metadata()
 
-  // Shield anchored in the upper-left, over the sky.
-  const MARK_HEIGHT = Math.round(H * 0.4) // ≈ 40% of canvas height
-  const MARK_LEFT = Math.round(W * 0.06)
-  const MARK_TOP = Math.round(H * 0.05)
-
+  // Shield, centred horizontally, in the upper sky.
   const mark = await sharp(MARK)
-    .resize({ height: MARK_HEIGHT })
+    .resize({ height: Math.round(H * SHIELD_H_FRAC) })
     .toBuffer()
   const markMeta = await sharp(mark).metadata()
+  const shift = Math.round(W * LATERAL_SHIFT_FRAC)
+  const markLeft = Math.round((W - markMeta.width) / 2) + shift
+  const markTop = Math.round(H * SHIELD_CENTER_Y_FRAC - markMeta.height / 2)
 
-  const shieldCx = MARK_LEFT + markMeta.width / 2
-  const shieldBottom = MARK_TOP + markMeta.height
-
-  // Wordmark, centred under the shield on the same vertical axis. With the
-  // shield pinned in the corner, the widest the centred text can be is set by
-  // its left edge reaching the canvas — so size it to that limit (max fit).
-  const EDGE_MARGIN = Math.round(W * 0.0085)
-  const TEXT_W = Math.round(2 * (shieldCx - EDGE_MARGIN))
-  const GAP = Math.round(H * 0.018)
-  const textBuf = await sharp(await renderWordmark({ fill: PARCHMENT }))
-    .resize({ width: TEXT_W })
-    .toBuffer()
-  const shadowBuf = await sharp(await renderWordmark({ fill: '#000000', blur: 7 }))
-    .resize({ width: TEXT_W })
-    .toBuffer()
+  // Wordmark, centred on the same axis, large enough to overlap the horse.
+  const TEXT_W = Math.round(W * TEXT_W_FRAC)
+  const textBuf = await sharp(await renderWordmark({ fill: PARCHMENT })).resize({ width: TEXT_W }).toBuffer()
+  const shadowBuf = await sharp(await renderWordmark({ fill: '#000000', blur: 7 })).resize({ width: TEXT_W }).toBuffer()
   const textH = (await sharp(textBuf).metadata()).height
-  const textLeft = Math.round(shieldCx - TEXT_W / 2)
-  const textTop = shieldBottom + GAP
+  const textLeft = Math.round((W - TEXT_W) / 2) + shift
+  const textTop = Math.round(H * TEXT_CENTER_Y_FRAC - textH / 2)
 
-  // Soft radial darken centred on the shield+wordmark group so it separates
-  // cleanly from the golden sky.
-  const groupMidY = (MARK_TOP + (textTop + textH)) / 2
-  const cx = (shieldCx / W) * 100
-  const cy = (groupMidY / H) * 100
-  const scrim = Buffer.from(
+  // Edge vignette (darker toward the corners) + a bottom scrim so the wordmark
+  // reads over the lighter sky / textured paint.
+  const overlay = Buffer.from(
     `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="g" cx="${cx.toFixed(1)}%" cy="${cy.toFixed(1)}%" r="46%">
-          <stop offset="0%" stop-color="rgba(0,0,0,0.5)"/>
-          <stop offset="55%" stop-color="rgba(0,0,0,0.24)"/>
-          <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+        <radialGradient id="vig" cx="50%" cy="40%" r="75%">
+          <stop offset="0%" stop-color="rgba(0,0,0,0)"/>
+          <stop offset="58%" stop-color="rgba(0,0,0,0)"/>
+          <stop offset="100%" stop-color="rgba(0,0,0,0.55)"/>
         </radialGradient>
+        <linearGradient id="bot" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="52%" stop-color="rgba(0,0,0,0)"/>
+          <stop offset="100%" stop-color="rgba(0,0,0,0.42)"/>
+        </linearGradient>
       </defs>
-      <rect width="${W}" height="${H}" fill="url(#g)"/>
+      <rect width="${W}" height="${H}" fill="url(#vig)"/>
+      <rect width="${W}" height="${H}" fill="url(#bot)"/>
     </svg>`,
   )
 
   await sharp(background)
     .composite([
-      { input: scrim, top: 0, left: 0 },
-      { input: mark, top: MARK_TOP, left: MARK_LEFT },
+      { input: overlay, top: 0, left: 0 },
+      { input: mark, top: markTop, left: markLeft },
       { input: shadowBuf, top: textTop + 2, left: textLeft },
       { input: textBuf, top: textTop, left: textLeft },
     ])
