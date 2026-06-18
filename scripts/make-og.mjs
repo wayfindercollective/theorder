@@ -42,7 +42,8 @@ const H = 1024
 // sits over clear sky.
 const CROP_TOP_BIAS = 0.14
 // Shift the whole lockup (shield + wordmark) off-centre. Negative = left.
-const LATERAL_SHIFT_FRAC = -0.045
+// Kept centred so it stays in the safe zone when platforms crop the sides.
+const LATERAL_SHIFT_FRAC = 0
 
 // --- shield (over the sky) ---
 const SHIELD_H_FRAC = 0.34 // shield height ÷ canvas height
