@@ -100,14 +100,14 @@
     "templated": true,
     "cards": [
       {
-        "video": "/testimonials/Tony.mp4",
-        "title": "Tony Litster — Entrepreneur, coach and real estate developer",
+        "video": "/testimonials/testimonial-2.mp4",
+        "title": "Alexander Merutka — CEO & Founder of Craftsman+ and Node Media",
         "quote": "",
         "attribution": ""
       },
       {
-        "video": "/testimonials/testimonial-2.mp4",
-        "title": "Alexander Merutka — CEO & Founder of Craftsman+ and Node Media",
+        "video": "/testimonials/Tony.mp4",
+        "title": "Tony Litster — Entrepreneur, coach and real estate developer",
         "quote": "",
         "attribution": ""
       },
