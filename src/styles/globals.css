@@ -1580,6 +1580,8 @@ button {
   overflow: hidden;
   background: #000;
   border: 1px solid var(--iron);
+  /* own stacking context so the caption/ring stack above the video per tile */
+  isolation: isolate;
 }
 .evidence-video {
   display: block;
@@ -1618,8 +1620,12 @@ button {
   margin: 0;
   padding: 0 0.9rem;
   /* always sits above the play ring and the video's own controls so the
-     name/role stays visible at all times, including while a clip is playing */
+     name/role stays visible at all times, including while a clip is playing.
+     translateZ(0) forces its own compositing layer so iOS Safari paints it
+     ABOVE the video instead of behind it (caption vanished otherwise). */
   z-index: 3;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   color: var(--parchment);
   text-align: center;
   font-style: italic;
@@ -1638,7 +1644,8 @@ button {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  /* translateZ(0) keeps the ring on its own layer above the video on iOS too */
+  transform: translate(-50%, -50%) translateZ(0);
   z-index: 2;
   display: flex;
   align-items: center;
