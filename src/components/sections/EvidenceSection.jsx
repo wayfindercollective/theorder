@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useInView } from '../../hooks/useInView.js'
 import { evidenceContent } from '../../config/sectionContent.js'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
@@ -9,8 +9,9 @@ import { renderRich, richText } from '../../lib/richtext.js'
  * clip (not a still). Clicking the centre play button restarts it from the top
  * with sound and hands over to the native controls.
  */
-function EvidenceVideo({ src, title, onActivate, ariaHidden }) {
+function EvidenceVideo({ src, title, onEngagedChange, ariaHidden }) {
   const videoRef = useRef(null)
+  const engagedRef = useRef(false)
   const [activated, setActivated] = useState(false)
 
   // Ensure the muted preview actually starts (some browsers ignore the
@@ -23,6 +24,33 @@ function EvidenceVideo({ src, title, onActivate, ariaHidden }) {
     if (p && p.catch) p.catch(() => {})
   }, [])
 
+  // Once activated (playing with sound), report engagement so the marquee holds
+  // still — but only while it's actually playing. Pausing or finishing the clip
+  // releases the hold so the carousel carries on and the others stay reachable.
+  useEffect(() => {
+    if (!activated) return
+    const v = videoRef.current
+    if (!v) return
+    const setEngaged = (val) => {
+      if (val === engagedRef.current) return
+      engagedRef.current = val
+      onEngagedChange && onEngagedChange(val ? 1 : -1)
+    }
+    const update = () => setEngaged(!v.paused && !v.ended)
+    v.addEventListener('play', update)
+    v.addEventListener('playing', update)
+    v.addEventListener('pause', update)
+    v.addEventListener('ended', update)
+    update()
+    return () => {
+      v.removeEventListener('play', update)
+      v.removeEventListener('playing', update)
+      v.removeEventListener('pause', update)
+      v.removeEventListener('ended', update)
+      setEngaged(false)
+    }
+  }, [activated, onEngagedChange])
+
   const activate = () => {
     const v = videoRef.current
     if (!v) return
@@ -32,7 +60,6 @@ function EvidenceVideo({ src, title, onActivate, ariaHidden }) {
     const p = v.play()
     if (p && p.catch) p.catch(() => {})
     setActivated(true)
-    onActivate && onActivate()
   }
 
   return (
@@ -72,9 +99,10 @@ export function EvidenceSection() {
   const { ref, inView } = useInView()
   const railRef = useRef(null)
   const [paused, setPaused] = useState(false)
-  // once a clip is playing with sound, keep the rail still so it never scrolls
-  // away mid-watch
-  const engagedRef = useRef(false)
+  // the rail holds still while the visitor hovers/touches it, or while a clip is
+  // actively playing with sound; otherwise it drifts
+  const hoveringRef = useRef(false)
+  const engagedCountRef = useRef(0)
   const cards = (evidenceContent.cards || []).filter(
     (c) => c.video || (c.quote && c.quote.trim()),
   )
@@ -101,9 +129,23 @@ export function EvidenceSection() {
     return () => window.removeEventListener('resize', apply)
   }, [cards.length])
 
-  const pause = () => setPaused(true)
+  const recompute = useCallback(() => {
+    setPaused(hoveringRef.current || engagedCountRef.current > 0)
+  }, [])
+  const handleEngaged = useCallback(
+    (delta) => {
+      engagedCountRef.current = Math.max(0, engagedCountRef.current + delta)
+      recompute()
+    },
+    [recompute],
+  )
+  const pause = () => {
+    hoveringRef.current = true
+    recompute()
+  }
   const resume = () => {
-    if (!engagedRef.current) setPaused(false)
+    hoveringRef.current = false
+    recompute()
   }
   // touch: let the swipe/tap settle before the drift takes back over
   const resumeSoon = () => window.setTimeout(resume, 1800)
@@ -142,10 +184,7 @@ export function EvidenceSection() {
                   src={c.video}
                   title={c.title}
                   ariaHidden={dup}
-                  onActivate={() => {
-                    engagedRef.current = true
-                    setPaused(true)
-                  }}
+                  onEngagedChange={handleEngaged}
                 />
               ) : (
                 <article key={i} className="evidence-card card card-stitched" aria-hidden={dup || undefined}>
