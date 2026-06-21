@@ -13,6 +13,9 @@ function EvidenceVideo({ src, title, onEngagedChange, ariaHidden }) {
   const videoRef = useRef(null)
   const engagedRef = useRef(false)
   const [activated, setActivated] = useState(false)
+  // whether this clip is actively playing with sound right now — drives whether
+  // the play button shows (every card shows it except the one playing)
+  const [playing, setPlaying] = useState(false)
 
   // Ensure the muted preview actually starts (some browsers ignore the
   // `muted` attribute set via React on first render).
@@ -36,7 +39,11 @@ function EvidenceVideo({ src, title, onEngagedChange, ariaHidden }) {
       engagedRef.current = val
       onEngagedChange && onEngagedChange(val ? 1 : -1)
     }
-    const update = () => setEngaged(!v.paused && !v.ended)
+    const update = () => {
+      const isPlaying = !v.paused && !v.ended
+      setPlaying(isPlaying)
+      setEngaged(isPlaying)
+    }
     v.addEventListener('play', update)
     v.addEventListener('playing', update)
     v.addEventListener('pause', update)
@@ -47,6 +54,7 @@ function EvidenceVideo({ src, title, onEngagedChange, ariaHidden }) {
       v.removeEventListener('playing', update)
       v.removeEventListener('pause', update)
       v.removeEventListener('ended', update)
+      setPlaying(false)
       setEngaged(false)
     }
   }, [activated, onEngagedChange])
@@ -75,7 +83,7 @@ function EvidenceVideo({ src, title, onEngagedChange, ariaHidden }) {
         preload="auto"
         controls={activated}
       />
-      {!activated && (
+      {!playing && (
         <button
           type="button"
           className="evidence-video-play"

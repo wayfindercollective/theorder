@@ -1617,6 +1617,9 @@ button {
   bottom: auto;
   margin: 0;
   padding: 0 0.9rem;
+  /* always sits above the play ring and the video's own controls so the
+     name/role stays visible at all times, including while a clip is playing */
+  z-index: 3;
   color: var(--parchment);
   text-align: center;
   font-style: italic;
@@ -1627,11 +1630,15 @@ button {
   /* let clicks pass through to the video controls underneath */
   pointer-events: none;
 }
-/* Big centred play affordance shown over the muted autoplay preview. Clicking
-   it (anywhere on the tile) restarts the clip from the top with sound. */
+/* Centred play affordance shown on every card except the one currently playing.
+   Clicking it plays the clip from the top with sound. It's a centred target (not
+   a full-tile overlay) so it never covers the video's own control bar when a
+   paused clip shows both. */
 .evidence-video-play {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 2;
   display: flex;
   align-items: center;
