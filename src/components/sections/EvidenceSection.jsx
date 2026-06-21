@@ -9,7 +9,7 @@ import { renderRich, richText } from '../../lib/richtext.js'
  * clip (not a still). Clicking the centre play button restarts it from the top
  * with sound and hands over to the native controls.
  */
-function EvidenceVideo({ src, title, onActivate }) {
+function EvidenceVideo({ src, title, onActivate, ariaHidden }) {
   const videoRef = useRef(null)
   const [activated, setActivated] = useState(false)
 
@@ -36,7 +36,7 @@ function EvidenceVideo({ src, title, onActivate }) {
   }
 
   return (
-    <article className="evidence-card evidence-card-video">
+    <article className="evidence-card evidence-card-video" aria-hidden={ariaHidden || undefined}>
       <video
         ref={videoRef}
         className="evidence-video"
@@ -54,6 +54,7 @@ function EvidenceVideo({ src, title, onActivate }) {
           className="evidence-video-play"
           onClick={activate}
           aria-label="Play with sound"
+          tabIndex={ariaHidden ? -1 : undefined}
         >
           <span className="evidence-video-play-ring">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -69,59 +70,46 @@ function EvidenceVideo({ src, title, onActivate }) {
 
 export function EvidenceSection() {
   const { ref, inView } = useInView()
-  const trackRef = useRef(null)
-  // pause the drift while the visitor is interacting (hover / touch) …
-  const pausedRef = useRef(false)
-  // … and once any clip is playing with sound, so it never scrolls away mid-watch
+  const railRef = useRef(null)
+  const [paused, setPaused] = useState(false)
+  // once a clip is playing with sound, keep the rail still so it never scrolls
+  // away mid-watch
   const engagedRef = useRef(false)
   const cards = (evidenceContent.cards || []).filter(
     (c) => c.video || (c.quote && c.quote.trim()),
   )
 
-  // Gentle continuous auto-scroll (ping-pongs between the ends). Does nothing
-  // when the tiles all fit (no overflow) or when reduced-motion is requested.
+  // Seamless continuous marquee: the tiles are rendered twice (see `loop` below)
+  // and the rail is translated by exactly one set width, looping forever. The
+  // period is measured from the duplicate's offset (robust to trailing margins)
+  // and the duration is derived from it so the speed is constant at any width.
   useEffect(() => {
-    const track = trackRef.current
-    if (!track) return
-    const reduce =
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce) return
-
-    let raf
-    let dir = 1
-    const speed = 0.35 // px per frame ≈ a slow, calm drift
-    const tick = () => {
-      const max = track.scrollWidth - track.clientWidth
-      if (max > 1 && !pausedRef.current && !engagedRef.current) {
-        let next = track.scrollLeft + dir * speed
-        if (next >= max) {
-          next = max
-          dir = -1
-        } else if (next <= 0) {
-          next = 0
-          dir = 1
-        }
-        track.scrollLeft = next
-      }
-      raf = requestAnimationFrame(tick)
+    const rail = railRef.current
+    if (!rail) return
+    const SPEED = 45 // px per second — a calm, continuous drift
+    const apply = () => {
+      const n = cards.length
+      const tiles = rail.children
+      if (tiles.length <= n) return
+      const period = tiles[n].offsetLeft - tiles[0].offsetLeft
+      if (period <= 0) return
+      rail.style.setProperty('--evidence-period', period + 'px')
+      rail.style.animationDuration = period / SPEED + 's'
     }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    apply()
+    window.addEventListener('resize', apply)
+    return () => window.removeEventListener('resize', apply)
   }, [cards.length])
 
-  const pause = () => {
-    pausedRef.current = true
-  }
+  const pause = () => setPaused(true)
   const resume = () => {
-    pausedRef.current = false
+    if (!engagedRef.current) setPaused(false)
   }
-  // touch: let the swipe momentum settle before the drift takes back over
-  const resumeSoon = () => {
-    window.setTimeout(() => {
-      pausedRef.current = false
-    }, 1800)
-  }
+  // touch: let the swipe/tap settle before the drift takes back over
+  const resumeSoon = () => window.setTimeout(resume, 1800)
+
+  // duplicate the set so the loop wraps with no visible gap
+  const loop = cards.concat(cards)
 
   return (
     <section className="section section-evidence" ref={ref}>
@@ -139,31 +127,35 @@ export function EvidenceSection() {
         </div>
 
         <div
-          ref={trackRef}
-          className={'evidence-grid evidence-carousel stagger ' + (inView ? 'in-view' : '')}
+          className="evidence-grid evidence-carousel"
           onMouseEnter={pause}
           onMouseLeave={resume}
           onTouchStart={pause}
           onTouchEnd={resumeSoon}
         >
-          {cards.map((c, i) =>
-            c.video ? (
-              <EvidenceVideo
-                key={i}
-                src={c.video}
-                title={c.title}
-                onActivate={() => {
-                  engagedRef.current = true
-                }}
-              />
-            ) : (
-              <article key={i} className="evidence-card card card-stitched">
-                <span className="evidence-mark display engraved">"</span>
-                <p className="evidence-quote">{c.quote}</p>
-                <p className="evidence-attr restraint">{c.attribution}</p>
-              </article>
-            ),
-          )}
+          <div ref={railRef} className={'evidence-rail' + (paused ? ' is-paused' : '')}>
+            {loop.map((c, i) => {
+              const dup = i >= cards.length
+              return c.video ? (
+                <EvidenceVideo
+                  key={i}
+                  src={c.video}
+                  title={c.title}
+                  ariaHidden={dup}
+                  onActivate={() => {
+                    engagedRef.current = true
+                    setPaused(true)
+                  }}
+                />
+              ) : (
+                <article key={i} className="evidence-card card card-stitched" aria-hidden={dup || undefined}>
+                  <span className="evidence-mark display engraved">"</span>
+                  <p className="evidence-quote">{c.quote}</p>
+                  <p className="evidence-attr restraint">{c.attribution}</p>
+                </article>
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>
