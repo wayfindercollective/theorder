@@ -1492,6 +1492,44 @@ button {
   width: min(100%, 227px);
   aspect-ratio: 2 / 3;
 }
+/* Carousel: the tiles become a slow, gently auto-scrolling rail (drift logic in
+   EvidenceSection.jsx). A capped, centred viewport shows ~3 tiles plus a peek of
+   the next so it reads as scrollable; the soft edge-fade lets tiles slip in and
+   out. Drift pauses on hover/touch and once a clip plays with sound. */
+.evidence-carousel {
+  display: flex;
+  gap: 1.5rem;
+  align-items: end;
+  width: min(100%, 760px);
+  margin-left: auto;
+  margin-right: auto;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 26px,
+    #000 calc(100% - 26px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 26px,
+    #000 calc(100% - 26px),
+    transparent 100%
+  );
+}
+.evidence-carousel::-webkit-scrollbar {
+  display: none;
+}
+.evidence-carousel .evidence-card {
+  flex: 0 0 227px;
+  width: 227px;
+  justify-self: auto;
+}
 .evidence-mark {
   font-size: 3.5rem;
   line-height: 0.5;

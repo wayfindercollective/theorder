@@ -134,6 +134,10 @@ const SECTION_DEFS = [
       { path: ['evidence', 'cards', 2, 'title'],       label: 'Testimonial 3 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
       { path: ['evidence', 'cards', 2, 'quote'],       label: 'Testimonial 3 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
       { path: ['evidence', 'cards', 2, 'attribution'], label: 'Testimonial 3 — name (text fallback)' },
+      { path: ['evidence', 'cards', 3, 'video'],       label: 'Testimonial 4 — video', hint: 'Path to a video file in /public, e.g. /testimonials/testimonial-4.mp4. When set, this card plays the video instead of a text quote.' },
+      { path: ['evidence', 'cards', 3, 'title'],       label: 'Testimonial 4 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
+      { path: ['evidence', 'cards', 3, 'quote'],       label: 'Testimonial 4 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
+      { path: ['evidence', 'cards', 3, 'attribution'], label: 'Testimonial 4 — name (text fallback)' },
     ],
   },
   {
