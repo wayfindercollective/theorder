@@ -114,21 +114,33 @@ ChatGPT's image is a bit soft and small. Upscayl makes it big and crisp.
 
 ---
 
-## Step 4 — Get it onto the website
+## Step 4 — Put it on the site yourself (the admin panel)
 
-You produce the painting; the final web-ready resizing and placement happens on
-the site side.
+You don't need to send the image to anyone. You upload it straight into the
+website.
 
-- **Put the finished upscaled PNG** into the shared **Google Drive → Media**
-  folder (or send it to Nathan), and say **which section it's for**
-  (e.g. "this replaces the Testimonials background", or "new background for
-  Who Am I").
-- Nathan / the build will resize it, colour-match the tone to the rest of the
-  site, and drop it into place. That last step keeps every image at the same
-  brightness so nothing sticks out.
+1. Go to **theorder.global/admin** and log in.
+2. Open the **Images** tab.
+3. Find the row for the section you want to change — every section is listed
+   (Hero, The Truth, Who We Are, The Principles, We're Offering You,
+   Testimonials, Who Am I background, Who Am I portrait, Closing, and so on).
+4. Click **Replace** on that row, choose your **Upscayl PNG**, and wait for it
+   to finish uploading.
+5. Click **Save**.
+6. Wait about **30 seconds**, then refresh theorder.global — your new image is
+   live.
 
-That's it. Generate → check the 4 things → Upscayl 4x → drop in Drive with the
-section name.
+Notes:
+- Max file size 8 MB. The site automatically shrinks big photos for you, so
+  don't worry about exact dimensions.
+- "Pick from library" lets you reuse any image you've already uploaded, instead
+  of uploading it again.
+- Each section keeps its own automatic brightness setting so everything stays
+  consistent. As long as your image follows the style above (same dark, warm
+  feel), it will drop in looking right. If something ever looks too bright or
+  too dark compared to the rest, tell Nathan — that's a quick one-off fix.
+
+That's it. Generate → check the 4 things → Upscayl 4x → upload in /admin → Save.
 
 ---
 
@@ -139,5 +151,6 @@ section name.
 3. Check the **4 things**: texture, colour, readable shadows, detail. Fix with a
    one-line add-on if needed; regenerate.
 4. Save the keeper. Open **Upscayl** → **Standard 4x** → **PNG**.
-5. Drop the upscaled PNG in **Drive → Media** and name the section it's for.
-6. Done.
+5. Go to **theorder.global/admin → Images**, **Replace** the section's image
+   with your Upscayl PNG, **Save**.
+6. Wait ~30 seconds, refresh the site. Done.
