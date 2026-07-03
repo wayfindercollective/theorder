@@ -1944,8 +1944,11 @@ button {
   min-height: 100vh;
   padding: clamp(2.2rem, 5vw, 3.6rem) 0;
 }
-/* The Principles — render the label as a heading, not a caption (both designs). */
-.section-principles .eyebrow { font-size: clamp(1rem, 2.2vw, 1.5rem); letter-spacing: 0.4em; }
+/* The Principles — render the label as a heading, not a caption (both designs).
+   White (parchment) instead of brass so the "III" numeral and "The Principles"
+   heading read easily on the bright library oil, while still matching the site's
+   warm off-white body text. */
+.section-principles .eyebrow { font-size: clamp(1rem, 2.2vw, 1.5rem); letter-spacing: 0.4em; color: var(--parchment); }
 .section-principles .eyebrow--numeral { font-size: 0.72rem; letter-spacing: 0.18em; }
 /* Narrow screens: tighten the label and its flanking rules so "THE PRINCIPLES"
    stays on a single line instead of wrapping. */
@@ -1992,11 +1995,15 @@ button {
   text-transform: uppercase;
   line-height: 1.3;
 }
-/* Brighter, higher-contrast brass for the principle words so they read
-   clearly on the dark ground (the default engraved gradient dips too dark). */
+/* White (parchment) principle words — brighter and easier to read on the bright
+   library ground than the brass gradient, while still matching the site's warm
+   off-white body text. Override the .engraved gradient's transparent text-fill,
+   and carry a strong drop shadow so the light words stay legible over the oil. */
 .section-principles .value-word.engraved {
-  background-image: linear-gradient(180deg, #ead9a6 0%, var(--brass-light) 52%, var(--brass) 100%);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  background: none;
+  -webkit-text-fill-color: var(--parchment);
+  color: var(--parchment);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92), 0 1px 2px rgba(0, 0, 0, 0.85);
 }
 @media (max-width: 760px) {
   .value-word { flex-basis: 33.333%; max-width: 33.333%; }
