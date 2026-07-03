@@ -112,7 +112,11 @@ const SECTION_DEFS = [
       { path: ['form', 'phonePlaceholder'], label: 'Phone — placeholder' },
       { path: ['form', 'phoneError'],       label: 'Phone — error message', hint: 'Shown if the number looks invalid.' },
       { path: ['form', 'countrySearchPlaceholder'], label: 'Country picker — search placeholder', hint: 'Greyed text in the search box of the phone country-code dropdown.' },
-      { path: ['consent', 'smsLine'],       label: 'SMS consent line', textarea: true, rows: 4, hint: 'The opt-in text beside the consent checkbox. Legal text — change with care.' },
+      { path: ['consent', 'smsLine'],       label: 'SMS consent line', textarea: true, rows: 6, hint: 'The opt-in text beside the consent checkbox. Carrier-required legal text — must name the brand, describe the messages, and include message frequency, rates, STOP, HELP and the no-third-party-sharing line. Change with care.' },
+      { path: ['consent', 'privacyLabel'],  label: 'Privacy link text', hint: 'Link text shown under the SMS consent checkbox. Leave blank to hide.' },
+      { path: ['consent', 'privacyHref'],   label: 'Privacy link URL', hint: 'Full https:// URL to the Privacy Policy.' },
+      { path: ['consent', 'termsLabel'],    label: 'Terms link text', hint: 'Link text shown under the SMS consent checkbox. Leave blank to hide.' },
+      { path: ['consent', 'termsHref'],     label: 'Terms link URL', hint: 'Full https:// URL to the Terms of Service.' },
     ],
   },
   {

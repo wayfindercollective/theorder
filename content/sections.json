@@ -169,7 +169,7 @@
   },
   "footer": {
     "email": "info@theorder.global",
-    "phone": "",
+    "phone": "+1 (315) 818-2026",
     "copyright": "© The Order",
     "privacyHref": "https://wayfindercollective.io/privacy",
     "privacyLabel": "Privacy"
@@ -191,6 +191,10 @@
     "countrySearchPlaceholder": "Search country or code…"
   },
   "consent": {
-    "smsLine": "I consent to receive SMS communications from THE ORDER about my application. Message and data rates may apply. Reply STOP to opt out at any time."
+    "smsLine": "By providing your phone number, you agree to receive SMS appointment reminders, booking confirmations, and account updates from The Order. Message frequency may vary. Standard Message and Data Rates may apply. Reply STOP to opt out. Reply HELP for help. We will not share mobile information with third parties for promotional or marketing purposes.",
+    "privacyLabel": "Privacy Policy",
+    "privacyHref": "https://wayfindercollective.io/privacy",
+    "termsLabel": "Terms of Service",
+    "termsHref": "https://wayfindercollective.io/terms"
   }
 }

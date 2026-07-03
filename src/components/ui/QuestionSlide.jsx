@@ -247,6 +247,24 @@ function ContactFields({ value, onChange, onSubmit, submitting, canAdvance }) {
         <span>{submitConsent.smsLine}</span>
       </label>
 
+      {(submitConsent.privacyHref || submitConsent.termsHref) && (
+        <p className="qs-consent-links restraint">
+          {submitConsent.privacyHref && (
+            <a href={submitConsent.privacyHref} target="_blank" rel="noopener noreferrer">
+              {submitConsent.privacyLabel || 'Privacy Policy'}
+            </a>
+          )}
+          {submitConsent.privacyHref && submitConsent.termsHref && (
+            <span aria-hidden="true"> · </span>
+          )}
+          {submitConsent.termsHref && (
+            <a href={submitConsent.termsHref} target="_blank" rel="noopener noreferrer">
+              {submitConsent.termsLabel || 'Terms of Service'}
+            </a>
+          )}
+        </p>
+      )}
+
       {/* Honeypot — bots fill this, real users never see it */}
       <div className="hp" aria-hidden="true">
         <label>

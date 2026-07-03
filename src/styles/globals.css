@@ -1247,6 +1247,17 @@ button {
   accent-color: var(--brass);
   flex-shrink: 0;
 }
+.qs-consent-links {
+  margin: 0.55rem 0 0 1.9rem;
+  font-size: 0.82rem;
+  color: var(--parchment-mute);
+}
+.qs-consent-links a {
+  color: var(--brass);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.qs-consent-links a:hover { color: var(--parchment); }
 
 /* phone */
 .phone-row { display: flex; gap: 0.6rem; }
