@@ -670,8 +670,12 @@ button {
 /* :focus-within keeps the toolbar up while the size dropdown itself has focus
    (opening the select blurs the editor, which must not hide the toolbar). */
 .rt:hover .rt-toolbar, .rt.is-focused .rt-toolbar, .rt:focus-within .rt-toolbar { opacity: 1; pointer-events: auto; }
-.rt-toolbar select.rt-size {
+/* The size dropdown — used by BOTH toolbars (admin field bar + presentation box
+   bar), so styled unscoped. color-scheme: dark makes the browser render the
+   native popup list itself dark, matching the editor instead of flashing white. */
+select.rt-size {
   appearance: auto;
+  color-scheme: dark;
   font-family: var(--font-mono); font-size: 12px; line-height: 1;
   color: var(--parchment); background: var(--bg-surface);
   border: 1px solid rgba(166, 136, 74, 0.4); border-radius: 3px;
@@ -679,8 +683,13 @@ button {
   max-height: none;
   cursor: pointer;
 }
-.rt-toolbar select.rt-size:focus { outline: none; border-color: var(--brass); }
-.rt-toolbar select.rt-size option { background: var(--bg-surface); color: var(--parchment); }
+select.rt-size:focus { outline: none; border-color: var(--brass); }
+select.rt-size option {
+  font-family: var(--font-mono);
+  background: var(--bg-surface);
+  color: var(--parchment);
+}
+select.rt-size option:checked { background: var(--brass); color: var(--bg-deep); }
 .rt-toolbar button {
   font-family: var(--font-mono); font-size: 12px; line-height: 1;
   color: var(--parchment-mute); padding: 4px 7px;
