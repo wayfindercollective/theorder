@@ -624,8 +624,34 @@ button {
    chunks, never on the public site.
    ============================================================ */
 .rt { position: relative; }
+/* While a field is being edited it must layer above its sibling fields so the
+   floating toolbar (and anything in it) is never covered or cut off. */
+.rt.is-focused, .rt:focus-within, .rt:hover { z-index: 40; }
 .rt-content-wrap { position: relative; }
 .rt-content .ProseMirror { outline: none; white-space: pre-wrap; word-break: break-word; }
+
+/* Word-style numeric font sizes — <span data-fs="N">. One universal scale: the
+   same number renders the same absolute size in every section of the site.
+   (Presentations map the same numbers to stage-proportional sizes — see
+   presentations.css — so slides still scale when presented fullscreen.) */
+[data-fs="8"]  { font-size: 8px; }
+[data-fs="9"]  { font-size: 9px; }
+[data-fs="10"] { font-size: 10px; }
+[data-fs="11"] { font-size: 11px; }
+[data-fs="12"] { font-size: 12px; }
+[data-fs="14"] { font-size: 14px; }
+[data-fs="16"] { font-size: 16px; }
+[data-fs="18"] { font-size: 18px; }
+[data-fs="20"] { font-size: 20px; }
+[data-fs="24"] { font-size: 24px; }
+[data-fs="28"] { font-size: 28px; }
+[data-fs="32"] { font-size: 32px; }
+[data-fs="36"] { font-size: 36px; }
+[data-fs="42"] { font-size: 42px; }
+[data-fs="48"] { font-size: 48px; }
+[data-fs="56"] { font-size: 56px; }
+[data-fs="64"] { font-size: 64px; }
+[data-fs="72"] { font-size: 72px; }
 .rt-placeholder {
   position: absolute; left: 0; top: 0;
   pointer-events: none; color: var(--ash); opacity: 0.75; font-style: italic;
@@ -641,7 +667,20 @@ button {
   opacity: 0; pointer-events: none;
   transition: opacity 120ms var(--ease-order);
 }
-.rt:hover .rt-toolbar, .rt.is-focused .rt-toolbar { opacity: 1; pointer-events: auto; }
+/* :focus-within keeps the toolbar up while the size dropdown itself has focus
+   (opening the select blurs the editor, which must not hide the toolbar). */
+.rt:hover .rt-toolbar, .rt.is-focused .rt-toolbar, .rt:focus-within .rt-toolbar { opacity: 1; pointer-events: auto; }
+.rt-toolbar select.rt-size {
+  appearance: auto;
+  font-family: var(--font-mono); font-size: 12px; line-height: 1;
+  color: var(--parchment); background: var(--bg-surface);
+  border: 1px solid rgba(166, 136, 74, 0.4); border-radius: 3px;
+  padding: 3px 4px;
+  max-height: none;
+  cursor: pointer;
+}
+.rt-toolbar select.rt-size:focus { outline: none; border-color: var(--brass); }
+.rt-toolbar select.rt-size option { background: var(--bg-surface); color: var(--parchment); }
 .rt-toolbar button {
   font-family: var(--font-mono); font-size: 12px; line-height: 1;
   color: var(--parchment-mute); padding: 4px 7px;

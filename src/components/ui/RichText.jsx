@@ -10,11 +10,15 @@
  *   block   — paragraphs, emits <p>… HTML (or '')   [code.intro]
  *   lines   — paragraphs, value is an ARRAY of inline-HTML lines [truth.provocation]
  *
- * Font size is relative em (FONT_SIZES) so it scales with the field's base size.
+ * Font size is a Word-style NUMBER (FONT_SIZE_STEPS) picked from a dropdown or
+ * stepped with A−/A+, stored as <span data-fs="N">. CSS maps the number to the
+ * same absolute px across the whole site, and to the stage-proportional size in
+ * presentations — so "size 8" is identical wherever it's used. (Legacy em spans
+ * from the first release still parse; the editor writes data-fs now.)
  * Output is normalised; the server re-sanitises everything against the allowlist.
  */
 import { useEffect, useRef, useState } from 'react'
-import { useEditor, EditorContent, useEditorState, Extension } from '@tiptap/react'
+import { useEditor, EditorContent, useEditorState, Extension, Mark } from '@tiptap/react'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
@@ -25,9 +29,31 @@ import History from '@tiptap/extension-history'
 import HardBreak from '@tiptap/extension-hard-break'
 import Link from '@tiptap/extension-link'
 import { TextStyle, FontSize } from '@tiptap/extension-text-style'
-import { FONT_SIZES, isRichEmpty, richText } from '../../lib/richtext.js'
+import { FONT_SIZE_STEPS, isRichEmpty, richText } from '../../lib/richtext.js'
 
-const ALIGN = { left: 'L', center: 'C', right: 'R' } // (presentation passes alignment via baseStyle)
+// Numeric font-size mark → <span data-fs="N">. The number's rendered size comes
+// from CSS ([data-fs] rules), so the same number means the same size everywhere.
+const FsNum = Mark.create({
+  name: 'fsNum',
+  addAttributes() {
+    return {
+      size: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('data-fs'),
+        renderHTML: (attrs) => (attrs.size ? { 'data-fs': String(attrs.size) } : {}),
+      },
+    }
+  },
+  parseHTML() {
+    return [{ tag: 'span[data-fs]' }]
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['span', HTMLAttributes, 0]
+  },
+})
+
+// Anchor for the A−/A+ steppers when the selection has no explicit size yet.
+const DEFAULT_STEP = FONT_SIZE_STEPS.indexOf(12)
 
 // --- serialisation helpers ---
 const toInline = (html) =>
@@ -94,7 +120,8 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
   const editor = useEditor({
     extensions: [
       DocNode, Paragraph, Text, Bold, Italic, Underline, History, HardBreak,
-      TextStyle, FontSize,
+      TextStyle, FontSize, // legacy em spans (first release) still parse
+      FsNum,
       ...(withLink ? [Link.configure({ openOnClick: false, autolink: false })] : []),
       enterBehavior,
     ],
@@ -125,22 +152,25 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
             italic: editor.isActive('italic'),
             underline: editor.isActive('underline'),
             link: editor.isActive('link'),
-            fontSize: editor.getAttributes('textStyle').fontSize || '1em',
+            fsNum: editor.getAttributes('fsNum').size || '',
           }
         : {},
   })
 
   if (!editor) return null
 
-  const cur = () => {
-    const i = FONT_SIZES.indexOf(s.fontSize)
-    return i === -1 ? FONT_SIZES.indexOf('1em') : i
+  // Apply a numeric size to the selection (also clears any legacy em span so the
+  // two systems can't stack). '' = back to the field's default size.
+  const applySize = (v) => {
+    const chain = editor.chain().focus().unsetFontSize()
+    if (!v) chain.unsetMark('fsNum').run()
+    else chain.setMark('fsNum', { size: String(v) }).run()
   }
   const stepSize = (delta) => {
-    const i = Math.min(FONT_SIZES.length - 1, Math.max(0, cur() + delta))
-    const next = FONT_SIZES[i]
-    if (next === '1em') editor.chain().focus().unsetFontSize().run()
-    else editor.chain().focus().setFontSize(next).run()
+    const cur = s.fsNum ? FONT_SIZE_STEPS.indexOf(Number(s.fsNum)) : DEFAULT_STEP
+    const base = cur === -1 ? DEFAULT_STEP : cur
+    const i = Math.min(FONT_SIZE_STEPS.length - 1, Math.max(0, base + delta))
+    applySize(FONT_SIZE_STEPS[i])
   }
   const toggleLink = () => {
     const prev = editor.getAttributes('link').href
@@ -152,12 +182,27 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
 
   return (
     <div className={`rt ${focused ? 'is-focused' : ''} ${className}`}>
-      <div className="rt-toolbar" onMouseDown={(e) => e.preventDefault()}>
+      {/* preventDefault keeps the editor's selection while clicking buttons — but
+          NOT on the <select>, which needs the default to open its native popup
+          (the popup is OS-rendered, so it can never be clipped by a container). */}
+      <div className="rt-toolbar" onMouseDown={(e) => { if (e.target.tagName !== 'SELECT') e.preventDefault() }}>
         <button type="button" className={s.bold ? 'on' : ''} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold (Ctrl+B)"><strong>B</strong></button>
         <button type="button" className={s.italic ? 'on' : ''} onClick={() => editor.chain().focus().toggleItalic().run()} title="Italic (Ctrl+I)"><em>i</em></button>
         <button type="button" className={s.underline ? 'on' : ''} onClick={() => editor.chain().focus().toggleUnderline().run()} title="Underline (Ctrl+U)"><u>U</u></button>
         <i className="rt-sep" />
         <button type="button" onClick={() => stepSize(-1)} title="Smaller">A−</button>
+        <select
+          className="rt-size"
+          value={s.fsNum}
+          onChange={(e) => applySize(e.target.value)}
+          title="Font size — the same number is the same size everywhere"
+          aria-label="Font size"
+        >
+          <option value="">Size</option>
+          {FONT_SIZE_STEPS.map((n) => (
+            <option key={n} value={String(n)}>{n}</option>
+          ))}
+        </select>
         <button type="button" onClick={() => stepSize(1)} title="Bigger">A+</button>
         {withLink && (
           <>

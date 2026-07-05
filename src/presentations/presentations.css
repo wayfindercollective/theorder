@@ -206,6 +206,31 @@
   font-family: var(--font-body); color: var(--parchment); line-height: 1.5;
 }
 .pres-rt .rt-placeholder { color: var(--ash); }
+/* The box-level toolbar (Head/Body/Box) floats above-LEFT of the box; right-align
+   the per-field text toolbars so the two never sit on top of each other. */
+.pres-rt .rt-toolbar { left: auto; right: 0; }
+
+/* Word-style numeric font sizes on a slide — the SAME numbers as the site, but
+   proportional to the 16:9 stage (px at the 1280-wide reference, scaled with the
+   stage) so text keeps its size relative to the slide on any present screen. */
+.pres-stage [data-fs="8"]  { font-size: calc(8 * 100cqw / 1280); }
+.pres-stage [data-fs="9"]  { font-size: calc(9 * 100cqw / 1280); }
+.pres-stage [data-fs="10"] { font-size: calc(10 * 100cqw / 1280); }
+.pres-stage [data-fs="11"] { font-size: calc(11 * 100cqw / 1280); }
+.pres-stage [data-fs="12"] { font-size: calc(12 * 100cqw / 1280); }
+.pres-stage [data-fs="14"] { font-size: calc(14 * 100cqw / 1280); }
+.pres-stage [data-fs="16"] { font-size: calc(16 * 100cqw / 1280); }
+.pres-stage [data-fs="18"] { font-size: calc(18 * 100cqw / 1280); }
+.pres-stage [data-fs="20"] { font-size: calc(20 * 100cqw / 1280); }
+.pres-stage [data-fs="24"] { font-size: calc(24 * 100cqw / 1280); }
+.pres-stage [data-fs="28"] { font-size: calc(28 * 100cqw / 1280); }
+.pres-stage [data-fs="32"] { font-size: calc(32 * 100cqw / 1280); }
+.pres-stage [data-fs="36"] { font-size: calc(36 * 100cqw / 1280); }
+.pres-stage [data-fs="42"] { font-size: calc(42 * 100cqw / 1280); }
+.pres-stage [data-fs="48"] { font-size: calc(48 * 100cqw / 1280); }
+.pres-stage [data-fs="56"] { font-size: calc(56 * 100cqw / 1280); }
+.pres-stage [data-fs="64"] { font-size: calc(64 * 100cqw / 1280); }
+.pres-stage [data-fs="72"] { font-size: calc(72 * 100cqw / 1280); }
 
 .pres-h {
   font-family: var(--font-display);

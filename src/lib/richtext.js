@@ -7,18 +7,27 @@
  * editor, the server sanitiser, and the renderer all agree on one rule set.
  */
 
-// Per-selection font sizes, relative (em) so they scale with each field's base
-// size (the cqw base in /presentations, the section CSS on the public site).
-// 1em is the implicit default (no span).
-export const FONT_SIZES = ['0.7em', '0.85em', '1em', '1.15em', '1.3em', '1.5em', '1.75em', '2em', '2.5em']
+// Numeric font sizes (Word/Docs-style). Stored as <span data-fs="N">; CSS maps
+// each number to the SAME absolute px everywhere on the site (globals.css), and
+// to the stage-proportional equivalent inside a presentation (presentations.css),
+// so "size 8" always means the same thing wherever you use it.
+export const FONT_SIZE_STEPS = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 56, 64, 72]
 
-// Regex the sanitiser uses to allow only those font-size values on a span style.
+// Legacy: the first rich-text release sized selections with relative em spans.
+// Kept ONLY so already-saved content still parses/renders; the editor now writes
+// data-fs numbers instead.
+export const FONT_SIZES = ['0.7em', '0.85em', '1em', '1.15em', '1.3em', '1.5em', '1.75em', '2em', '2.5em']
 export const FONT_SIZE_RE = /^(0\.7|0\.85|1|1\.15|1\.3|1\.5|1\.75|2|2\.5)em$/
 
 // sanitize-html configs (plain data — the server passes these to sanitize-html).
 export const ALLOWED_INLINE = {
   allowedTags: ['b', 'strong', 'i', 'em', 'u', 'a', 'span', 'br'],
-  allowedAttributes: { a: ['href', 'target', 'rel'], span: ['style'] },
+  allowedAttributes: {
+    a: ['href', 'target', 'rel'],
+    // data-fs is value-restricted to the exact numeric steps; style kept for
+    // legacy em spans only.
+    span: ['style', { name: 'data-fs', values: FONT_SIZE_STEPS.map(String) }],
+  },
   allowedStyles: { '*': { 'font-size': [FONT_SIZE_RE] } },
   allowedSchemes: ['http', 'https', 'mailto'],
   // disallowed tags discarded but their text kept (so a stray <p> becomes text)
