@@ -153,6 +153,9 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
             underline: editor.isActive('underline'),
             link: editor.isActive('link'),
             fsNum: editor.getAttributes('fsNum').size || '',
+            // selection position, so the toolbar re-renders (and re-measures the
+            // effective size) whenever the caret moves between sized runs
+            caret: `${editor.state.selection.from}:${editor.state.selection.to}`,
           }
         : {},
   })
@@ -166,11 +169,44 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
     if (!v) chain.unsetMark('fsNum').run()
     else chain.setMark('fsNum', { size: String(v) }).run()
   }
+
+  // The size at the caret when no explicit size is set: measure the rendered
+  // text and convert back to the universal number scale — dividing out the 16:9
+  // stage scaling in presentations (numbers are px at the 1280 reference width),
+  // absolute px everywhere else. So the dropdown always shows the current size.
+  const effectiveSize = () => {
+    try {
+      const dom = editor.view.domAtPos(editor.state.selection.from)
+      const el = dom.node.nodeType === 3 ? dom.node.parentElement : dom.node
+      if (!el || !el.closest) return ''
+      const px = parseFloat(getComputedStyle(el).fontSize)
+      if (!px) return ''
+      const stage = el.closest('.pres-stage')
+      const n = stage && stage.clientWidth ? (px * 1280) / stage.clientWidth : px
+      return String(Math.round(n))
+    } catch {
+      return ''
+    }
+  }
+
+  const shownSize = s.fsNum || effectiveSize()
+  // If the current size isn't one of the standard steps (e.g. a field's default
+  // lands on 40), list it anyway so the dropdown can display it truthfully.
+  const sizeOptions = shownSize && !FONT_SIZE_STEPS.includes(Number(shownSize))
+    ? [...FONT_SIZE_STEPS, Number(shownSize)].sort((a, b) => a - b)
+    : FONT_SIZE_STEPS
+
+  // Step relative to the size currently shown (Word-style): next step up/down
+  // from the effective size, whether or not an explicit size is set yet.
   const stepSize = (delta) => {
-    const cur = s.fsNum ? FONT_SIZE_STEPS.indexOf(Number(s.fsNum)) : DEFAULT_STEP
-    const base = cur === -1 ? DEFAULT_STEP : cur
-    const i = Math.min(FONT_SIZE_STEPS.length - 1, Math.max(0, base + delta))
-    applySize(FONT_SIZE_STEPS[i])
+    const curN = Number(shownSize) || FONT_SIZE_STEPS[DEFAULT_STEP]
+    if (delta > 0) {
+      const next = FONT_SIZE_STEPS.find((n) => n > curN)
+      applySize(next ?? FONT_SIZE_STEPS[FONT_SIZE_STEPS.length - 1])
+    } else {
+      const smaller = FONT_SIZE_STEPS.filter((n) => n < curN)
+      applySize(smaller.length ? smaller[smaller.length - 1] : FONT_SIZE_STEPS[0])
+    }
   }
   const toggleLink = () => {
     const prev = editor.getAttributes('link').href
@@ -193,13 +229,13 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
         <button type="button" onClick={() => stepSize(-1)} title="Smaller">A−</button>
         <select
           className="rt-size"
-          value={s.fsNum}
+          value={shownSize}
           onChange={(e) => applySize(e.target.value)}
           title="Font size — the same number is the same size everywhere"
           aria-label="Font size"
         >
-          <option value="">Size</option>
-          {FONT_SIZE_STEPS.map((n) => (
+          <option value="">Default</option>
+          {sizeOptions.map((n) => (
             <option key={n} value={String(n)}>{n}</option>
           ))}
         </select>
