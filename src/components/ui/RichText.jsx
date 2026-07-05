@@ -55,6 +55,25 @@ const FsNum = Mark.create({
 // Anchor for the A−/A+ steppers when the selection has no explicit size yet.
 const DEFAULT_STEP = FONT_SIZE_STEPS.indexOf(12)
 
+// The rendered size at the caret, converted back to the universal number scale —
+// dividing out the 16:9 stage scaling in presentations (numbers are px at the
+// 1280 reference width), absolute px everywhere else. Exported so an external
+// toolbar (the presentation box bar) can show the current size too.
+export function measureEffectiveSize(editor) {
+  try {
+    const dom = editor.view.domAtPos(editor.state.selection.from)
+    const el = dom.node.nodeType === 3 ? dom.node.parentElement : dom.node
+    if (!el || !el.closest) return ''
+    const px = parseFloat(getComputedStyle(el).fontSize)
+    if (!px) return ''
+    const stage = el.closest('.pres-stage')
+    const n = stage && stage.clientWidth ? (px * 1280) / stage.clientWidth : px
+    return String(Math.round(n))
+  } catch {
+    return ''
+  }
+}
+
 // --- serialisation helpers ---
 const toInline = (html) =>
   String(html || '')
@@ -96,10 +115,20 @@ const sameValue = (a, b, mode) =>
     ? JSON.stringify(a || []) === JSON.stringify(b || [])
     : (a || '') === (b || '')
 
-export function RichText({ value, onChange, mode = 'inline', baseStyle, placeholder, withLink = false, className = '' }) {
+export function RichText({
+  value, onChange, mode = 'inline', baseStyle, placeholder, withLink = false, className = '',
+  // externalToolbar: skip the built-in floating toolbar; the parent renders one
+  // instead (the presentation box bar), driving the editor it receives via
+  // onEditorReady. onFocusChange tells the parent which field is active.
+  externalToolbar = false, onEditorReady, onFocusChange,
+}) {
   const lastEmitted = useRef(undefined)
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
+  const onEditorReadyRef = useRef(onEditorReady)
+  onEditorReadyRef.current = onEditorReady
+  const onFocusChangeRef = useRef(onFocusChange)
+  onFocusChangeRef.current = onFocusChange
   const [focused, setFocused] = useState(false)
 
   const enterBehavior = Extension.create({
@@ -131,9 +160,16 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
       lastEmitted.current = out
       onChangeRef.current(out)
     },
-    onFocus: () => setFocused(true),
-    onBlur: () => setFocused(false),
+    onFocus: () => { setFocused(true); onFocusChangeRef.current?.(true) },
+    onBlur: () => { setFocused(false); onFocusChangeRef.current?.(false) },
   })
+
+  // Hand the editor instance to an external toolbar (presentations).
+  useEffect(() => {
+    if (!editor) return
+    onEditorReadyRef.current?.(editor)
+    return () => onEditorReadyRef.current?.(null)
+  }, [editor])
 
   // External value change → load it without emitting (so loading never marks dirty).
   useEffect(() => {
@@ -170,26 +206,7 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
     else chain.setMark('fsNum', { size: String(v) }).run()
   }
 
-  // The size at the caret when no explicit size is set: measure the rendered
-  // text and convert back to the universal number scale — dividing out the 16:9
-  // stage scaling in presentations (numbers are px at the 1280 reference width),
-  // absolute px everywhere else. So the dropdown always shows the current size.
-  const effectiveSize = () => {
-    try {
-      const dom = editor.view.domAtPos(editor.state.selection.from)
-      const el = dom.node.nodeType === 3 ? dom.node.parentElement : dom.node
-      if (!el || !el.closest) return ''
-      const px = parseFloat(getComputedStyle(el).fontSize)
-      if (!px) return ''
-      const stage = el.closest('.pres-stage')
-      const n = stage && stage.clientWidth ? (px * 1280) / stage.clientWidth : px
-      return String(Math.round(n))
-    } catch {
-      return ''
-    }
-  }
-
-  const shownSize = s.fsNum || effectiveSize()
+  const shownSize = s.fsNum || measureEffectiveSize(editor)
   // If the current size isn't one of the standard steps (e.g. a field's default
   // lands on 40), list it anyway so the dropdown can display it truthfully.
   const sizeOptions = shownSize && !FONT_SIZE_STEPS.includes(Number(shownSize))
@@ -221,6 +238,7 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
       {/* preventDefault keeps the editor's selection while clicking buttons — but
           NOT on the <select>, which needs the default to open its native popup
           (the popup is OS-rendered, so it can never be clipped by a container). */}
+      {!externalToolbar && (
       <div className="rt-toolbar" onMouseDown={(e) => { if (e.target.tagName !== 'SELECT') e.preventDefault() }}>
         <button type="button" className={s.bold ? 'on' : ''} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold (Ctrl+B)"><strong>B</strong></button>
         <button type="button" className={s.italic ? 'on' : ''} onClick={() => editor.chain().focus().toggleItalic().run()} title="Italic (Ctrl+I)"><em>i</em></button>
@@ -247,6 +265,7 @@ export function RichText({ value, onChange, mode = 'inline', baseStyle, placehol
           </>
         )}
       </div>
+      )}
       <div className="rt-content-wrap">
         {placeholder && isRichEmpty(value) && (
           <span className="rt-placeholder" aria-hidden="true" style={baseStyle}>{placeholder}</span>

@@ -206,9 +206,8 @@
   font-family: var(--font-body); color: var(--parchment); line-height: 1.5;
 }
 .pres-rt .rt-placeholder { color: var(--ash); }
-/* The box-level toolbar (Head/Body/Box) floats above-LEFT of the box; right-align
-   the per-field text toolbars so the two never sit on top of each other. */
-.pres-rt .rt-toolbar { left: auto; right: 0; }
+/* Slide fields use the unified box toolbar (externalToolbar) — no per-field
+   floating bars, so nothing can overlap. */
 
 /* Word-style numeric font sizes on a slide — the SAME numbers as the site, but
    proportional to the 16:9 stage (px at the 1280-wide reference, scaled with the
@@ -267,7 +266,9 @@
   left: 0;
   bottom: calc(100% + 6px);
   display: flex; gap: 5px; align-items: center; flex-wrap: wrap;
-  max-width: min(94cqw, 520px);
+  /* wide enough for the full context row (Box + field controls); wraps upward
+     on narrow boxes since it's anchored to its bottom edge */
+  max-width: min(96cqw, 660px);
   padding: 5px 7px;
   background: rgba(12, 10, 8, 0.97);
   border: 1px solid rgba(166, 136, 74, 0.4);

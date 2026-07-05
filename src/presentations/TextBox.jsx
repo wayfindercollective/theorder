@@ -1,30 +1,137 @@
 /**
- * The black text box on a slide — one heading + body. Heading and body each have
- * their OWN size and alignment (independent of each other); the box itself has a
- * position (L/C/R + free drag) and resize. Plain text only (inputs/textareas →
- * React text nodes; no contentEditable/HTML, so no XSS or rich-paste).
+ * The black text box on a slide — one heading + body, each a rich-text field.
+ *
+ * ONE context-aware toolbar per box (no separate per-field bars): it always
+ * shows the drag grip + Box position, and extends with the active field's
+ * controls (B/i/U, size, alignment) when the cursor is in the heading or body.
+ * Size follows Word's intuition: nothing selected → the whole field's base
+ * size; text highlighted → just that run (a data-fs mark on the selection).
  *
  * Geometry is stored as % of the slide stage, and font sizes scale with the
- * stage width via container-query units (cqw), so a box lands identically on the
- * build screen and the screen-shared window.
+ * stage width via container-query units (cqw), so a box lands identically on
+ * the build screen and the screen-shared window.
  *
- * In Present mode: no controls/handles; a box left entirely empty renders nothing.
+ * In Present mode: no controls; a box left entirely empty renders nothing;
+ * content renders through DOMPurify (renderPresent).
  */
-import { useRef } from 'react'
-import { RichText } from '../components/ui/RichText.jsx'
-import { isRichEmpty } from '../lib/richtext.js'
+import { useRef, useState } from 'react'
+import { useEditorState } from '@tiptap/react'
+import { RichText, measureEffectiveSize } from '../components/ui/RichText.jsx'
+import { isRichEmpty, FONT_SIZE_STEPS } from '../lib/richtext.js'
 import { renderPresent } from './renderPresent.js'
 
 const REF_W = 1280 // reference stage width at which *Px are literal pixels
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 const cqw = (px) => `calc(${px} * 100cqw / ${REF_W})`
 const ALIGN_LABEL = { left: 'L', center: 'C', right: 'R' }
+// Field base-size defaults (universal numbers = px at the reference width),
+// matching the blank-slide defaults in siteImages.js.
+const DEFAULT_BASE = { heading: 40, body: 20 }
+
+/**
+ * The active field's section of the box toolbar: B/i/U, size, alignment.
+ * With the caret only (no selection) the size controls change the whole field's
+ * base size; with a selection they mark just the highlighted run.
+ */
+function FieldControls({ editor, fieldKey, box, onBoxChange }) {
+  const s = useEditorState({
+    editor,
+    selector: ({ editor }) =>
+      editor
+        ? {
+            bold: editor.isActive('bold'),
+            italic: editor.isActive('italic'),
+            underline: editor.isActive('underline'),
+            fsNum: editor.getAttributes('fsNum').size || '',
+            collapsed: editor.state.selection.empty,
+            // re-render (and re-measure) when the caret moves between runs
+            caret: `${editor.state.selection.from}:${editor.state.selection.to}`,
+          }
+        : {},
+  })
+
+  const baseKey = fieldKey === 'heading' ? 'headingPx' : 'bodyPx'
+  const alignKey = fieldKey === 'heading' ? 'headingAlign' : 'bodyAlign'
+  const curAlign = box[alignKey] ?? box.textAlign ?? 'left'
+
+  // What the dropdown shows: the field's base size when nothing is selected,
+  // otherwise the selection's size (explicit mark, or measured).
+  const shown = s.collapsed
+    ? String(box[baseKey] ?? DEFAULT_BASE[fieldKey])
+    : s.fsNum || measureEffectiveSize(editor)
+  const sizeOptions = shown && !FONT_SIZE_STEPS.includes(Number(shown))
+    ? [...FONT_SIZE_STEPS, Number(shown)].sort((x, y) => x - y)
+    : FONT_SIZE_STEPS
+
+  const applySize = (v) => {
+    if (s.collapsed) {
+      // whole field — its base size ('' / Default restores the original)
+      onBoxChange({ [baseKey]: v ? clamp(Number(v), 8, 200) : DEFAULT_BASE[fieldKey] })
+      return
+    }
+    const chain = editor.chain().focus().unsetFontSize()
+    if (!v) chain.unsetMark('fsNum').run()
+    else chain.setMark('fsNum', { size: String(v) }).run()
+  }
+  const stepSize = (delta) => {
+    const curN = Number(shown) || DEFAULT_BASE[fieldKey]
+    if (delta > 0) {
+      const next = FONT_SIZE_STEPS.find((n) => n > curN)
+      applySize(next ?? FONT_SIZE_STEPS[FONT_SIZE_STEPS.length - 1])
+    } else {
+      const smaller = FONT_SIZE_STEPS.filter((n) => n < curN)
+      applySize(smaller.length ? smaller[smaller.length - 1] : FONT_SIZE_STEPS[0])
+    }
+  }
+
+  return (
+    <>
+      <span className="pres-tb-group" title="Format — applies to the highlighted text">
+        <em>{fieldKey === 'heading' ? 'Head' : 'Body'}</em>
+        <button type="button" className={s.bold ? 'on' : ''} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold (Ctrl+B)"><strong>B</strong></button>
+        <button type="button" className={s.italic ? 'on' : ''} onClick={() => editor.chain().focus().toggleItalic().run()} title="Italic (Ctrl+I)"><em>i</em></button>
+        <button type="button" className={s.underline ? 'on' : ''} onClick={() => editor.chain().focus().toggleUnderline().run()} title="Underline (Ctrl+U)"><u>U</u></button>
+      </span>
+      <span className="pres-tb-group" title="Size — nothing selected sizes the whole field; highlighted text sizes just that part">
+        <button type="button" onClick={() => stepSize(-1)} title="Smaller">A−</button>
+        <select
+          className="rt-size"
+          value={shown}
+          onChange={(e) => applySize(e.target.value)}
+          title="Font size — the same number is the same size everywhere"
+          aria-label="Font size"
+        >
+          <option value="">Default</option>
+          {sizeOptions.map((n) => (
+            <option key={n} value={String(n)}>{n}</option>
+          ))}
+        </select>
+        <button type="button" onClick={() => stepSize(1)} title="Bigger">A+</button>
+      </span>
+      <span className="pres-tb-group" title={`${fieldKey === 'heading' ? 'Heading' : 'Body'} alignment`}>
+        {['left', 'center', 'right'].map((a) => (
+          <button key={a} type="button" className={curAlign === a ? 'on' : ''} onClick={() => onBoxChange({ [alignKey]: a })}>
+            {ALIGN_LABEL[a]}
+          </button>
+        ))}
+      </span>
+    </>
+  )
+}
 
 export function TextBox({ slide, present, onChange, onBoxChange }) {
   const ref = useRef(null)
+  // Editor instances handed up by the two RichText fields; the toolbar drives
+  // whichever field was focused last (sticky, so it survives toolbar clicks).
+  const [headEd, setHeadEd] = useState(null)
+  const [bodyEd, setBodyEd] = useState(null)
+  const [activeField, setActiveField] = useState(null)
+
   const b = slide.box
   const empty = isRichEmpty(slide.heading) && isRichEmpty(slide.body)
   if (present && empty) return null
+
+  const activeEd = activeField === 'heading' ? headEd : activeField === 'body' ? bodyEd : null
 
   const stageRect = () => ref.current?.parentElement?.getBoundingClientRect()
 
@@ -79,8 +186,6 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
     onBoxChange({ boxAlign: a, xPct: clamp(x, 0, 100 - b.wPct) })
   }
 
-  const bumpFont = (key, delta) => onBoxChange({ [key]: clamp(b[key] + delta, 12, 200) })
-
   // Heading and body align independently. Fall back to the old shared `textAlign`
   // for decks saved before the split.
   const headingAlign = b.headingAlign ?? b.textAlign ?? 'left'
@@ -93,30 +198,14 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
   return (
     <div ref={ref} className={`pres-box${present ? ' is-present' : ''}`} style={style}>
       {!present && (
-        <div className="pres-box-toolbar" onPointerDown={(e) => e.stopPropagation()}>
+        <div
+          className="pres-box-toolbar"
+          onPointerDown={(e) => e.stopPropagation()}
+          // keep the editor's selection while clicking toolbar buttons — but let
+          // the <select> take its default so its native popup opens
+          onMouseDown={(e) => { if (e.target.tagName !== 'SELECT') e.preventDefault() }}
+        >
           <span className="pres-box-grip" onPointerDown={startMove} title="Drag to move">✛</span>
-          <span className="pres-tb-group" title="Heading — size & alignment">
-            <em>Head</em>
-            <button type="button" onClick={() => bumpFont('headingPx', -2)} title="Smaller">A−</button>
-            <button type="button" onClick={() => bumpFont('headingPx', 2)} title="Bigger">A+</button>
-            <i className="pres-tb-sep" />
-            {['left', 'center', 'right'].map((a) => (
-              <button key={a} type="button" className={headingAlign === a ? 'on' : ''} onClick={() => onBoxChange({ headingAlign: a })}>
-                {ALIGN_LABEL[a]}
-              </button>
-            ))}
-          </span>
-          <span className="pres-tb-group" title="Body — size & alignment">
-            <em>Body</em>
-            <button type="button" onClick={() => bumpFont('bodyPx', -2)} title="Smaller">A−</button>
-            <button type="button" onClick={() => bumpFont('bodyPx', 2)} title="Bigger">A+</button>
-            <i className="pres-tb-sep" />
-            {['left', 'center', 'right'].map((a) => (
-              <button key={a} type="button" className={bodyAlign === a ? 'on' : ''} onClick={() => onBoxChange({ bodyAlign: a })}>
-                {ALIGN_LABEL[a]}
-              </button>
-            ))}
-          </span>
           <span className="pres-tb-group" title="Box position (left / centre / right)">
             <em>Box</em>
             {['left', 'center', 'right'].map((a) => (
@@ -125,6 +214,9 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
               </button>
             ))}
           </span>
+          {activeEd && (
+            <FieldControls editor={activeEd} fieldKey={activeField} box={b} onBoxChange={onBoxChange} />
+          )}
         </div>
       )}
 
@@ -143,6 +235,9 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
               placeholder="Heading"
               className="pres-rt pres-rt-h display"
               onChange={(v) => onChange({ heading: v })}
+              externalToolbar
+              onEditorReady={setHeadEd}
+              onFocusChange={(f) => f && setActiveField('heading')}
             />
             <RichText
               mode="inline"
@@ -151,6 +246,9 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
               placeholder="Body…"
               className="pres-rt pres-rt-b"
               onChange={(v) => onChange({ body: v })}
+              externalToolbar
+              onEditorReady={setBodyEd}
+              onFocusChange={(f) => f && setActiveField('body')}
             />
           </>
         )}
