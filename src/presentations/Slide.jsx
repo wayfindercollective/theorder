@@ -27,13 +27,15 @@ export function Slide({ slide, index, total, present, onChange, onBoxChange, onD
   const patchExtra = (id, fn) =>
     onChange({ extras: extras.map((x) => (x.id === id ? fn(x) : x)) })
 
+  // Stagger each new element a little so two adds never land exactly on top
+  // of each other (a stack of identical boxes reads as "nothing happened").
   const addTextBox = () =>
     onChange({
       extras: [...extras, {
         id: newId(),
         heading: '',
         body: '',
-        box: { xPct: 34, yPct: 16, wPct: 32, hPct: 16, boxAlign: 'center', headingAlign: 'left', bodyAlign: 'left', headingPx: 28, bodyPx: 20 },
+        box: { xPct: 30 + (extras.length % 4) * 4, yPct: 14 + (extras.length % 4) * 6, wPct: 32, hPct: 16, boxAlign: 'center', headingAlign: 'left', bodyAlign: 'left', headingPx: 28, bodyPx: 20 },
       }],
     })
 
@@ -41,7 +43,7 @@ export function Slide({ slide, index, total, present, onChange, onBoxChange, onD
     if (picker === 'background') {
       onChange({ siteImageIndex: val })
     } else {
-      onChange({ images: [...images, { id: newId(), src: val, xPct: 33, yPct: 20, wPct: 34 }] })
+      onChange({ images: [...images, { id: newId(), src: val, xPct: 33 + (images.length % 4) * 4, yPct: 18 + (images.length % 4) * 6, wPct: 34 }] })
     }
     setPicker(null)
   }

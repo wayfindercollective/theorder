@@ -17,6 +17,34 @@ import { listLibraryImages, uploadImage, humanizeError } from './presentationsAp
 // Browsers can't display HEIC (the iPhone default) — catch it before upload.
 const DISPLAYABLE = /\.(jpe?g|png|webp|gif|avif)$/i
 
+// Shrink big photos in the browser before uploading: a phone camera JPEG is
+// 3–12 MB and 4000+px, which the API rejects past 8 MB and which would slow
+// every deck load. Slides never need more than ~1920px. Falls back to the
+// original file untouched if anything about decoding/encoding fails.
+async function downscaleForSlide(file) {
+  const isJpegish = /^image\/(jpe?g|webp)$/i.test(file.type)
+  const isPng = /^image\/png$/i.test(file.type)
+  if (!isJpegish && !isPng) return file
+  if (file.size < 900 * 1024) return file
+  try {
+    const bmp = await createImageBitmap(file)
+    const scale = Math.min(1, 1920 / Math.max(bmp.width, bmp.height))
+    if (scale === 1 && isPng) return file // small-dimension PNG: recompressing rarely helps
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, Math.round(bmp.width * scale))
+    canvas.height = Math.max(1, Math.round(bmp.height * scale))
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height)
+    // PNGs keep their format (transparency); photos re-encode as JPEG.
+    const type = isPng ? 'image/png' : 'image/jpeg'
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, type, 0.85))
+    if (!blob || blob.size >= file.size) return file
+    const name = isPng ? file.name : (file.name || 'image').replace(/\.\w+$/, '') + '.jpg'
+    return new File([blob], name, { type })
+  } catch {
+    return file
+  }
+}
+
 export function ImagePicker({ mode, onPick, onClose }) {
   const [uploads, setUploads] = useState(null) // null = loading
   const [error, setError] = useState('')
@@ -47,7 +75,7 @@ export function ImagePicker({ mode, onPick, onClose }) {
     setBusy(true)
     setError('')
     try {
-      const { url } = await uploadImage(file)
+      const { url } = await uploadImage(await downscaleForSlide(file))
       onPick(url)
     } catch (e) {
       setError(humanizeError(e))

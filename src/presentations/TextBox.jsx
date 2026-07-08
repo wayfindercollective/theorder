@@ -137,10 +137,22 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
   const [headEd, setHeadEd] = useState(null)
   const [bodyEd, setBodyEd] = useState(null)
   const [activeField, setActiveField] = useState(null)
+  // Toolbar visibility is tracked in React (not CSS :hover/:focus-within)
+  // because the toolbar is a SIBLING of the box, anchored to the stage top —
+  // that keeps it reachable wherever the box sits and however tall it grows.
+  const [boxHover, setBoxHover] = useState(false)
+  const [tbHover, setTbHover] = useState(false)
+  const [focusCount, setFocusCount] = useState(0)
 
   const b = slide.box
   const empty = isRichEmpty(slide.heading) && isRichEmpty(slide.body)
   if (present && empty) return null
+
+  const fieldFocus = (field) => (f) => {
+    setFocusCount((n) => Math.max(0, n + (f ? 1 : -1)))
+    if (f) setActiveField(field)
+  }
+  const toolbarOpen = !present && (boxHover || tbHover || focusCount > 0)
 
   const activeEd = activeField === 'heading' ? headEd : activeField === 'body' ? bodyEd : null
 
@@ -189,6 +201,14 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
     )
   }
 
+  // Grab the box by its frame (the padding strip / the gap between fields) to
+  // move it — clicks inside the text fields still just place the caret.
+  const startFrameMove = (e) => {
+    const t = e.target
+    if (t !== e.currentTarget && !(t.classList && t.classList.contains('pres-box-content'))) return
+    startMove(e)
+  }
+
   const setBoxAlign = (a) => {
     let x = b.xPct
     if (a === 'left') x = 4
@@ -209,10 +229,12 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
   const bodyStyle = { fontSize: cqw(b.bodyPx), textAlign: bodyAlign }
 
   return (
-    <div ref={ref} className={`pres-box${present ? ' is-present' : ''}`} style={style}>
-      {!present && (
+    <>
+      {toolbarOpen && (
         <div
           className="pres-box-toolbar"
+          onPointerEnter={() => setTbHover(true)}
+          onPointerLeave={() => setTbHover(false)}
           onPointerDown={(e) => e.stopPropagation()}
           // keep the editor's selection while clicking toolbar buttons — but let
           // the <select> take its default so its native popup opens
@@ -238,6 +260,14 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
         </div>
       )}
 
+    <div
+      ref={ref}
+      className={`pres-box${present ? ' is-present' : ''}`}
+      style={style}
+      onPointerDown={present ? undefined : startFrameMove}
+      onPointerEnter={present ? undefined : () => setBoxHover(true)}
+      onPointerLeave={present ? undefined : () => setBoxHover(false)}
+    >
       <div className="pres-box-content">
         {present ? (
           <>
@@ -256,7 +286,7 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
               onChange={(v) => onChange({ heading: v })}
               externalToolbar
               onEditorReady={setHeadEd}
-              onFocusChange={(f) => f && setActiveField('heading')}
+              onFocusChange={fieldFocus('heading')}
             />
             <RichText
               mode="block"
@@ -268,7 +298,7 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
               onChange={(v) => onChange({ body: v })}
               externalToolbar
               onEditorReady={setBodyEd}
-              onFocusChange={(f) => f && setActiveField('body')}
+              onFocusChange={fieldFocus('body')}
             />
           </>
         )}
@@ -276,5 +306,6 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
 
       {!present && <span className="pres-box-resize" onPointerDown={startResize} title="Drag to resize" />}
     </div>
+    </>
   )
 }

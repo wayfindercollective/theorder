@@ -190,6 +190,11 @@
 }
 .pres-box.is-present { box-shadow: 0 12px 44px -16px rgba(0, 0, 0, 0.8); }
 
+/* A box moves by grabbing its frame — the padding strip around the text —
+   not just the toolbar grip. Inside the fields, the caret wins. */
+.pres-box:not(.is-present) { cursor: move; }
+.pres-box:not(.is-present) .rt-content .ProseMirror { cursor: text; }
+
 /* The box auto-grows with its text (the inline style sets min-height, never
    height) so content is never clipped — in edit OR present mode. */
 .pres-box-content { display: flex; flex-direction: column; gap: 0.45em; width: 100%; flex: 1 1 auto; }
@@ -290,27 +295,26 @@
 .pres-b-input { flex: 1; min-height: 1.5em; }
 .pres-h-input::placeholder, .pres-b-input::placeholder { color: var(--ash); }
 
-/* box drag-move toolbar (edit only) */
+/* Box formatting toolbar (edit only). A SIBLING of its box, anchored to the
+   top-centre of the slide's stage — one predictable place, like a ribbon, and
+   always fully on-screen no matter where the box sits or how tall its text
+   grows (the old above-the-box float clipped against the stage edge). Shown /
+   hidden by React (box hovered, toolbar hovered, or a field focused). */
 .pres-box-toolbar {
   position: absolute;
-  left: 0;
-  bottom: calc(100% + 6px);
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
   display: flex; gap: 5px; align-items: center; flex-wrap: wrap;
-  /* wide enough for the full context row (Box + field controls); wraps upward
-     on narrow boxes since it's anchored to its bottom edge */
-  max-width: min(96cqw, 660px);
+  justify-content: center;
+  max-width: min(94cqw, 720px);
   padding: 5px 7px;
   background: rgba(12, 10, 8, 0.97);
   border: 1px solid rgba(166, 136, 74, 0.4);
   border-radius: 4px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 160ms var(--ease-order);
-  z-index: 8;
+  z-index: 25;
 }
 .pres-tb-sep { width: 1px; height: 14px; background: rgba(166, 136, 74, 0.3); margin: 0 1px; }
-.pres-box:hover .pres-box-toolbar,
-.pres-box:focus-within .pres-box-toolbar { opacity: 1; pointer-events: auto; }
 
 .pres-box-toolbar button {
   font-family: var(--font-mono);
@@ -424,6 +428,8 @@
 }
 .pres-img:hover .pres-img-del { opacity: 1; }
 .pres-img-del:hover { color: var(--cordovan-light); border-color: var(--cordovan-light); }
+/* picture flush with the top of the slide → keep its ✕ inside, not clipped */
+.pres-img.at-top .pres-img-del { top: 6px; right: 6px; }
 
 /* remove button inside a text-box toolbar */
 .pres-box-toolbar .pres-tb-del:hover { color: var(--cordovan-light); border-color: var(--cordovan-light); }

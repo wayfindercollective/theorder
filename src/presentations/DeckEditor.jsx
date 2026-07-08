@@ -37,6 +37,9 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
   const dragIndex = useRef(null)
   // Bumped on every edit; lets save() detect edits that landed mid-request.
   const revRef = useRef(0)
+  // When the last edit landed — autosave waits for typing to settle.
+  const lastEditRef = useRef(0)
+  const saveRef = useRef(null)
 
   // Load an existing deck — and offer to restore a newer localStorage draft if
   // a previous session crashed/expired before saving.
@@ -98,10 +101,23 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
 
   const update = useCallback((fn) => {
     revRef.current += 1
+    lastEditRef.current = Date.now()
     setDeck((d) => (d ? fn(d) : d))
     setDirty(true)
     setSavedTick(false)
   }, [])
+
+  // Autosave: once edits settle (15s idle), push to the server unprompted — a
+  // forgotten Save can never cost more than the last few seconds of work. The
+  // idle gate matters: adopting the server's sanitised copy mid-typing could
+  // move the caret, so we only save when the keyboard has gone quiet.
+  useEffect(() => {
+    if (!dirty || saving) return
+    const t = setInterval(() => {
+      if (Date.now() - lastEditRef.current >= 15000) saveRef.current?.()
+    }, 5000)
+    return () => clearInterval(t)
+  }, [dirty, saving])
 
   const onSlideChange = useCallback((sid, changes) =>
     update((d) => ({ ...d, slides: d.slides.map((s) => (s.id === sid ? { ...s, ...changes } : s)) })), [update])
@@ -173,6 +189,7 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
       setSaving(false)
     }
   }
+  saveRef.current = save
 
   const enterPresent = () => {
     setPresent(true)

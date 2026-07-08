@@ -54,7 +54,7 @@ export function SlideImage({ img, present, onChange, onDelete }) {
   return (
     <div
       ref={ref}
-      className={`pres-img${present ? ' is-present' : ''}`}
+      className={`pres-img${present ? ' is-present' : ''}${img.yPct < 3 ? ' at-top' : ''}`}
       style={style}
       onPointerDown={present ? undefined : startMove}
     >
