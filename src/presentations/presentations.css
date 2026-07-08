@@ -190,9 +190,9 @@
 }
 .pres-box.is-present { box-shadow: 0 12px 44px -16px rgba(0, 0, 0, 0.8); }
 
-.pres-box-content { display: flex; flex-direction: column; gap: 0.45em; width: 100%; height: 100%; overflow: hidden; }
-/* In edit mode let the rich-text floating toolbars escape the box; present clips. */
-.pres-box:not(.is-present) .pres-box-content { overflow: visible; }
+/* The box auto-grows with its text (the inline style sets min-height, never
+   height) so content is never clipped — in edit OR present mode. */
+.pres-box-content { display: flex; flex-direction: column; gap: 0.45em; width: 100%; flex: 1 1 auto; }
 
 /* RichText editor inside a slide box — base size/alignment come from baseStyle. */
 .pres-rt { position: relative; width: 100%; }
@@ -237,6 +237,7 @@
   letter-spacing: 0.04em;
   line-height: 1.12;
   margin: 0;
+  white-space: pre-wrap; /* manual spacing is respected, same as while editing */
 }
 .pres-b {
   color: var(--parchment);
@@ -250,10 +251,12 @@
    (.pres-rt-b's ProseMirror) and in present mode (.pres-b), so bullets land
    identically on the build screen and the shared screen. Paragraphs and items
    sit tight (slide copy, not web prose); lists get a normal indent + marker. */
+/* Every paragraph is one tight line (Enter = next line, like the old hard
+   breaks). A blank line is just an empty paragraph — the ::before keeps it
+   open in present mode, mirroring the editor's own placeholder <br>. */
 .pres-b > p,
 .pres-rt-b .rt-content .ProseMirror > p { margin: 0; }
-.pres-b > p + p,
-.pres-rt-b .rt-content .ProseMirror > p + p { margin-top: 0.5em; }
+.pres-b p:empty::before { content: '\00a0'; }
 
 .pres-b ul,
 .pres-b ol,
@@ -386,6 +389,134 @@
   transition: all 200ms var(--ease-order);
 }
 .pres-add-btn:hover { color: var(--parchment); border-color: var(--brass); background: rgba(166, 136, 74, 0.08); }
+
+/* ---- Pictures placed on a slide ---- */
+.pres-img {
+  position: absolute;
+  z-index: 3; /* under the text boxes (4) so words can sit over a picture */
+  line-height: 0;
+}
+.pres-img img {
+  width: 100%;
+  height: auto;
+  display: block;
+  box-shadow: 0 10px 36px -12px rgba(0, 0, 0, 0.8);
+  user-select: none;
+}
+.pres-img:not(.is-present) { cursor: grab; }
+.pres-img:not(.is-present):active { cursor: grabbing; }
+.pres-img:not(.is-present):hover { outline: 1px dashed rgba(166, 136, 74, 0.7); }
+.pres-img .pres-box-resize { right: -6px; bottom: -6px; }
+.pres-img:hover .pres-box-resize { opacity: 0.9; }
+.pres-img-del {
+  position: absolute;
+  top: -10px; right: -10px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--parchment);
+  background: rgba(12, 10, 8, 0.95);
+  border: 1px solid rgba(166, 136, 74, 0.5);
+  opacity: 0;
+  transition: opacity 160ms var(--ease-order);
+  z-index: 9;
+}
+.pres-img:hover .pres-img-del { opacity: 1; }
+.pres-img-del:hover { color: var(--cordovan-light); border-color: var(--cordovan-light); }
+
+/* remove button inside a text-box toolbar */
+.pres-box-toolbar .pres-tb-del:hover { color: var(--cordovan-light); border-color: var(--cordovan-light); }
+
+.pres-tools-sep { width: 1px; height: 14px; background: rgba(166, 136, 74, 0.3); }
+
+/* ---- Picture / background picker (overlays the slide's stage) ---- */
+.pres-picker-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3cqw;
+}
+.pres-picker {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid rgba(166, 136, 74, 0.4);
+  border-radius: 6px;
+  box-shadow: 0 24px 80px -20px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+.pres-picker-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(166, 136, 74, 0.25);
+}
+.pres-picker-head h3 {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  color: var(--parchment);
+}
+.pres-picker-error {
+  margin: 10px 16px 0;
+  color: var(--cordovan-light);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+.pres-picker-body { flex: 1; overflow-y: auto; padding: 14px 16px 20px; }
+.pres-picker-label {
+  margin: 14px 0 8px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+.pres-picker-label:first-child { margin-top: 0; }
+.pres-picker-empty { color: var(--ash); font-size: 0.85rem; }
+.pres-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 10px;
+}
+.pres-picker-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(166, 136, 74, 0.2);
+  border-radius: 4px;
+  transition: border-color 160ms var(--ease-order);
+  text-align: left;
+}
+.pres-picker-item:hover { border-color: var(--brass); }
+.pres-picker-item img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  border-radius: 2px;
+}
+.pres-picker-item span {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  color: var(--parchment-mute);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ---- Present mode ---- */
 .pres-exit {

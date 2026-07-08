@@ -79,4 +79,29 @@ export function deleteDeck(id) {
   return call(`/api/presentations?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
+// The shared image store (same one the /admin Images tab manages).
+export function listLibraryImages() {
+  return call('/api/admin/images', { method: 'GET' }).then((d) => d.images || [])
+}
+
+// Raw-body upload (the endpoint reads X-Filename + Content-Type, not multipart).
+export async function uploadImage(file) {
+  const headers = {
+    'X-Filename': file.name || 'image',
+    'Content-Type': file.type || 'application/octet-stream',
+  }
+  const token = getToken()
+  if (token) headers.Authorization = `Bearer ${token}`
+  const res = await fetch('/api/admin/upload', { method: 'POST', headers, body: file })
+  const text = await res.text()
+  let data
+  try { data = JSON.parse(text) } catch { data = { error: text } }
+  if (!res.ok) {
+    const err = new Error(data?.error || `HTTP ${res.status}`)
+    err.status = res.status
+    throw err
+  }
+  return data
+}
+
 export { humanizeError }

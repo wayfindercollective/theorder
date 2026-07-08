@@ -83,6 +83,49 @@ const toInline = (html) =>
     .replace(/<\/p>\s*$/i, '')
     .trim()
 
+// Legacy slide bodies wrote hard breaks (<br>) between lines, which made every
+// line part of ONE paragraph — so toggling a bullet list swallowed the whole
+// body into a single bullet. New content uses real paragraphs; this splits the
+// old <br>-joined paragraphs into real ones on load (browser only), re-opening
+// any inline marks (<strong>a<br>b</strong>) so no formatting is lost.
+const splitLegacyBreaks = (html) => {
+  const s = String(html || '')
+  if (typeof document === 'undefined' || !/<br[\s/>]/i.test(s)) return s
+  const src = document.createElement('div')
+  src.innerHTML = s
+  const out = document.createElement('div')
+  for (const block of Array.from(src.childNodes)) {
+    if (block.nodeName !== 'P') { out.appendChild(block.cloneNode(true)); continue }
+    let p = document.createElement('p')
+    out.appendChild(p)
+    let insert = p
+    const newParagraph = () => {
+      const chain = []
+      for (let el = insert; el !== p; el = el.parentNode) chain.unshift(el)
+      p = document.createElement('p')
+      out.appendChild(p)
+      insert = p
+      for (const w of chain) insert = insert.appendChild(w.cloneNode(false))
+    }
+    const walk = (node) => {
+      for (const child of Array.from(node.childNodes)) {
+        if (child.nodeName === 'BR') { newParagraph(); continue }
+        if (child.nodeType === 3) { insert.appendChild(child.cloneNode()); continue }
+        insert = insert.appendChild(child.cloneNode(false))
+        walk(child)
+        insert = insert.parentNode
+      }
+    }
+    walk(block)
+  }
+  // drop mark shells left empty by a break at a run's edge (<strong></strong>);
+  // never touch <br> — list items (cloned wholesale) may legitimately hold them
+  for (const el of Array.from(out.querySelectorAll('p *'))) {
+    if (el.nodeName !== 'BR' && !el.textContent && !el.querySelector('br')) el.remove()
+  }
+  return out.innerHTML
+}
+
 // paragraphs never nest and marks never cross a paragraph boundary, so matching
 // each <p>…</p> inner is a safe split into lines.
 const toLines = (html) => {
@@ -102,12 +145,16 @@ function serialize(editor, mode) {
   return isRichEmpty(inline) ? '' : inline
 }
 
-function toContent(value, mode) {
+function toContent(value, mode, withLists) {
   if (mode === 'lines') {
     const arr = Array.isArray(value) ? value : []
     return arr.length ? arr.map((l) => `<p>${l || ''}</p>`).join('') : '<p></p>'
   }
-  if (mode === 'block') return value || '<p></p>'
+  // Slide bodies (block + lists) migrate legacy <br> lines to real paragraphs so
+  // list toggles work per line. Site block fields (code.intro) are left alone —
+  // their public CSS gives paragraphs real margins, so a silent split would
+  // change the live site's spacing.
+  if (mode === 'block') return (withLists ? splitLegacyBreaks(value) : value) || '<p></p>'
   return value ? `<p>${value}</p>` : '<p></p>'
 }
 
@@ -144,17 +191,10 @@ export function RichText({
         const br = () => this.editor.commands.setHardBreak()
         return { Enter: br, 'Shift-Enter': br }
       }
-      if (mode === 'block' && withLists) {
-        // Body with lists: keep the old tight line-break on Enter for ordinary
-        // text, but hand Enter to the list extensions (new bullet / exit list)
-        // when the caret is inside a list item.
-        return {
-          Enter: () => {
-            if (this.editor.isActive('listItem')) return false
-            return this.editor.commands.setHardBreak()
-          },
-        }
-      }
+      // block (with or without lists): default Enter — a real new paragraph
+      // (tight-spaced by CSS in slides), and inside a list a new item. Real
+      // paragraphs are what make "select three lines → bullet" give three
+      // bullets instead of one. Shift+Enter still inserts a soft line break.
       return {}
     },
   })
@@ -172,7 +212,11 @@ export function RichText({
       ...(withLink ? [Link.configure({ openOnClick: false, autolink: false })] : []),
       enterBehavior,
     ],
-    content: toContent(value, mode),
+    // Keep runs of spaces exactly as typed. Without this, ProseMirror's HTML
+    // parser collapses them on every load — which is what "reset" the manual
+    // column spacing in slide bodies between sessions.
+    parseOptions: { preserveWhitespace: true },
+    content: toContent(value, mode, withLists),
     onUpdate: ({ editor }) => {
       const out = serialize(editor, mode)
       lastEmitted.current = out
@@ -194,8 +238,11 @@ export function RichText({
     if (!editor) return
     if (sameValue(value, lastEmitted.current, mode)) return
     lastEmitted.current = value
-    editor.commands.setContent(toContent(value, mode), { emitUpdate: false })
-  }, [value, editor, mode])
+    editor.commands.setContent(toContent(value, mode, withLists), {
+      emitUpdate: false,
+      parseOptions: { preserveWhitespace: true },
+    })
+  }, [value, editor, mode, withLists])
 
   const s = useEditorState({
     editor,

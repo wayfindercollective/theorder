@@ -58,26 +58,61 @@ function align(v) {
   return v === 'center' || v === 'right' ? v : 'left'
 }
 
+// Extra text boxes and placed pictures per slide (both additive — old decks
+// simply have empty arrays after their next save).
+const MAX_EXTRAS = 12
+const MAX_SLIDE_IMAGES = 12
+// A slide picture may only point at a bundled site asset or this project's own
+// public Blob store — never an arbitrary origin (and never a javascript: URL).
+const LOCAL_SRC_RE = /^\/images\/[A-Za-z0-9][A-Za-z0-9._/-]*$/
+const BLOB_SRC_RE = /^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/[!-~]+$/i
+
+function imageSrc(v) {
+  const s = typeof v === 'string' ? v.trim() : ''
+  if (s.length > 600 || s.includes('..')) return ''
+  return LOCAL_SRC_RE.test(s) || BLOB_SRC_RE.test(s) ? s : ''
+}
+
+function sanitizeBox(b) {
+  return {
+    xPct: clampNum(b.xPct, 0, 100, 8),
+    yPct: clampNum(b.yPct, 0, 100, 60),
+    wPct: clampNum(b.wPct, 5, 100, 46),
+    hPct: clampNum(b.hPct, 5, 100, 30),
+    boxAlign: align(b.boxAlign),
+    // Heading and body align independently; migrate old shared `textAlign`.
+    headingAlign: align(b.headingAlign ?? b.textAlign),
+    bodyAlign: align(b.bodyAlign ?? b.textAlign),
+    headingPx: clampInt(b.headingPx, 12, 200, 40),
+    bodyPx: clampInt(b.bodyPx, 12, 200, 20),
+  }
+}
+
 function sanitizeSlide(s) {
-  const b = (s && s.box) || {}
+  const extras = Array.isArray(s?.extras) ? s.extras.slice(0, MAX_EXTRAS) : []
+  const images = Array.isArray(s?.images) ? s.images.slice(0, MAX_SLIDE_IMAGES) : []
   return {
     id: typeof s?.id === 'string' && s.id ? s.id.slice(0, 64) : randomUUID(),
     siteImageIndex: clampInt(s?.siteImageIndex, 0, MAX_IMAGE_INDEX, 0),
     // heading stays inline (one line); body allows block + bullet lists
     heading: sanitizeInline(s?.heading),
     body: sanitizeRich(s?.body),
-    box: {
-      xPct: clampNum(b.xPct, 0, 100, 8),
-      yPct: clampNum(b.yPct, 0, 100, 60),
-      wPct: clampNum(b.wPct, 5, 100, 46),
-      hPct: clampNum(b.hPct, 5, 100, 30),
-      boxAlign: align(b.boxAlign),
-      // Heading and body align independently; migrate old shared `textAlign`.
-      headingAlign: align(b.headingAlign ?? b.textAlign),
-      bodyAlign: align(b.bodyAlign ?? b.textAlign),
-      headingPx: clampInt(b.headingPx, 12, 200, 40),
-      bodyPx: clampInt(b.bodyPx, 12, 200, 20),
-    },
+    box: sanitizeBox((s && s.box) || {}),
+    extras: extras.map((x) => ({
+      id: typeof x?.id === 'string' && x.id ? x.id.slice(0, 64) : randomUUID(),
+      heading: sanitizeInline(x?.heading),
+      body: sanitizeRich(x?.body),
+      box: sanitizeBox((x && x.box) || {}),
+    })),
+    images: images
+      .map((im) => ({
+        id: typeof im?.id === 'string' && im.id ? im.id.slice(0, 64) : randomUUID(),
+        src: imageSrc(im?.src),
+        xPct: clampNum(im?.xPct, 0, 100, 33),
+        yPct: clampNum(im?.yPct, 0, 100, 20),
+        wPct: clampNum(im?.wPct, 2, 100, 34),
+      }))
+      .filter((im) => im.src),
   }
 }
 
@@ -87,7 +122,14 @@ function sanitizeDeckForRead(deck) {
   if (!deck || !Array.isArray(deck.slides)) return deck
   return {
     ...deck,
-    slides: deck.slides.map((s) => ({ ...s, heading: sanitizeInline(s?.heading), body: sanitizeRich(s?.body) })),
+    slides: deck.slides.map((s) => ({
+      ...s,
+      heading: sanitizeInline(s?.heading),
+      body: sanitizeRich(s?.body),
+      ...(Array.isArray(s?.extras) && {
+        extras: s.extras.map((x) => ({ ...x, heading: sanitizeInline(x?.heading), body: sanitizeRich(x?.body) })),
+      }),
+    })),
   }
 }
 
@@ -157,8 +199,10 @@ export default async function handler(req, res) {
       : []
     // Limit by visible text length (never truncate HTML — that would cut a tag).
     for (const s of slides) {
-      if (richText(s.heading).length > MAX_HEADING_TEXT || richText(s.body).length > MAX_BODY_TEXT) {
-        return res.status(400).json({ error: 'slide text too long' })
+      for (const t of [s, ...s.extras]) {
+        if (richText(t.heading).length > MAX_HEADING_TEXT || richText(t.body).length > MAX_BODY_TEXT) {
+          return res.status(400).json({ error: 'slide text too long' })
+        }
       }
     }
     const title = str(body?.title, 120).trim() || 'Untitled Presentation'

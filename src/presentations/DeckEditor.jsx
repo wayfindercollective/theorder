@@ -120,6 +120,27 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
     update((d) => ({ ...d, slides: d.slides.filter((s) => s.id !== sid) }))
   }
 
+  // Deep-copy a slide (fresh ids throughout) and insert it right below.
+  const duplicateSlide = (sid) => {
+    const cid = newId()
+    update((d) => {
+      const i = d.slides.findIndex((s) => s.id === sid)
+      if (i < 0) return d
+      const src = d.slides[i]
+      const copy = {
+        ...src,
+        id: cid,
+        box: { ...src.box },
+        extras: (src.extras || []).map((x) => ({ ...x, id: newId(), box: { ...x.box } })),
+        images: (src.images || []).map((im) => ({ ...im, id: newId() })),
+      }
+      const arr = [...d.slides]
+      arr.splice(i + 1, 0, copy)
+      return { ...d, slides: arr }
+    })
+    setScrollToId(cid)
+  }
+
   const reorder = (from, to) => update((d) => {
     if (to < 0 || to >= d.slides.length) return d
     const arr = [...d.slides]
@@ -239,6 +260,7 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
               onChange={(changes) => onSlideChange(slide.id, changes)}
               onBoxChange={(boxChanges) => onBoxChange(slide.id, boxChanges)}
               onDelete={() => deleteSlide(slide.id)}
+              onDuplicate={() => duplicateSlide(slide.id)}
               onMove={(dir) => reorder(i, i + dir)}
               dragProps={{
                 onDragStart: () => { dragIndex.current = i },

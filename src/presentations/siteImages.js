@@ -64,6 +64,20 @@ export const SITE_IMAGES = DEFS.map((d) => ({
 
 export const SITE_IMAGE_COUNT = SITE_IMAGES.length
 
+// Pictures that can be PLACED on a slide (not backgrounds): Nico's own photos
+// and marks, bundled with the site under /images/pres-library/. The picker
+// shows these plus everything uploaded through /admin.
+export const PRES_LIBRARY = [
+  { src: '/images/pres-library/true-gentleman.jpg', label: 'The True Gentleman' },
+  { src: '/images/pres-library/regiment-afghanistan.jpg', label: 'The Regiment — Afghanistan' },
+  { src: '/images/pres-library/brotherhood-framed.jpg', label: 'Brotherhood (framed photo)' },
+  { src: '/images/pres-library/black-triumph.jpg', label: 'The Black Triumph' },
+  { src: '/images/pres-library/mountain-valley.jpg', label: 'Mountain valley' },
+  { src: '/images/pres-library/egypt-relief.jpg', label: 'Egyptian temple relief' },
+  { src: '/images/pres-library/desert-pyramid.jpg', label: 'Desert pyramid' },
+  { src: '/images/pres-library/order-logo-aged.png', label: 'The Order logo (aged)' },
+]
+
 const mod = (i) => ((i % SITE_IMAGE_COUNT) + SITE_IMAGE_COUNT) % SITE_IMAGE_COUNT
 
 export function imageForIndex(i) {
@@ -87,6 +101,8 @@ export function blankSlideForIndex(index, idgen) {
     siteImageIndex: mod(index),
     heading: '',
     body: '',
+    extras: [],
+    images: [],
     box: {
       ...img.defaultBox,
       boxAlign: sides.boxAlign,

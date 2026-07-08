@@ -128,7 +128,9 @@ function FieldControls({ editor, fieldKey, box, onBoxChange }) {
   )
 }
 
-export function TextBox({ slide, present, onChange, onBoxChange }) {
+// `slide` is anything shaped { heading, body, box } — the main slide box or an
+// extra text box. `onDelete` (extras only) adds a remove button to the toolbar.
+export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
   const ref = useRef(null)
   // Editor instances handed up by the two RichText fields; the toolbar drives
   // whichever field was focused last (sticky, so it survives toolbar clicks).
@@ -200,7 +202,9 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
   const headingAlign = b.headingAlign ?? b.textAlign ?? 'left'
   const bodyAlign = b.bodyAlign ?? b.textAlign ?? 'left'
 
-  const style = { left: `${b.xPct}%`, top: `${b.yPct}%`, width: `${b.wPct}%`, height: `${b.hPct}%` }
+  // minHeight, not height: the box grows with its text so nothing is ever
+  // clipped, however much is typed in. hPct is the floor set by the resize handle.
+  const style = { left: `${b.xPct}%`, top: `${b.yPct}%`, width: `${b.wPct}%`, minHeight: `${b.hPct}%` }
   const headStyle = { fontSize: cqw(b.headingPx), textAlign: headingAlign }
   const bodyStyle = { fontSize: cqw(b.bodyPx), textAlign: bodyAlign }
 
@@ -225,6 +229,11 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
           </span>
           {activeEd && (
             <FieldControls editor={activeEd} fieldKey={activeField} box={b} onBoxChange={onBoxChange} />
+          )}
+          {onDelete && (
+            <span className="pres-tb-group">
+              <button type="button" className="pres-tb-del" onClick={onDelete} title="Remove this text box">✕</button>
+            </span>
           )}
         </div>
       )}
