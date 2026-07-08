@@ -172,28 +172,12 @@ button {
   justify-content: center;
 }
 
-/* Long funnel, ~14 full-viewport painted sections: without this the browser
-   styles, lays out, rasters and blends EVERY section (each carries a filtered
-   full-bleed oil + a mix-blend-mode noise layer + a vignette) on every frame,
-   even the ones far off screen — so a single scroll pays for the whole page.
-   content-visibility:auto lets it skip all rendering work for a section until it
-   nears the viewport, so scrolling only costs what's actually visible.
-   contain-intrinsic-size ≈ the real ~100vh so the scrollbar and in-page CTA
-   jumps stay accurate; the `auto` keyword makes each section remember its own
-   measured height after it has rendered once. Deliberately NOT applied to:
-   the hero (above the fold), Evidence (its marquee measures child offsets at
-   mount) or Application (scroll target + live form). */
-.section-truth,
-.section-code,
-.section-principles,
-.section-become,
-.section-founder,
-.section-faq,
-.section-how,
-.section-closing {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 100vh;
-}
+/* NOTE: content-visibility:auto was tried here to skip rendering offscreen
+   sections, but it ALSO defers fetching each section's background painting
+   until you scroll near it — so the oils loaded late, one at a time, and
+   sometimes appeared not to load at all. The paintings must load eagerly, so
+   this stays off. The real scroll win is the fixed-background fix above
+   (removing the per-frame full-viewport repaint), which stands on its own. */
 
 .section > .shell,
 .section > .shell-narrow {
