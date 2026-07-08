@@ -8,6 +8,8 @@
  * occupies one half of the section and fades into the centre — the v2 split
  * layout. Drop it in as the first child of a <section>. No-ops when image is unset.
  */
+import { bgImage } from '../../lib/img.js'
+
 export function SectionPainting({ image, align = 'full' }) {
   if (!image) return null
   const className = align === 'full'
@@ -16,7 +18,7 @@ export function SectionPainting({ image, align = 'full' }) {
   return (
     <div
       className={className}
-      style={{ backgroundImage: `url(${image})` }}
+      style={{ backgroundImage: bgImage(image) }}
       aria-hidden="true"
     />
   )

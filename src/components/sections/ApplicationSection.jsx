@@ -10,6 +10,7 @@ import { normalizePhone } from '../../lib/phone.js'
 import { getUTMs, getLastCTA } from '../../lib/utm.js'
 import { track } from '../../lib/analytics.js'
 import { useInView } from '../../hooks/useInView.js'
+import { bgImage } from '../../lib/img.js'
 
 const FUNNEL_SLUG = import.meta.env.VITE_FUNNEL_SLUG || 'the-order'
 const SOURCE = import.meta.env.VITE_SITE_DOMAIN || 'theorder.global'
@@ -186,7 +187,7 @@ export function ApplicationSection() {
       {applicationCopy.image && (
         <div
           className="section-bg-image"
-          style={{ backgroundImage: `url(${applicationCopy.image})` }}
+          style={{ backgroundImage: bgImage(applicationCopy.image) }}
           aria-hidden="true"
         />
       )}

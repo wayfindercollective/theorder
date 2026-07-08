@@ -84,11 +84,27 @@ body {
   margin: 0;
   background: var(--bg-deep);
   min-height: 100vh;
-  /* subtle grain — leather feel without an image */
+}
+
+/* Subtle leather grain — two glows pinned to the viewport.
+   This USED to be `body { background-image: …; background-attachment: fixed }`,
+   which forced the browser to repaint the whole viewport background on every
+   scroll frame (the single biggest scroll-jank source, made worse by Lenis
+   re-scrolling every frame for ~1.2s after each wheel tick). Moving the exact
+   same gradients onto a `position: fixed` layer of their own gives the identical
+   look — glows locked to the viewport, behind all content — but the compositor
+   simply holds the layer in place while the page scrolls: zero per-frame repaint.
+   translateZ(0) guarantees it gets its own GPU layer. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     radial-gradient(ellipse at 50% -10%, rgba(166, 136, 74, 0.08), transparent 60%),
     radial-gradient(ellipse at 50% 110%, rgba(92, 31, 28, 0.06), transparent 60%);
-  background-attachment: fixed;
+  transform: translateZ(0);
 }
 
 h1, h2, h3, h4 {
@@ -154,6 +170,29 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+/* Long funnel, ~14 full-viewport painted sections: without this the browser
+   styles, lays out, rasters and blends EVERY section (each carries a filtered
+   full-bleed oil + a mix-blend-mode noise layer + a vignette) on every frame,
+   even the ones far off screen — so a single scroll pays for the whole page.
+   content-visibility:auto lets it skip all rendering work for a section until it
+   nears the viewport, so scrolling only costs what's actually visible.
+   contain-intrinsic-size ≈ the real ~100vh so the scrollbar and in-page CTA
+   jumps stay accurate; the `auto` keyword makes each section remember its own
+   measured height after it has rendered once. Deliberately NOT applied to:
+   the hero (above the fold), Evidence (its marquee measures child offsets at
+   mount) or Application (scroll target + live form). */
+.section-truth,
+.section-code,
+.section-principles,
+.section-become,
+.section-founder,
+.section-faq,
+.section-how,
+.section-closing {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100vh;
 }
 
 .section > .shell,

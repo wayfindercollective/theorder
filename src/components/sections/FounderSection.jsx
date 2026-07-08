@@ -2,6 +2,7 @@ import { useInView } from '../../hooks/useInView.js'
 import { founderContent } from '../../config/sectionContent.js'
 import { renderRich } from '../../lib/richtext.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
+import { bgImage } from '../../lib/img.js'
 
 export function FounderSection() {
   const { ref, inView } = useInView()
@@ -10,7 +11,7 @@ export function FounderSection() {
       {founderContent.image && (
         <div
           className="section-bg-image"
-          style={{ backgroundImage: `url(${founderContent.image})` }}
+          style={{ backgroundImage: bgImage(founderContent.image) }}
           aria-hidden="true"
         />
       )}
@@ -26,7 +27,7 @@ export function FounderSection() {
         <div className={'founder-grid stagger ' + (inView ? 'in-view' : '')}>
           <div
             className={'founder-portrait card nailed ' + (founderContent.portrait ? 'has-portrait' : 'card-stitched')}
-            style={founderContent.portrait ? { backgroundImage: `url(${founderContent.portrait})` } : undefined}
+            style={founderContent.portrait ? { backgroundImage: bgImage(founderContent.portrait) } : undefined}
           >
             <span className="nail-tl" />
             <span className="nail-br" />

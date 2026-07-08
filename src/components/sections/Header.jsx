@@ -8,17 +8,26 @@ export function Header() {
   useEffect(() => {
     // The top bar stays hidden over the hero (the hero shows its own logo) and
     // slides in only once the hero has scrolled past, then stays for the rest.
-    const on = () => {
+    // The trigger height is cached and only re-measured on resize — reading
+    // hero.offsetHeight inside the scroll handler would force a synchronous
+    // reflow on every single scroll event for the whole page.
+    let trigger = 0
+    const measure = () => {
       const hero = document.getElementById('top')
-      const trigger = (hero ? hero.offsetHeight : window.innerHeight) - 90
-      setScrolled(window.scrollY > trigger)
+      trigger = (hero ? hero.offsetHeight : window.innerHeight) - 90
     }
+    const on = () => setScrolled(window.scrollY > trigger)
+    const onResize = () => {
+      measure()
+      on()
+    }
+    measure()
     on()
     window.addEventListener('scroll', on, { passive: true })
-    window.addEventListener('resize', on, { passive: true })
+    window.addEventListener('resize', onResize, { passive: true })
     return () => {
       window.removeEventListener('scroll', on)
-      window.removeEventListener('resize', on)
+      window.removeEventListener('resize', onResize)
     }
   }, [])
 

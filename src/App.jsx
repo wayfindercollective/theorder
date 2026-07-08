@@ -71,14 +71,26 @@ function PublicSite() {
     }
     window.scrollTo(0, 0)
 
+    // UTM capture must run before anything can navigate away — keep it sync.
     captureUTMs()
-    bootAnalytics()
-    track('session_start', {
-      url: window.location.href,
-      referrer: document.referrer,
-      viewport_w: window.innerWidth,
-      viewport_h: window.innerHeight,
-    })
+
+    // Analytics pulls in a chunk and hits the network; defer it to idle so it
+    // never competes with first paint / hydration on a hard reload.
+    const boot = () => {
+      bootAnalytics()
+      track('session_start', {
+        url: window.location.href,
+        referrer: document.referrer,
+        viewport_w: window.innerWidth,
+        viewport_h: window.innerHeight,
+      })
+    }
+    const ric = window.requestIdleCallback
+    const id = ric ? ric(boot, { timeout: 3000 }) : window.setTimeout(boot, 1200)
+    return () => {
+      if (ric && window.cancelIdleCallback) window.cancelIdleCallback(id)
+      else window.clearTimeout(id)
+    }
   }, [])
 
   return (

@@ -18,38 +18,60 @@
 
 import { useEffect, useRef } from 'react'
 import { heroFilm } from '../../config/sectionContent.js'
+import { optImage } from '../../lib/img.js'
 
 export function HeroFilm({ scrollEl }) {
   const progressRef = useRef(0)
+  // True only while the hero is on screen. Gates the scroll handler's layout
+  // read and the crossfade loop so neither runs once the hero has scrolled away.
+  const activeRef = useRef(true)
 
   useEffect(() => {
+    const el = scrollEl?.current
+    if (!el) return
     function update() {
-      const el = scrollEl?.current
-      if (!el) return
+      // Reading getBoundingClientRect() forces a synchronous reflow. Skip it
+      // entirely once the hero is off screen, otherwise every scroll event for
+      // the WHOLE rest of the page would pay that reflow for nothing.
+      if (!activeRef.current) return
       const rect = el.getBoundingClientRect()
       const h = rect.height
       const scrolled = -rect.top
       progressRef.current = Math.min(Math.max(scrolled / h, 0), 1)
     }
+
+    let io
+    if (typeof IntersectionObserver !== 'undefined') {
+      io = new IntersectionObserver(
+        ([e]) => {
+          activeRef.current = e.isIntersecting
+          if (e.isIntersecting) update()
+        },
+        { threshold: 0 },
+      )
+      io.observe(el)
+    }
+
     update()
     window.addEventListener('scroll', update, { passive: true })
     window.addEventListener('resize', update)
     return () => {
       window.removeEventListener('scroll', update)
       window.removeEventListener('resize', update)
+      if (io) io.disconnect()
     }
   }, [scrollEl])
 
   if (heroFilm?.video?.src) {
-    return <HeroVideo progressRef={progressRef} />
+    return <HeroVideo progressRef={progressRef} activeRef={activeRef} />
   }
   if (heroFilm?.frames?.length > 0) {
-    return <HeroFrames progressRef={progressRef} />
+    return <HeroFrames progressRef={progressRef} activeRef={activeRef} />
   }
   return <HeroPlaceholder />
 }
 
-function HeroVideo({ progressRef }) {
+function HeroVideo({ progressRef, activeRef }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -57,7 +79,8 @@ function HeroVideo({ progressRef }) {
     if (!v) return
     let rafId
     function tick() {
-      if (v.duration && !isNaN(v.duration)) {
+      // Skip the (expensive) per-frame seek while the hero is off screen.
+      if ((!activeRef || activeRef.current) && v.duration && !isNaN(v.duration)) {
         const target = progressRef.current * v.duration
         // smooth seek — lerp toward target
         const cur = v.currentTime
@@ -67,7 +90,7 @@ function HeroVideo({ progressRef }) {
     }
     rafId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafId)
-  }, [progressRef])
+  }, [progressRef, activeRef])
 
   return (
     <div className="hero-film hero-film-video">
@@ -84,7 +107,7 @@ function HeroVideo({ progressRef }) {
   )
 }
 
-function HeroFrames({ progressRef }) {
+function HeroFrames({ progressRef, activeRef }) {
   const refs = useRef([])
 
   useEffect(() => {
@@ -92,6 +115,11 @@ function HeroFrames({ progressRef }) {
     const n = heroFilm.frames.length
     if (n === 0) return
     function tick() {
+      // Off screen: nothing to crossfade — skip the per-frame opacity writes.
+      if (activeRef && !activeRef.current) {
+        rafId = requestAnimationFrame(tick)
+        return
+      }
       const p = progressRef.current * (n - 1)
       const i = Math.floor(p)
       const t = p - i
@@ -116,7 +144,7 @@ function HeroFrames({ progressRef }) {
         <img
           key={f.src}
           ref={(el) => (refs.current[i] = el)}
-          src={f.src}
+          src={optImage(f.src)}
           alt=""
           loading={i === 0 ? 'eager' : 'lazy'}
           decoding="async"

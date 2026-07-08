@@ -1,5 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { consideredContent } from '../../config/sectionContent.js'
+import { bgImage } from '../../lib/img.js'
 
 export function WhoIsConsideredSection() {
   const { ref, inView } = useInView()
@@ -8,7 +9,7 @@ export function WhoIsConsideredSection() {
       {consideredContent.image && (
         <div
           className={`section-side-image section-side-image-${consideredContent.imageAlign || 'left'}`}
-          style={{ backgroundImage: `url(${consideredContent.image})` }}
+          style={{ backgroundImage: bgImage(consideredContent.image) }}
           aria-hidden="true"
         />
       )}

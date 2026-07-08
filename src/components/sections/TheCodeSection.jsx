@@ -3,6 +3,7 @@ import { codeContent } from '../../config/sectionContent.js'
 import { renderRich } from '../../lib/richtext.js'
 import { sectionAlign } from '../../config/design.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
+import { bgImage } from '../../lib/img.js'
 
 // "Who We Are" — heading + manifesto prose, round-table image behind it.
 // The Principles wall lives in its own section (PrinciplesSection).
@@ -18,7 +19,7 @@ export function TheCodeSection() {
           className={align === 'full'
             ? 'section-bg-image'
             : `section-side-image section-side-image-${align}`}
-          style={{ backgroundImage: `url(${codeContent.image})` }}
+          style={{ backgroundImage: bgImage(codeContent.image) }}
           aria-hidden="true"
         />
       )}

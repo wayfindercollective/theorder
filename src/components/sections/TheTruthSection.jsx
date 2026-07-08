@@ -1,6 +1,7 @@
 import { useInView } from '../../hooks/useInView.js'
 import { truthContent } from '../../config/sectionContent.js'
 import { renderRich, richText } from '../../lib/richtext.js'
+import { bgImage } from '../../lib/img.js'
 
 export function TheTruthSection() {
   const { ref, inView } = useInView()
@@ -15,7 +16,7 @@ export function TheTruthSection() {
           className={isFull
             ? 'section-bg-image'
             : `section-side-image section-side-image-${truthContent.imageAlign || 'right'}`}
-          style={{ backgroundImage: `url(${truthContent.image})` }}
+          style={{ backgroundImage: bgImage(truthContent.image) }}
           aria-hidden="true"
         />
       )}
