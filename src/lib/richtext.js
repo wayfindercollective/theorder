@@ -39,6 +39,14 @@ export const ALLOWED_BLOCK = {
   allowedTags: [...ALLOWED_INLINE.allowedTags, 'p'],
 }
 
+// Block + bulleted/numbered lists. Used by the presentation slide body so the
+// coach can write and paste bullet points; the same allowlist gates the editor
+// output, the server sanitiser, and present-mode DOMPurify.
+export const ALLOWED_RICH = {
+  ...ALLOWED_BLOCK,
+  allowedTags: [...ALLOWED_BLOCK.allowedTags, 'ul', 'ol', 'li'],
+}
+
 // The rich-text fields in content/sections.json — single source of truth, used by
 // SectionsTab (to pick the editor mode) and the server sanitiser (to clean each
 // field at the same mode the editor produced it).

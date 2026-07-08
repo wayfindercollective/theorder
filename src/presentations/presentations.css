@@ -246,6 +246,33 @@
   font-family: var(--font-body);
 }
 
+/* Slide-body blocks + bullet/numbered lists — the SAME look in the editor
+   (.pres-rt-b's ProseMirror) and in present mode (.pres-b), so bullets land
+   identically on the build screen and the shared screen. Paragraphs and items
+   sit tight (slide copy, not web prose); lists get a normal indent + marker. */
+.pres-b > p,
+.pres-rt-b .rt-content .ProseMirror > p { margin: 0; }
+.pres-b > p + p,
+.pres-rt-b .rt-content .ProseMirror > p + p { margin-top: 0.5em; }
+
+.pres-b ul,
+.pres-b ol,
+.pres-rt-b .rt-content .ProseMirror ul,
+.pres-rt-b .rt-content .ProseMirror ol {
+  margin: 0.15em 0;
+  padding-left: 1.4em;
+  white-space: normal; /* never let the body's pre-wrap open gaps between items */
+}
+.pres-b ul,
+.pres-rt-b .rt-content .ProseMirror ul { list-style: disc; }
+.pres-b ol,
+.pres-rt-b .rt-content .ProseMirror ol { list-style: decimal; }
+.pres-b li,
+.pres-rt-b .rt-content .ProseMirror li { margin: 0.1em 0; }
+/* ListItem wraps its text in a <p>; flatten that so bullets stay tight. */
+.pres-b li > p,
+.pres-rt-b .rt-content .ProseMirror li > p { margin: 0; }
+
 /* editable fields share the rendered look exactly */
 .pres-h-input, .pres-b-input {
   background: transparent;

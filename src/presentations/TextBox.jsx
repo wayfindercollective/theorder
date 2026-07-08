@@ -42,6 +42,8 @@ function FieldControls({ editor, fieldKey, box, onBoxChange }) {
             bold: editor.isActive('bold'),
             italic: editor.isActive('italic'),
             underline: editor.isActive('underline'),
+            bulletList: editor.isActive('bulletList'),
+            orderedList: editor.isActive('orderedList'),
             fsNum: editor.getAttributes('fsNum').size || '',
             collapsed: editor.state.selection.empty,
             // re-render (and re-measure) when the caret moves between runs
@@ -115,6 +117,13 @@ function FieldControls({ editor, fieldKey, box, onBoxChange }) {
           </button>
         ))}
       </span>
+      {/* Lists live on the body only — headings stay one line. */}
+      {fieldKey === 'body' && (
+        <span className="pres-tb-group" title="Bulleted / numbered list">
+          <button type="button" className={s.bulletList ? 'on' : ''} onClick={() => editor.chain().focus().toggleBulletList().run()} title="Bullet list">•</button>
+          <button type="button" className={s.orderedList ? 'on' : ''} onClick={() => editor.chain().focus().toggleOrderedList().run()} title="Numbered list">1.</button>
+        </span>
+      )}
     </>
   )
 }
@@ -224,7 +233,8 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
         {present ? (
           <>
             {!isRichEmpty(slide.heading) && <h2 className="pres-h display" style={headStyle} dangerouslySetInnerHTML={renderPresent(slide.heading)} />}
-            {!isRichEmpty(slide.body) && <p className="pres-b" style={bodyStyle} dangerouslySetInnerHTML={renderPresent(slide.body)} />}
+            {/* div, not p: the body can now hold block content (paragraphs, lists) */}
+            {!isRichEmpty(slide.body) && <div className="pres-b" style={bodyStyle} dangerouslySetInnerHTML={renderPresent(slide.body)} />}
           </>
         ) : (
           <>
@@ -240,7 +250,8 @@ export function TextBox({ slide, present, onChange, onBoxChange }) {
               onFocusChange={(f) => f && setActiveField('heading')}
             />
             <RichText
-              mode="inline"
+              mode="block"
+              withLists
               value={slide.body}
               baseStyle={bodyStyle}
               placeholder="Body…"

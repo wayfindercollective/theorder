@@ -6,7 +6,7 @@
  * each field is cleaned at the SAME mode the editor produced it.
  */
 import sanitizeHtml from 'sanitize-html'
-import { ALLOWED_INLINE, ALLOWED_BLOCK, RICH_PATHS, richText } from '../../src/lib/richtext.js'
+import { ALLOWED_INLINE, ALLOWED_BLOCK, ALLOWED_RICH, RICH_PATHS, richText } from '../../src/lib/richtext.js'
 
 // Force safe link attributes (scheme is already restricted by allowedSchemes).
 const transformTags = {
@@ -17,6 +17,7 @@ const transformTags = {
 }
 const inlineOpts = { ...ALLOWED_INLINE, transformTags }
 const blockOpts = { ...ALLOWED_BLOCK, transformTags }
+const richOpts = { ...ALLOWED_RICH, transformTags }
 
 export function sanitizeInline(html) {
   if (html == null) return ''
@@ -30,6 +31,14 @@ export function sanitizeInline(html) {
 export function sanitizeBlock(html) {
   if (html == null) return ''
   const clean = sanitizeHtml(String(html), blockOpts)
+  return richText(clean) ? clean : ''
+}
+
+// Block + lists (presentation slide body). Keeps <ul>/<ol>/<li> so pasted or
+// authored bullet points survive the write boundary.
+export function sanitizeRich(html) {
+  if (html == null) return ''
+  const clean = sanitizeHtml(String(html), richOpts)
   return richText(clean) ? clean : ''
 }
 

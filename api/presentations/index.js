@@ -24,7 +24,7 @@ import { randomUUID } from 'node:crypto'
 import { list, put, del } from '@vercel/blob'
 import { requireAuth } from '../_lib/auth.js'
 import { getBlobToken } from '../_lib/blob.js'
-import { sanitizeInline } from '../_lib/sanitizeRich.js'
+import { sanitizeInline, sanitizeRich } from '../_lib/sanitizeRich.js'
 import { richText } from '../../src/lib/richtext.js'
 
 const MAX_HEADING_TEXT = 200
@@ -63,9 +63,9 @@ function sanitizeSlide(s) {
   return {
     id: typeof s?.id === 'string' && s.id ? s.id.slice(0, 64) : randomUUID(),
     siteImageIndex: clampInt(s?.siteImageIndex, 0, MAX_IMAGE_INDEX, 0),
-    // rich text, sanitised to the inline allowlist (empty → '')
+    // heading stays inline (one line); body allows block + bullet lists
     heading: sanitizeInline(s?.heading),
-    body: sanitizeInline(s?.body),
+    body: sanitizeRich(s?.body),
     box: {
       xPct: clampNum(b.xPct, 0, 100, 8),
       yPct: clampNum(b.yPct, 0, 100, 60),
@@ -87,7 +87,7 @@ function sanitizeDeckForRead(deck) {
   if (!deck || !Array.isArray(deck.slides)) return deck
   return {
     ...deck,
-    slides: deck.slides.map((s) => ({ ...s, heading: sanitizeInline(s?.heading), body: sanitizeInline(s?.body) })),
+    slides: deck.slides.map((s) => ({ ...s, heading: sanitizeInline(s?.heading), body: sanitizeRich(s?.body) })),
   }
 }
 

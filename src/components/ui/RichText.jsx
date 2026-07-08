@@ -29,6 +29,7 @@ import History from '@tiptap/extension-history'
 import HardBreak from '@tiptap/extension-hard-break'
 import Link from '@tiptap/extension-link'
 import { TextStyle, FontSize } from '@tiptap/extension-text-style'
+import { BulletList, OrderedList, ListItem, ListKeymap } from '@tiptap/extension-list'
 import { FONT_SIZE_STEPS, isRichEmpty, richText } from '../../lib/richtext.js'
 
 // Numeric font-size mark → <span data-fs="N">. The number's rendered size comes
@@ -117,6 +118,10 @@ const sameValue = (a, b, mode) =>
 
 export function RichText({
   value, onChange, mode = 'inline', baseStyle, placeholder, withLink = false, className = '',
+  // withLists: enable bullet/numbered lists (needs a block mode — lists are
+  // block nodes). Off for the site's inline/heading/lines fields; on for the
+  // presentation slide body so it can hold, and paste in, bulleted points.
+  withLists = false,
   // externalToolbar: skip the built-in floating toolbar; the parent renders one
   // instead (the presentation box bar), driving the editor it receives via
   // onEditorReady. onFocusChange tells the parent which field is active.
@@ -139,6 +144,17 @@ export function RichText({
         const br = () => this.editor.commands.setHardBreak()
         return { Enter: br, 'Shift-Enter': br }
       }
+      if (mode === 'block' && withLists) {
+        // Body with lists: keep the old tight line-break on Enter for ordinary
+        // text, but hand Enter to the list extensions (new bullet / exit list)
+        // when the caret is inside a list item.
+        return {
+          Enter: () => {
+            if (this.editor.isActive('listItem')) return false
+            return this.editor.commands.setHardBreak()
+          },
+        }
+      }
       return {}
     },
   })
@@ -151,6 +167,8 @@ export function RichText({
       DocNode, Paragraph, Text, Bold, Italic, Underline, History, HardBreak,
       TextStyle, FontSize, // legacy em spans (first release) still parse
       FsNum,
+      // Lists (opt-in). ListKeymap makes Backspace/Delete at item edges behave.
+      ...(withLists ? [BulletList, OrderedList, ListItem, ListKeymap] : []),
       ...(withLink ? [Link.configure({ openOnClick: false, autolink: false })] : []),
       enterBehavior,
     ],
@@ -188,6 +206,8 @@ export function RichText({
             italic: editor.isActive('italic'),
             underline: editor.isActive('underline'),
             link: editor.isActive('link'),
+            bulletList: editor.isActive('bulletList'),
+            orderedList: editor.isActive('orderedList'),
             fsNum: editor.getAttributes('fsNum').size || '',
             // selection position, so the toolbar re-renders (and re-measures the
             // effective size) whenever the caret moves between sized runs
@@ -258,6 +278,13 @@ export function RichText({
           ))}
         </select>
         <button type="button" onClick={() => stepSize(1)} title="Bigger">A+</button>
+        {withLists && (
+          <>
+            <i className="rt-sep" />
+            <button type="button" className={s.bulletList ? 'on' : ''} onClick={() => editor.chain().focus().toggleBulletList().run()} title="Bullet list">•</button>
+            <button type="button" className={s.orderedList ? 'on' : ''} onClick={() => editor.chain().focus().toggleOrderedList().run()} title="Numbered list">1.</button>
+          </>
+        )}
         {withLink && (
           <>
             <i className="rt-sep" />

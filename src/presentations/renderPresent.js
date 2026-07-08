@@ -11,7 +11,7 @@
 import DOMPurify from 'dompurify'
 
 const CONFIG = {
-  ALLOWED_TAGS: ['b', 'strong', 'i', 'em', 'u', 'a', 'span', 'br', 'p'],
+  ALLOWED_TAGS: ['b', 'strong', 'i', 'em', 'u', 'a', 'span', 'br', 'p', 'ul', 'ol', 'li'],
   // data-fs carries the numeric font size; an out-of-scale value simply matches
   // no CSS rule, so it needs no value validation here.
   ALLOWED_ATTR: ['href', 'target', 'rel', 'style', 'data-fs'],
