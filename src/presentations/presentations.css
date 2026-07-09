@@ -296,18 +296,20 @@
 .pres-h-input::placeholder, .pres-b-input::placeholder { color: var(--ash); }
 
 /* Box formatting toolbar (edit only). A SIBLING of its box, anchored to the
-   top-centre of the slide's stage — one predictable place, like a ribbon, and
+   top-LEFT of the slide's stage — one predictable place, like a ribbon, and
    always fully on-screen no matter where the box sits or how tall its text
    grows (the old above-the-box float clipped against the stage edge). Shown /
-   hidden by React (box hovered, toolbar hovered, or a field focused). */
+   hidden by React (box hovered, toolbar hovered, or a field focused).
+   The slide tools own the top-RIGHT corner: the max-width reserves their zone
+   (~500px) so the two panels can NEVER overlap — on a narrow stage the bar
+   wraps to more rows on the left instead of growing under the tools. */
 .pres-box-toolbar {
   position: absolute;
-  left: 50%;
+  left: 8px;
   top: 8px;
-  transform: translateX(-50%);
   display: flex; gap: 5px; align-items: center; flex-wrap: wrap;
-  justify-content: center;
-  max-width: min(94cqw, 720px);
+  justify-content: flex-start;
+  max-width: min(94cqw, max(340px, calc(100cqw - 500px)));
   padding: 5px 7px;
   background: rgba(12, 10, 8, 0.97);
   border: 1px solid rgba(166, 136, 74, 0.4);
