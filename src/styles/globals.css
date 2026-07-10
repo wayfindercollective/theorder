@@ -1445,6 +1445,64 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 .final-begin.in { opacity: 1; }
 
+/* ---- Booking calendar on the final screen ---- */
+/* Once submitted, the shell widens past the reading column so the embedded
+   calendar gets room to lay out its month + time slots side by side. */
+.shell-narrow.application-shell--booking { max-width: min(1020px, 96vw); }
+
+.final-booking {
+  width: 100%;
+  margin-top: 2.5rem;
+  opacity: 0;
+  transition: opacity 1200ms var(--ease-order) 250ms;
+}
+.final-booking.in { opacity: 1; }
+.final-booking-heading {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  letter-spacing: 0.05em;
+  margin: 1.2rem 0 1.4rem;
+}
+
+.booking-widget { width: 100%; }
+/* Cross-origin frame with no resize postMessage → tall FIXED height (inline
+   style) and the page scrolls; never a scrollbar inside the frame. */
+.booking-frame-wrap {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(166, 136, 74, 0.35);
+  border-radius: 6px;
+  background: rgba(8, 7, 6, 0.5);
+}
+.booking-frame { display: block; width: 100%; height: 100%; border: 0; }
+
+.booking-frame-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 2rem;
+  pointer-events: none; /* the loading spinner must never block the calendar */
+}
+.booking-frame-status--solid {
+  pointer-events: auto;
+  background: var(--bg-surface);
+}
+.booking-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(166, 136, 74, 0.3);
+  border-top-color: var(--brass);
+  animation: booking-spin 900ms linear infinite;
+}
+@keyframes booking-spin { to { transform: rotate(360deg); } }
+.booking-slow { color: var(--parchment-mute); margin-bottom: 1.2rem; }
+
+.booking-escape { margin-top: 0.9rem; text-align: center; }
+.booking-escape a { color: var(--brass-light); text-decoration: underline; }
+.booking-escape a:hover { color: var(--parchment); }
+
 /* ============================================================
    FOUNDER
    ============================================================ */

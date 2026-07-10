@@ -191,7 +191,9 @@ export function ApplicationSection() {
           aria-hidden="true"
         />
       )}
-      <div className="shell-narrow application-shell">
+      {/* The submitted card widens: the booking calendar needs more room
+          than the reading column gives the questionnaire. */}
+      <div className={'shell-narrow application-shell' + (submitted ? ' application-shell--booking' : '')}>
         {!submitted && (
           <>
             <div className="application-card card card-stitched nailed" ref={formRef}>
@@ -230,7 +232,18 @@ export function ApplicationSection() {
           <div className="application-card card card-stitched nailed">
             <span className="nail-tl" />
             <span className="nail-br" />
-            <FinalScreen />
+            <FinalScreen
+              contact={{
+                name: (formData.contact?.fullName || '').trim(),
+                email: (formData.contact?.email || '').trim().toLowerCase(),
+                // Same normalisation as the lead payload — the calendar gets
+                // the E.164 number, not whatever local format was typed.
+                phone: normalizePhone(
+                  formData.contact?.phone,
+                  formData.contact?.country || countryCodes[0]
+                ).phone,
+              }}
+            />
           </div>
         )}
       </div>
