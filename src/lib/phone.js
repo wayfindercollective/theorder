@@ -28,6 +28,10 @@ export function normalizePhone(rawPhone, country) {
       national = national.replace(/^0+/, '')
     }
   }
-  const phone = dialDigits ? `+${dialDigits} ${national}` : national
+  // Strict E.164 for the wire: `+` + digits only, NO space or punctuation
+  // (e.g. `+15551234567`). Wayfinder's SMS-consent gate silently drops the
+  // opt-in if the phone won't normalize to E.164 — a space after the country
+  // code ("+1 5551234567") was enough to break it. Keep this separator-free.
+  const phone = dialDigits ? `+${dialDigits}${national}` : national
   return { phone, phoneCountry: country?.code || '' }
 }
