@@ -221,6 +221,12 @@ const SECTION_DEFS = [
       { path: ['finalScreen', 'heading'], label: 'Heading', hint: 'Display font, large.' },
       { path: ['finalScreen', 'sub'],     label: 'Sub line', textarea: true, hint: 'Standard body paragraph.' },
       { path: ['finalScreen', 'begin'],   label: 'Encouragement', textarea: true, italic: true, hint: 'Renders italic, brass-light colour.' },
+      { path: ['finalScreen', 'bookingEyebrow'], label: 'Booking — eyebrow', hint: 'Small label above the booking calendar. e.g. The Next Step' },
+      { path: ['finalScreen', 'bookingHeading'], label: 'Booking — heading', hint: 'Heading above the booking calendar. e.g. Book Your Call' },
+      { path: ['finalScreen', 'bookingSlowMessage'], label: 'Booking — slow-load message', textarea: true, hint: 'Shown if the calendar takes more than ~10 seconds to load.' },
+      { path: ['finalScreen', 'bookingSlowButton'], label: 'Booking — slow-load button', hint: 'Button under the slow-load message; opens the calendar in a new tab.' },
+      { path: ['finalScreen', 'bookingEscapeLine'], label: 'Booking — fallback line', hint: 'Small line under the calendar. e.g. Calendar not loading?' },
+      { path: ['finalScreen', 'bookingEscapeLink'], label: 'Booking — fallback link text', hint: 'The link at the end of the fallback line; opens the calendar in a new tab.' },
     ],
   },
 ]

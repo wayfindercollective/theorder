@@ -20,6 +20,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKING_URL } from '../../config/booking.js'
+import { finalScreenContent } from '../../config/sectionContent.js'
 import { track } from '../../lib/analytics.js'
 
 // Tall enough that the whole calendar card — including the last evening
@@ -83,7 +84,9 @@ export function BookingWidget({ name, email, phone, scrollAnchorRef }) {
         {timedOut && !loaded && (
           <div className="booking-frame-status booking-frame-status--solid">
             <div>
-              <p className="booking-slow">The calendar is taking longer than usual to load.</p>
+              <p className="booking-slow">
+                {finalScreenContent.bookingSlowMessage || 'The calendar is taking longer than usual to load.'}
+              </p>
               <a
                 className="btn btn-primary"
                 href={url}
@@ -91,7 +94,7 @@ export function BookingWidget({ name, email, phone, scrollAnchorRef }) {
                 rel="noopener noreferrer"
                 onClick={() => track('booking_open_new_tab', { reason: 'timeout' })}
               >
-                Book Your Call
+                {finalScreenContent.bookingSlowButton || 'Book Your Call'}
               </a>
             </div>
           </div>
@@ -100,14 +103,14 @@ export function BookingWidget({ name, email, phone, scrollAnchorRef }) {
 
       {/* Escape hatch — must ALWAYS be visible (see CSP note above). */}
       <p className="booking-escape restraint">
-        Calendar not loading?{' '}
+        {finalScreenContent.bookingEscapeLine || 'Calendar not loading?'}{' '}
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => track('booking_open_new_tab', { reason: 'manual' })}
         >
-          Open it in a new tab
+          {finalScreenContent.bookingEscapeLink || 'Open it in a new tab'}
         </a>
       </p>
     </div>

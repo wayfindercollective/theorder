@@ -177,7 +177,13 @@
   "finalScreen": {
     "heading": "THE ORDER",
     "sub": "God Wills It",
-    "begin": "[ Encouragement line ]"
+    "begin": "[ Encouragement line ]",
+    "bookingEyebrow": "The Next Step",
+    "bookingHeading": "Book Your Call",
+    "bookingSlowMessage": "The calendar is taking longer than usual to load.",
+    "bookingSlowButton": "Book Your Call",
+    "bookingEscapeLine": "Calendar not loading?",
+    "bookingEscapeLink": "Open it in a new tab"
   },
   "form": {
     "nameLabel": "Name",
