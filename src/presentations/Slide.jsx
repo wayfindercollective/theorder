@@ -18,11 +18,26 @@ import { imageForIndex } from './siteImages.js'
 
 const newId = () => crypto.randomUUID()
 
+// Background alignment override cycle: Auto (the painting's own alignment,
+// stored as no field at all) → full-bleed centre → left half → right half.
+// Left/right reuse the site's faded-edge side treatment, leaving the other
+// half dark for a text box.
+const BG_ALIGN_CYCLE = [undefined, 'center', 'left', 'right']
+const BG_ALIGN_LABEL = { center: 'Centre', left: 'Left', right: 'Right' }
+
 export function Slide({ slide, index, total, present, onChange, onBoxChange, onDelete, onDuplicate, onMove, dragProps }) {
   const img = imageForIndex(slide.siteImageIndex)
   const [picker, setPicker] = useState(null) // 'image' | 'background' | null
   const extras = slide.extras || []
   const images = slide.images || []
+  // 'center' maps to the full-bleed treatment; SectionPainting has no
+  // 'center' variant (align='full' IS centred).
+  const paintingAlign = slide.bgAlign === 'center' ? 'full' : (slide.bgAlign || img.align)
+
+  const cycleBgAlign = () => {
+    const i = BG_ALIGN_CYCLE.indexOf(slide.bgAlign)
+    onChange({ bgAlign: BG_ALIGN_CYCLE[(i + 1) % BG_ALIGN_CYCLE.length] })
+  }
 
   const patchExtra = (id, fn) =>
     onChange({ extras: extras.map((x) => (x.id === id ? fn(x) : x)) })
@@ -50,7 +65,7 @@ export function Slide({ slide, index, total, present, onChange, onBoxChange, onD
 
   return (
     <div className={`pres-stage section ${img.sectionClass}`}>
-      <SectionPainting image={img.src} align={img.align} />
+      <SectionPainting image={img.src} align={paintingAlign} />
 
       {images.map((im) => (
         <SlideImage
@@ -81,6 +96,13 @@ export function Slide({ slide, index, total, present, onChange, onBoxChange, onD
           <button type="button" onClick={() => setPicker('image')} title="Add a picture to this slide">+ Picture</button>
           <button type="button" onClick={addTextBox} title="Add another text box">+ Text</button>
           <button type="button" onClick={() => setPicker('background')} title="Change the background painting">Background</button>
+          <button
+            type="button"
+            onClick={cycleBgAlign}
+            title="Background position — Centre fills the slide; Left/Right fade the painting to one half so a text box fits on the dark side. Auto follows the painting's own layout."
+          >
+            BG: {BG_ALIGN_LABEL[slide.bgAlign] || 'Auto'}
+          </button>
           <i className="pres-tools-sep" />
           <button type="button" onClick={onDuplicate} title="Duplicate this slide">⧉</button>
           <button type="button" onClick={() => onMove(-1)} disabled={index === 0} title="Move up">↑</button>

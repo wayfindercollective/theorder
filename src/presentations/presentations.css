@@ -121,6 +121,37 @@
   display: block;
 }
 
+/* A slide is a fixed 16:9 canvas — the public site's mobile collapse
+   (globals.css @media ≤900px turns side paintings into dim full-bleed) must
+   NOT apply here, or a left/right background loses its dark half in a narrow
+   editor window. Re-assert the desktop side treatment at every viewport. */
+@media (max-width: 900px) {
+  .pres-stage .section-side-image {
+    width: 58%;
+    opacity: 0.95;
+  }
+  .pres-stage .section-side-image-right {
+    -webkit-mask-image:
+      linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+    mask-image:
+      linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+  .pres-stage .section-side-image-left {
+    -webkit-mask-image:
+      linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+    mask-image:
+      linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+}
+
 /* ---- Hero (fixed first slide) ---- */
 /* Mirrors the live split hero exactly: painting masked to the RIGHT 56% (faded
    on its inner edge, rider in frame), the left stays dark, and the logo +

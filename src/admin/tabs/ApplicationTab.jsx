@@ -7,6 +7,11 @@
  * strings the CRM scores on / the field names it reads) — those stay locked
  * behind an explicit unlock toggle so they can't be changed by accident.
  *
+ * Each answer option also carries a "Declines the application" flag — a
+ * business rule, NOT part of the CRM contract, so it is never locked. An
+ * applicant who picks a flagged answer finishes the form, sees the negation
+ * screen (edited here too), and no lead is sent to the CRM.
+ *
  * The contact step is pinned last (the form's submit lives on it) and can't
  * be removed or moved.
  */
@@ -42,11 +47,14 @@ function nextQuestionId(qs) {
   return `question${n}`
 }
 
-export function ApplicationTab({ questions, onChange }) {
+export function ApplicationTab({ questions, onChange, sections, onSectionsChange }) {
   const qs = questions?.questions || []
   const [unlocked, setUnlocked] = useState(false)
   const update = (path, value) => onChange((cur) => setAt(cur, path, value))
   const updateList = (fn) => onChange((cur) => ({ ...cur, questions: fn(cur.questions || []) }))
+  const decline = sections?.declineScreen || {}
+  const updateDecline = (key, value) =>
+    onSectionsChange((cur) => ({ ...cur, declineScreen: { ...(cur.declineScreen || {}), [key]: value } }))
 
   // The contact step is pinned to the end — choice questions can only move
   // within the range above it.
@@ -100,8 +108,50 @@ export function ApplicationTab({ questions, onChange }) {
       <p className="restraint admin-tab-intro">
         Edit the questions and answer options applicants see. The scoring values and
         field IDs are the contract with the CRM — they stay locked unless you unlock
-        them below, and changing them changes how leads are scored.
+        them below, and changing them changes how leads are scored. Tick
+        “Declines the application” on an answer to turn away anyone who picks it:
+        they finish the form, see the negation screen below, and are NOT sent to the
+        CRM.
       </p>
+
+      <section className="admin-section-block">
+        <h2 className="admin-section-title display">Negation screen</h2>
+        <p className="restraint admin-tab-intro">
+          Shown instead of the booking screen when an applicant picks a declining
+          answer. Their details are not stored and no lead is created.
+        </p>
+        <div className="admin-fields">
+          <label className="admin-field">
+            <span className="admin-field-label">Heading</span>
+            <input
+              className="input-field"
+              type="text"
+              value={decline.heading ?? ''}
+              onChange={(e) => updateDecline('heading', e.target.value)}
+            />
+          </label>
+          <label className="admin-field">
+            <span className="admin-field-label">Message</span>
+            <input
+              className="input-field"
+              type="text"
+              value={decline.body ?? ''}
+              onChange={(e) => updateDecline('body', e.target.value)}
+            />
+            <span className="admin-field-hint">The invitation to return when they are ready to go all in.</span>
+          </label>
+          <label className="admin-field">
+            <span className="admin-field-label">Privacy line</span>
+            <input
+              className="input-field"
+              type="text"
+              value={decline.notice ?? ''}
+              onChange={(e) => updateDecline('notice', e.target.value)}
+            />
+            <span className="admin-field-hint">Tells them their information has not been stored. Leave blank to hide.</span>
+          </label>
+        </div>
+      </section>
 
       {qs.map((q, qi) => (
         <section key={qi} className="admin-section-block">
@@ -173,40 +223,62 @@ export function ApplicationTab({ questions, onChange }) {
                 </span>
               </div>
               {(q.options || []).map((opt, oi) => (
-                <div key={oi} className="admin-option-row admin-option-row-managed">
-                  <input
-                    className="input-field admin-option-label"
-                    type="text"
-                    placeholder="Answer shown to the applicant"
-                    value={getAt(questions, ['questions', qi, 'options', oi, 'label']) ?? ''}
-                    onChange={(e) => update(['questions', qi, 'options', oi, 'label'], e.target.value)}
-                  />
-                  <input
-                    className={'input-field admin-option-value' + (unlocked ? ' admin-value-unlocked' : '')}
-                    type="text"
-                    placeholder={unlocked ? 'Scoring value sent to the CRM' : 'Scoring value (locked)'}
-                    value={getAt(questions, ['questions', qi, 'options', oi, 'value']) ?? ''}
-                    readOnly={!unlocked}
-                    tabIndex={unlocked ? 0 : -1}
-                    title={unlocked ? 'Scoring value sent to the CRM' : 'Scoring value — unlock below to edit'}
-                    onChange={(e) => update(['questions', qi, 'options', oi, 'value'], e.target.value)}
-                  />
-                  <div className="admin-q-toolbar">
-                    <button
-                      type="button" className="admin-mini-btn" title="Move up" aria-label="Move option up"
-                      onClick={() => moveOption(qi, oi, -1)} disabled={oi === 0}
-                    >↑</button>
-                    <button
-                      type="button" className="admin-mini-btn" title="Move down" aria-label="Move option down"
-                      onClick={() => moveOption(qi, oi, 1)} disabled={oi === (q.options || []).length - 1}
-                    >↓</button>
-                    <button
-                      type="button" className="admin-mini-btn admin-mini-danger" title="Remove option" aria-label="Remove option"
-                      onClick={() => removeOption(qi, oi)} disabled={(q.options || []).length <= 2}
-                    >✕</button>
+                <div key={oi}>
+                  <div className="admin-option-row admin-option-row-managed">
+                    <input
+                      className="input-field admin-option-label"
+                      type="text"
+                      placeholder="Answer shown to the applicant"
+                      value={getAt(questions, ['questions', qi, 'options', oi, 'label']) ?? ''}
+                      onChange={(e) => update(['questions', qi, 'options', oi, 'label'], e.target.value)}
+                    />
+                    <input
+                      className={'input-field admin-option-value' + (unlocked ? ' admin-value-unlocked' : '')}
+                      type="text"
+                      placeholder={unlocked ? 'Scoring value sent to the CRM' : 'Scoring value (locked)'}
+                      value={getAt(questions, ['questions', qi, 'options', oi, 'value']) ?? ''}
+                      readOnly={!unlocked}
+                      tabIndex={unlocked ? 0 : -1}
+                      title={unlocked ? 'Scoring value sent to the CRM' : 'Scoring value — unlock below to edit'}
+                      onChange={(e) => update(['questions', qi, 'options', oi, 'value'], e.target.value)}
+                    />
+                    <div className="admin-q-toolbar">
+                      <button
+                        type="button" className="admin-mini-btn" title="Move up" aria-label="Move option up"
+                        onClick={() => moveOption(qi, oi, -1)} disabled={oi === 0}
+                      >↑</button>
+                      <button
+                        type="button" className="admin-mini-btn" title="Move down" aria-label="Move option down"
+                        onClick={() => moveOption(qi, oi, 1)} disabled={oi === (q.options || []).length - 1}
+                      >↓</button>
+                      <button
+                        type="button" className="admin-mini-btn admin-mini-danger" title="Remove option" aria-label="Remove option"
+                        onClick={() => removeOption(qi, oi)} disabled={(q.options || []).length <= 2}
+                      >✕</button>
+                    </div>
                   </div>
+                  {/* Business rule, not CRM contract — never locked. */}
+                  <label
+                    className="admin-unlock admin-option-disqualify"
+                    style={{ margin: '0.15rem 0 0.6rem', fontSize: '0.8rem' }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!!opt.disqualify}
+                      onChange={(e) => update(['questions', qi, 'options', oi, 'disqualify'], e.target.checked)}
+                    />
+                    <span style={opt.disqualify ? { color: '#c98' } : undefined}>
+                      Declines the application{opt.disqualify ? ' — applicants who pick this are turned away' : ''}
+                    </span>
+                  </label>
                 </div>
               ))}
+              {(q.options || []).length > 0 && (q.options || []).every((o) => o.disqualify) && (
+                <p className="admin-field-hint" style={{ color: '#c86' }}>
+                  ⚠ Every answer on this question declines the application — NO
+                  applicant can get through this form. Untick at least one.
+                </p>
+              )}
               <div>
                 <button type="button" className="admin-add-btn" onClick={() => addOption(qi)}>
                   + Add answer option

@@ -101,24 +101,28 @@
     "cards": [
       {
         "video": "/testimonials/testimonial-2.mp4",
+        "poster": "/testimonials/testimonial-2-poster.jpg",
         "title": "Alexander Merutka — CEO & Founder of Craftsman+ and Node Media",
         "quote": "",
         "attribution": ""
       },
       {
         "video": "/testimonials/Tony.mp4",
+        "poster": "/testimonials/Tony-poster.jpg",
         "title": "Tony Litster — Entrepreneur, coach and real estate developer",
         "quote": "",
         "attribution": ""
       },
       {
         "video": "/testimonials/testimonial-4.mp4",
+        "poster": "/testimonials/testimonial-4-poster.jpg",
         "title": "Tommy Johnstone — CEO and Founder of Polar",
         "quote": "",
         "attribution": ""
       },
       {
         "video": "/testimonials/testimonial-3.mp4",
+        "poster": "/testimonials/testimonial-3-poster.jpg",
         "title": "Callum Nosworthy — Executive Director of Watchtower Capital Group",
         "quote": "",
         "attribution": ""
@@ -173,6 +177,11 @@
     "copyright": "© The Order",
     "privacyHref": "https://wayfindercollective.io/privacy",
     "privacyLabel": "Privacy"
+  },
+  "declineScreen": {
+    "heading": "Thank you for your enquiry.",
+    "body": "Please return when you have made progress and are willing to go all in.",
+    "notice": "Your information has not been stored."
   },
   "finalScreen": {
     "heading": "THE ORDER",

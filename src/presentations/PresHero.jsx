@@ -6,13 +6,15 @@
  */
 import { heroContent, brandContent } from '../config/sectionContent.js'
 import { SITE_IMAGES } from './siteImages.js'
+import { bgImage } from '../lib/img.js'
 
 export function PresHero() {
   const heroImg = SITE_IMAGES[0].src
   const logo = brandContent?.logo || '/images/logo-mark.png'
   return (
     <div className="pres-stage pres-hero">
-      <div className="pres-hero-bg" style={{ backgroundImage: `url(${heroImg})` }} aria-hidden="true" />
+      {/* bgImage() routes to the lean WebP derivative when one exists */}
+      <div className="pres-hero-bg" style={{ backgroundImage: bgImage(heroImg) }} aria-hidden="true" />
       <div className="pres-hero-veil" aria-hidden="true" />
       <div className="pres-hero-content">
         <img className="logo-mark pres-hero-logo" src={logo} alt={brandContent?.wordmark || 'The Order'} />

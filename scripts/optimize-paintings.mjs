@@ -28,11 +28,19 @@ const OVERRIDES = {
   'hero-horseman': { maxLong: 2400, quality: 82 },
 }
 
+// The /presentations deck backgrounds NOT referenced from sections.json (the
+// six presentation-only paintings appended in src/presentations/siteImages.js).
+// They render through the same bgImage() router, so a manifest entry is all
+// they need to serve as WebP.
+const STATIC_EXTRAS = [
+  'pres-soldier', 'pres-squad', 'pres-base', 'pres-dog', 'pres-blade', 'pres-sentinel',
+]
+
 // Collect every /images/*.{jpg,png} the site references from sections.json,
 // minus the social-share meta image (crawler-only, never rendered on-page).
 function referenced() {
   const json = JSON.parse(fs.readFileSync(path.join(root, 'content', 'sections.json'), 'utf8'))
-  const found = new Set()
+  const found = new Set(STATIC_EXTRAS)
   const walk = (o) => {
     if (!o) return
     if (typeof o === 'string') {

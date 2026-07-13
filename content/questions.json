@@ -51,6 +51,33 @@
       ]
     },
     {
+      "id": "selfInvestment",
+      "type": "choice",
+      "scored": false,
+      "question": "How do you value yourself?",
+      "subtitle": "",
+      "options": [
+        {
+          "label": "I have heavily invested time and resources in myself",
+          "value": "I have heavily invested time and resources in myself"
+        },
+        {
+          "label": "I am willing to invest time and resources into myself",
+          "value": "I am willing to invest time and resources into myself"
+        },
+        {
+          "label": "I wouldn't invest time and/or money in myself",
+          "value": "I wouldn't invest time and/or money in myself",
+          "disqualify": true
+        },
+        {
+          "label": "I cannot invest time and/or money in myself right now",
+          "value": "I cannot invest time and/or money in myself right now",
+          "disqualify": true
+        }
+      ]
+    },
+    {
       "id": "contact",
       "type": "contact",
       "scored": false,

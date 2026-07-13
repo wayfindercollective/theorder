@@ -253,7 +253,14 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
 
       <main className="admin-tab-body">
         {tab === 'sections'    && <SectionsTab    sections={draft.sections} onChange={updateSections} />}
-        {tab === 'application' && <ApplicationTab questions={draft.questions} onChange={updateQuestions} />}
+        {tab === 'application' && (
+          <ApplicationTab
+            questions={draft.questions}
+            onChange={updateQuestions}
+            sections={draft.sections}
+            onSectionsChange={updateSections}
+          />
+        )}
         {tab === 'images'      && <ImagesTab      sections={draft.sections} onChange={updateSections} />}
         {tab === 'library'     && <LibraryTab     sections={draft.sections} />}
         {tab === 'logo'        && <LogoTab        sections={draft.sections} onChange={updateSections} />}

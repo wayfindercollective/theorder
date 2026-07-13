@@ -1435,6 +1435,23 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 .final-sub.in { opacity: 1; transform: translateY(0); }
 
+/* "God Wills It" — gilt (Nico, 2026-07-13). The same brass gradient as
+   .engraved, raised to a ceremonial size so the line reads as the seal of
+   the thank-you page. drop-shadow (not text-shadow) so the glow respects
+   the gradient-clipped glyphs. */
+.final-sub--gilded {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.8vw, 1.7rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(196, 164, 95, 0.3));
+}
+
 .final-begin {
   color: var(--brass-light);
   font-style: italic;
@@ -1687,11 +1704,10 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
      small screens keep a sane gap */
   margin-right: max(1.5rem, calc(25vw - 170px));
 }
-@media (prefers-reduced-motion: reduce) {
-  .evidence-rail {
-    animation: none;
-  }
-}
+/* Reduced motion: the rail keeps drifting, just far slower — handled in
+   EvidenceSection.jsx (it watches the media query and derives the duration).
+   `animation: none` here froze the carousel for every iOS Low Power Mode
+   visitor, which read as "the testimonials sometimes don't scroll". */
 .evidence-mark {
   font-size: 3.5rem;
   line-height: 0.5;

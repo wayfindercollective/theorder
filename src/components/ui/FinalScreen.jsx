@@ -27,7 +27,7 @@ export function FinalScreen({ contact }) {
       <h2 className={'final-heading display' + (stage >= 2 ? ' in' : '')}>
         {finalScreenContent.heading}
       </h2>
-      <p className={'final-sub' + (stage >= 2 ? ' in' : '')}>
+      <p className={'final-sub final-sub--gilded' + (stage >= 2 ? ' in' : '')}>
         {finalScreenContent.sub}
       </p>
       <div className="section-divider" style={{ marginTop: '3rem', marginBottom: '3rem' }} />

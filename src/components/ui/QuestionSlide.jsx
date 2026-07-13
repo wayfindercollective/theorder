@@ -192,6 +192,8 @@ function ContactFields({ value, onChange, onSubmit, submitting, canAdvance }) {
             <span className="phone-cc-dial">{country.dial}</span>
             <span className="phone-cc-caret">▾</span>
           </button>
+          {/* Phone is optional (deliberately unadvertised — most applicants
+              give both channels; name + valid email alone can submit). */}
           <input
             className="input-field phone-input"
             type="tel"
@@ -200,7 +202,6 @@ function ContactFields({ value, onChange, onSubmit, submitting, canAdvance }) {
             onChange={(e) => onChange({ phone: e.target.value.replace(/[^\d\s()+-]/g, '') })}
             onBlur={() => setPhoneTouched(true)}
             placeholder={formCopy.phonePlaceholder}
-            required
           />
         </div>
         {countryOpen && (
@@ -238,14 +239,18 @@ function ContactFields({ value, onChange, onSubmit, submitting, canAdvance }) {
         )}
       </div>
 
-      <label className="qs-consent">
-        <input
-          type="checkbox"
-          checked={consent}
-          onChange={(e) => onChange({ smsConsent: e.target.checked })}
-        />
-        <span>{submitConsent.smsLine}</span>
-      </label>
+      {/* SMS consent only makes sense once there is a number to consent for —
+          an email-only applicant never sees (or grants) it. */}
+      {phoneDigits.length > 0 && (
+        <label className="qs-consent">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => onChange({ smsConsent: e.target.checked })}
+          />
+          <span>{submitConsent.smsLine}</span>
+        </label>
+      )}
 
       {(submitConsent.privacyHref || submitConsent.termsHref) && (
         <p className="qs-consent-links restraint">

@@ -27,5 +27,11 @@ export const closingContent   = data.closing
 export const ctaContent       = data.cta
 export const footerContent    = data.footer
 export const finalScreenContent = data.finalScreen
+// Fallback keeps DeclineScreen render-safe if a stale content deploy lacks the block.
+export const declineScreenContent = data.declineScreen || {
+  heading: 'Thank you for your enquiry.',
+  body: 'Please return when you have made progress and are willing to go all in.',
+  notice: 'Your information has not been stored.',
+}
 export const formCopy         = data.form
 export const submitConsent    = data.consent

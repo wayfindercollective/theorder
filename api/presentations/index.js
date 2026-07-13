@@ -57,6 +57,13 @@ function str(v, max) {
 function align(v) {
   return v === 'center' || v === 'right' ? v : 'left'
 }
+// Background alignment override is OPTIONAL — absent means "use the painting's
+// own alignment". Unlike align() this MUST stay nullable: defaulting it (e.g.
+// to 'left') would stamp an override onto every pre-existing slide on its next
+// save and silently collapse full-bleed backgrounds to side-images.
+function bgAlign(v) {
+  return v === 'center' || v === 'left' || v === 'right' ? v : undefined
+}
 
 // Extra text boxes and placed pictures per slide (both additive — old decks
 // simply have empty arrays after their next save).
@@ -94,6 +101,8 @@ function sanitizeSlide(s) {
   return {
     id: typeof s?.id === 'string' && s.id ? s.id.slice(0, 64) : randomUUID(),
     siteImageIndex: clampInt(s?.siteImageIndex, 0, MAX_IMAGE_INDEX, 0),
+    // key omitted entirely when unset — see bgAlign() note
+    ...(bgAlign(s?.bgAlign) ? { bgAlign: bgAlign(s.bgAlign) } : {}),
     // heading stays inline (one line); body allows block + bullet lists
     heading: sanitizeInline(s?.heading),
     body: sanitizeRich(s?.body),

@@ -75,6 +75,7 @@ export const PRES_LIBRARY = [
   { src: '/images/pres-library/mountain-valley.jpg', label: 'Mountain valley' },
   { src: '/images/pres-library/egypt-relief.jpg', label: 'Egyptian temple relief' },
   { src: '/images/pres-library/desert-pyramid.jpg', label: 'Desert pyramid' },
+  { src: '/images/pres-library/bible-rosary.jpg', label: 'Bible & rosary' },
   { src: '/images/pres-library/order-logo-aged.png', label: 'The Order logo (aged)' },
 ]
 

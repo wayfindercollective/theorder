@@ -12,5 +12,11 @@ export const OPTIMIZED = new Set([
   "oil-operate",
   "oil-principles",
   "oil-testimony",
+  "pres-base",
+  "pres-blade",
+  "pres-dog",
+  "pres-sentinel",
+  "pres-soldier",
+  "pres-squad",
   "truth-destruction"
 ])

@@ -5,27 +5,53 @@ import { SectionPainting } from '../ui/SectionPainting.jsx'
 import { renderRich, richText } from '../../lib/richtext.js'
 
 /**
- * A video testimonial. It autoplays muted on a loop so it visibly reads as a
- * clip (not a still). Clicking the centre play button restarts it from the top
- * with sound and hands over to the native controls.
+ * A video testimonial. It plays muted on a loop while on screen so it visibly
+ * reads as a clip (not a still). Clicking the centre play button restarts it
+ * from the top with sound and hands over to the native controls.
+ *
+ * LAZY BY DESIGN: preload="none" + a poster frame means a tile costs one small
+ * JPEG until it actually approaches the viewport — the silent preview only
+ * starts (and only downloads the clip) when the tile is near-visible, and
+ * pauses again off-screen. This section used to eager-load every clip on page
+ * load, which was most of the site's slow first load.
  */
-function EvidenceVideo({ src, title, onEngagedChange, ariaHidden }) {
+function EvidenceVideo({ src, poster, title, onEngagedChange, ariaHidden }) {
   const videoRef = useRef(null)
   const engagedRef = useRef(false)
   const [activated, setActivated] = useState(false)
   // whether this clip is actively playing with sound right now — drives whether
   // the play button shows (every card shows it except the one playing)
   const [playing, setPlaying] = useState(false)
+  const [nearView, setNearView] = useState(false)
 
-  // Ensure the muted preview actually starts (some browsers ignore the
-  // `muted` attribute set via React on first render).
   useEffect(() => {
     const v = videoRef.current
-    if (!v) return
-    v.muted = true
-    const p = v.play()
-    if (p && p.catch) p.catch(() => {})
+    if (!v || typeof IntersectionObserver === 'undefined') {
+      setNearView(true) // ancient browser: fall back to eager behaviour
+      return
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => setNearView(entry.isIntersecting),
+      { rootMargin: '200px' }
+    )
+    io.observe(v)
+    return () => io.disconnect()
   }, [])
+
+  // Drive the muted preview from visibility. Once the visitor activates sound
+  // the native controls own playback — stop steering it. (Set `muted` on the
+  // element directly: some browsers ignore the attribute set via React.)
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v || activated) return
+    if (nearView) {
+      v.muted = true
+      const p = v.play()
+      if (p && p.catch) p.catch(() => {})
+    } else {
+      v.pause()
+    }
+  }, [nearView, activated])
 
   // Once activated (playing with sound), report engagement so the marquee holds
   // still — but only while it's actually playing. Pausing or finishing the clip
@@ -44,16 +70,13 @@ function EvidenceVideo({ src, title, onEngagedChange, ariaHidden }) {
       setPlaying(isPlaying)
       setEngaged(isPlaying)
     }
-    v.addEventListener('play', update)
-    v.addEventListener('playing', update)
-    v.addEventListener('pause', update)
-    v.addEventListener('ended', update)
+    // 'error'/'emptied' too: a mobile decode failure must never leave the
+    // marquee permanently held (engaged stuck > 0 = rail frozen forever).
+    const EVENTS = ['play', 'playing', 'pause', 'ended', 'error', 'emptied']
+    EVENTS.forEach((e) => v.addEventListener(e, update))
     update()
     return () => {
-      v.removeEventListener('play', update)
-      v.removeEventListener('playing', update)
-      v.removeEventListener('pause', update)
-      v.removeEventListener('ended', update)
+      EVENTS.forEach((e) => v.removeEventListener(e, update))
       setPlaying(false)
       setEngaged(false)
     }
@@ -76,11 +99,11 @@ function EvidenceVideo({ src, title, onEngagedChange, ariaHidden }) {
         ref={videoRef}
         className="evidence-video"
         src={src}
-        autoPlay
+        poster={poster || undefined}
         muted
         loop
         playsInline
-        preload="auto"
+        preload="none"
         controls={activated}
       />
       {!playing && (
@@ -119,11 +142,18 @@ export function EvidenceSection() {
   // and the rail is translated by exactly one set width, looping forever. The
   // period is measured from the duplicate's offset (robust to trailing margins)
   // and the duration is derived from it so the speed is constant at any width.
+  //
+  // Reduced motion (which iOS Low Power Mode reports!) used to freeze the rail
+  // entirely — that was Nico's "sometimes they don't scroll" bug. The drift is
+  // the section's whole point, so under reduced motion it slows to a crawl
+  // instead of stopping; the media query is watched live because Low Power
+  // Mode toggles mid-session.
   useEffect(() => {
     const rail = railRef.current
     if (!rail) return
-    const SPEED = 45 // px per second — a calm, continuous drift
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
     const apply = () => {
+      const SPEED = mq.matches ? 16 : 45 // px per second
       const n = cards.length
       const tiles = rail.children
       if (tiles.length <= n) return
@@ -133,8 +163,17 @@ export function EvidenceSection() {
       rail.style.animationDuration = period / SPEED + 's'
     }
     apply()
+    // ResizeObserver over the one-shot measure: tile layout can settle late
+    // (fonts, posters) and the period must follow.
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(apply) : null
+    if (ro) ro.observe(rail)
     window.addEventListener('resize', apply)
-    return () => window.removeEventListener('resize', apply)
+    mq.addEventListener?.('change', apply)
+    return () => {
+      if (ro) ro.disconnect()
+      window.removeEventListener('resize', apply)
+      mq.removeEventListener?.('change', apply)
+    }
   }, [cards.length])
 
   const recompute = useCallback(() => {
@@ -151,12 +190,19 @@ export function EvidenceSection() {
     hoveringRef.current = true
     recompute()
   }
-  const resume = () => {
+  const resume = useCallback(() => {
     hoveringRef.current = false
     recompute()
-  }
-  // touch: let the swipe/tap settle before the drift takes back over
-  const resumeSoon = () => window.setTimeout(resume, 1800)
+  }, [recompute])
+  // touch: let the swipe/tap settle before the drift takes back over. One
+  // pending timer only — a page-scroll finger brushing the rail used to stack
+  // stale timers and could leave the rail paused.
+  const resumeTimer = useRef(0)
+  const resumeSoon = useCallback(() => {
+    window.clearTimeout(resumeTimer.current)
+    resumeTimer.current = window.setTimeout(resume, 1800)
+  }, [resume])
+  useEffect(() => () => window.clearTimeout(resumeTimer.current), [])
 
   // duplicate the set so the loop wraps with no visible gap
   const loop = cards.concat(cards)
@@ -190,6 +236,7 @@ export function EvidenceSection() {
                 <EvidenceVideo
                   key={i}
                   src={c.video}
+                  poster={c.poster}
                   title={c.title}
                   ariaHidden={dup}
                   onEngagedChange={handleEngaged}
