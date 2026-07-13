@@ -27,13 +27,15 @@ export function DeclineScreen() {
       <h2 className={'final-heading display' + (stage >= 2 ? ' in' : '')}>
         {declineScreenContent.heading}
       </h2>
-      <p className={'final-sub' + (stage >= 2 ? ' in' : '')}>
+      {/* Nico: the invitation-to-return line is the big, bold, gold moment;
+          the privacy line is a small white footnote under the divider. */}
+      <p className={'final-sub decline-body' + (stage >= 2 ? ' in' : '')}>
         {declineScreenContent.body}
       </p>
       {declineScreenContent.notice && (
         <>
           <div className="section-divider" style={{ marginTop: '3rem', marginBottom: '3rem' }} />
-          <p className={'final-begin restraint' + (stage >= 2 ? ' in' : '')}>
+          <p className={'final-begin decline-notice' + (stage >= 2 ? ' in' : '')}>
             {declineScreenContent.notice}
           </p>
         </>

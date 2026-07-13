@@ -1462,6 +1462,36 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 .final-begin.in { opacity: 1; }
 
+/* Decline (negation) screen typography (Nico, 2026-07-13): the
+   invitation-to-return line is the big, bold, gold hero; the privacy line is a
+   small white footnote. Compound selectors so these beat .final-sub /
+   .final-begin / .restraint regardless of source order. */
+.final-sub.decline-body {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3.2vw, 2.1rem);
+  line-height: 1.28;
+  letter-spacing: 0.03em;
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: auto;
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 16px rgba(196, 164, 95, 0.28));
+}
+.final-begin.decline-notice {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  max-width: none;
+}
+
 /* ---- Booking calendar on the final screen ---- */
 /* Once submitted, the shell widens past the reading column so the embedded
    calendar gets room to lay out its month + time slots side by side. */
