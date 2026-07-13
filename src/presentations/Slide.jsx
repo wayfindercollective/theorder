@@ -14,7 +14,7 @@ import { SectionPainting } from '../components/ui/SectionPainting.jsx'
 import { TextBox } from './TextBox.jsx'
 import { SlideImage } from './SlideImage.jsx'
 import { ImagePicker } from './ImagePicker.jsx'
-import { imageForIndex } from './siteImages.js'
+import { customImage, imageForIndex } from './siteImages.js'
 
 const newId = () => crypto.randomUUID()
 
@@ -26,7 +26,8 @@ const BG_ALIGN_CYCLE = [undefined, 'center', 'left', 'right']
 const BG_ALIGN_LABEL = { center: 'Centre', left: 'Left', right: 'Right' }
 
 export function Slide({ slide, index, total, present, onChange, onBoxChange, onDelete, onDuplicate, onMove, dragProps }) {
-  const img = imageForIndex(slide.siteImageIndex)
+  // A hand-picked library image (bgSrc) overrides the painting cycle.
+  const img = slide.bgSrc ? customImage(slide.bgSrc) : imageForIndex(slide.siteImageIndex)
   const [picker, setPicker] = useState(null) // 'image' | 'background' | null
   const extras = slide.extras || []
   const images = slide.images || []
@@ -56,7 +57,10 @@ export function Slide({ slide, index, total, present, onChange, onBoxChange, onD
 
   const onPicked = (val) => {
     if (picker === 'background') {
-      onChange({ siteImageIndex: val })
+      // A number is a painting-cycle index; a string is a library image used
+      // as a custom background (bgSrc). Picking either clears the other.
+      if (typeof val === 'number') onChange({ siteImageIndex: val, bgSrc: undefined })
+      else onChange({ bgSrc: val })
     } else {
       onChange({ images: [...images, { id: newId(), src: val, xPct: 33 + (images.length % 4) * 4, yPct: 18 + (images.length % 4) * 6, wPct: 34 }] })
     }

@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { humanizeError, listImages, uploadImage } from '../adminApi.js'
+import { websiteImagesFrom, PRES_PAINTINGS, PRES_PHOTOS, freshUploads, uploadLabel } from '../../lib/imageLibrary.js'
 
 const IMAGE_SLOTS = [
   { key: ['hero', '__heroFilm__'], label: 'Hero — background image', heroFilm: true },
@@ -40,7 +41,7 @@ function setAt(obj, path, value) {
   return next
 }
 
-function PickerModal({ open, onPick, onClose }) {
+function PickerModal({ open, sections, onPick, onClose }) {
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -64,6 +65,16 @@ function PickerModal({ open, onPick, onClose }) {
 
   if (!open) return null
 
+  // The full shared library: uploads first (the usual pick for a swap), then
+  // everything bundled with the site. Same set the presentations pickers show.
+  const websiteImages = websiteImagesFrom(sections)
+  const groups = [
+    { title: 'Uploads', items: freshUploads(images, websiteImages).map((im) => ({ src: im.url, label: uploadLabel(im) })) },
+    { title: 'On the website', items: websiteImages },
+    { title: 'Presentation paintings', items: PRES_PAINTINGS },
+    { title: 'Nico’s photo library', items: PRES_PHOTOS },
+  ]
+
   return (
     <div className="library-modal-backdrop" onClick={onClose}>
       <div className="library-modal" onClick={(e) => e.stopPropagation()}>
@@ -73,22 +84,29 @@ function PickerModal({ open, onPick, onClose }) {
         </div>
         {loading && <p className="restraint">Loading…</p>}
         {error && <p className="qs-error">{error}</p>}
-        {!loading && !error && images.length === 0 && (
-          <p className="restraint admin-image-empty">No uploads yet.</p>
-        )}
-        <div className="library-grid library-grid-modal">
-          {images.map((img) => (
-            <button
-              key={img.url}
-              type="button"
-              className="library-thumb"
-              onClick={() => { onPick(img.url); onClose() }}
-              title={img.pathname}
-            >
-              <img src={img.url} alt="" loading="lazy" />
-            </button>
-          ))}
-        </div>
+        {groups.map((group) => (
+          <section key={group.title} className="library-group">
+            <h3 className="library-group-title">{group.title}</h3>
+            {group.title === 'Uploads' && !loading && group.items.length === 0 ? (
+              <p className="restraint admin-image-empty">No uploads yet.</p>
+            ) : (
+              <div className="library-grid library-grid-modal">
+                {group.items.map((it) => (
+                  <button
+                    key={it.src}
+                    type="button"
+                    className="library-pick-item"
+                    onClick={() => { onPick(it.src); onClose() }}
+                    title={it.label}
+                  >
+                    <span className="library-thumb"><img src={it.src} alt="" loading="lazy" /></span>
+                    <span className="library-pick-label">{it.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
+        ))}
       </div>
     </div>
   )
@@ -160,7 +178,7 @@ function ImageRow({ slot, sections, onChange }) {
           Pick from library
         </button>
       </div>
-      <PickerModal open={pickerOpen} onPick={writeUrl} onClose={() => setPickerOpen(false)} />
+      <PickerModal open={pickerOpen} sections={sections} onPick={writeUrl} onClose={() => setPickerOpen(false)} />
     </div>
   )
 }

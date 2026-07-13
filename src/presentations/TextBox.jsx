@@ -201,6 +201,22 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
     )
   }
 
+  // Drag a side edge to change just the width — the right edge moves freely;
+  // the left edge holds the box's right side in place.
+  const startEdgeResize = (side) => (e) => {
+    e.stopPropagation()
+    const x0 = b.xPct
+    const w0 = b.wPct
+    drag(e, (dx) => {
+      if (side === 'r') {
+        onBoxChange({ boxAlign: 'free', wPct: clamp(w0 + dx, 12, 100 - x0) })
+      } else {
+        const nx = clamp(x0 + dx, 0, x0 + w0 - 12)
+        onBoxChange({ boxAlign: 'free', xPct: nx, wPct: w0 + (x0 - nx) })
+      }
+    })
+  }
+
   // Grab the box by its frame (the padding strip / the gap between fields) to
   // move it — clicks inside the text fields still just place the caret.
   const startFrameMove = (e) => {
@@ -304,7 +320,13 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
         )}
       </div>
 
-      {!present && <span className="pres-box-resize" onPointerDown={startResize} title="Drag to resize" />}
+      {!present && (
+        <>
+          <span className="pres-box-edge pres-box-edge-l" onPointerDown={startEdgeResize('l')} title="Drag to change the box width" />
+          <span className="pres-box-edge pres-box-edge-r" onPointerDown={startEdgeResize('r')} title="Drag to change the box width" />
+          <span className="pres-box-resize" onPointerDown={startResize} title="Drag to resize" />
+        </>
+      )}
     </div>
     </>
   )

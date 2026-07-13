@@ -3132,6 +3132,52 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .library-copied { color: var(--brass); }
 .library-delete { padding: 0.4rem 0.7rem; font-size: 0.7rem; }
 
+/* Library groups — the shared library is shown in named groups (website /
+   presentation paintings / photos / uploads) in the tab and in pickers. */
+.library-actions { display: flex; gap: 0.6rem; flex-shrink: 0; align-items: center; }
+.library-group { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.6rem; }
+.library-group:first-of-type { margin-top: 0; }
+.library-group-title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ash);
+  border-bottom: 1px solid var(--iron);
+  padding-bottom: 0.4rem;
+}
+.library-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--parchment-mute);
+}
+
+/* Picker modal items: thumb + caption */
+.library-pick-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 180ms var(--ease-order);
+}
+.library-pick-item:hover { border-color: var(--brass); }
+.library-pick-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  color: var(--ash);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Library modal — picker invoked from an image slot */
 
 .library-modal-backdrop {

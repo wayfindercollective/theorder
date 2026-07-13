@@ -1,13 +1,21 @@
 /**
- * LibraryTab — grid view of every image in Vercel Blob's `images/` prefix.
+ * LibraryTab — the shared image library, in four groups:
  *
- * Click an image to copy its URL. "Delete" removes it from storage.
- * (Doesn't unbind references from sections.json — that's caller-side.)
+ *   On the website          — every image the site uses right now (follows the
+ *                             draft you're editing, read-only here)
+ *   Presentation paintings  — the six deck-only paintings
+ *   Nico's photo library    — his photos + marks bundled with the site
+ *   Uploads                 — everything in Vercel Blob; upload more right here,
+ *                             delete what's no longer needed
+ *
+ * The same four groups feed every image picker — the Images tab's
+ * "Pick from library" and both pickers in the presentations builder.
+ * Click any image to copy its URL.
  */
 
-import { useCallback, useEffect, useState } from 'react'
-import { deleteImage, listImages } from '../adminApi.js'
-import { humanizeError } from '../adminApi.js'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { deleteImage, listImages, uploadImage, humanizeError } from '../adminApi.js'
+import { websiteImagesFrom, PRES_PAINTINGS, PRES_PHOTOS, freshUploads } from '../../lib/imageLibrary.js'
 
 function bytes(n) {
   if (!n) return ''
@@ -24,8 +32,10 @@ function shortDate(s) {
 export function LibraryTab({ sections }) {
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
+  const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState('')
+  const fileRef = useRef(null)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -59,6 +69,21 @@ export function LibraryTab({ sections }) {
     }
   }
 
+  const onFiles = async (e) => {
+    const files = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (!files.length) return
+    setBusy(true)
+    setError('')
+    let failed = ''
+    for (const f of files) {
+      try { await uploadImage(f) } catch (err) { failed = humanizeError(err) }
+    }
+    if (failed) setError(failed)
+    await refresh()
+    setBusy(false)
+  }
+
   const onDelete = async (img) => {
     if (inUse(img.url)) {
       const ok = window.confirm(
@@ -77,54 +102,107 @@ export function LibraryTab({ sections }) {
     }
   }
 
+  const websiteImages = websiteImagesFrom(sections)
+  const bundledGroups = [
+    { title: 'On the website', items: websiteImages },
+    { title: 'Presentation paintings', items: PRES_PAINTINGS },
+    { title: 'Nico’s photo library', items: PRES_PHOTOS },
+  ]
+  // Uploads bound into a section already appear under "On the website".
+  const uploads = freshUploads(images, websiteImages)
+
   return (
     <div className="admin-tab-pane">
       <div className="library-head">
         <p className="restraint admin-tab-intro">
-          Every image you have uploaded. Click an image to copy its URL.
-          {images.length > 0 && <> · {images.length} total</>}
+          The shared image library. Everything here — the website’s images, the presentation
+          paintings and photos, and your uploads — appears in every image picker (website
+          sections and presentation slides alike). Click an image to copy its URL.
         </p>
-        <button type="button" className="btn btn-ghost" onClick={refresh} disabled={loading}>
-          {loading ? 'Loading…' : 'Refresh'}
-        </button>
+        <div className="library-actions">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            hidden
+            onChange={onFiles}
+          />
+          <button type="button" className="btn" onClick={() => fileRef.current?.click()} disabled={busy}>
+            {busy ? 'Uploading…' : '⬆ Upload images'}
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={refresh} disabled={loading || busy}>
+            {loading ? 'Loading…' : 'Refresh'}
+          </button>
+        </div>
       </div>
 
       {error && <p className="qs-error">{error}</p>}
 
-      {!loading && images.length === 0 && (
-        <p className="restraint admin-image-empty">No uploads yet. Use the Images tab to upload your first one.</p>
-      )}
-
-      <div className="library-grid">
-        {images.map((img) => {
-          const used = inUse(img.url)
-          return (
-            <div key={img.url} className={'library-card' + (used ? ' is-used' : '')}>
-              <button
-                type="button"
-                className="library-thumb"
-                onClick={() => copyUrl(img.url)}
-                title="Click to copy URL"
-              >
-                <img src={img.url} alt="" loading="lazy" />
-              </button>
-              <div className="library-meta">
-                <div className="library-meta-line">
-                  <span>{bytes(img.size)}</span>
-                  <span>{shortDate(img.uploadedAt)}</span>
-                </div>
-                <div className="library-meta-line">
-                  {used ? <span className="library-used">in use</span> : <span className="library-unused">unused</span>}
-                  {copied === img.url && <span className="library-copied">copied</span>}
-                </div>
-                <button type="button" className="btn btn-ghost library-delete" onClick={() => onDelete(img)}>
-                  Delete
+      {bundledGroups.map((group) => (
+        <section key={group.title} className="library-group">
+          <h3 className="library-group-title">{group.title}</h3>
+          <div className="library-grid">
+            {group.items.map((it) => (
+              <div key={it.src} className="library-card">
+                <button
+                  type="button"
+                  className="library-thumb"
+                  onClick={() => copyUrl(it.src)}
+                  title="Click to copy URL"
+                >
+                  <img src={it.src} alt="" loading="lazy" />
                 </button>
+                <div className="library-meta">
+                  <div className="library-meta-line">
+                    <span className="library-label">{it.label}</span>
+                    {copied === it.src && <span className="library-copied">copied</span>}
+                  </div>
+                </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <section className="library-group">
+        <h3 className="library-group-title">
+          Uploads{uploads.length > 0 && <> · {uploads.length}</>}
+        </h3>
+        {!loading && uploads.length === 0 && (
+          <p className="restraint admin-image-empty">No uploads yet — use “Upload images” above.</p>
+        )}
+        <div className="library-grid">
+          {uploads.map((img) => {
+            const used = inUse(img.url)
+            return (
+              <div key={img.url} className={'library-card' + (used ? ' is-used' : '')}>
+                <button
+                  type="button"
+                  className="library-thumb"
+                  onClick={() => copyUrl(img.url)}
+                  title="Click to copy URL"
+                >
+                  <img src={img.url} alt="" loading="lazy" />
+                </button>
+                <div className="library-meta">
+                  <div className="library-meta-line">
+                    <span>{bytes(img.size)}</span>
+                    <span>{shortDate(img.uploadedAt)}</span>
+                  </div>
+                  <div className="library-meta-line">
+                    {used ? <span className="library-used">in use</span> : <span className="library-unused">unused</span>}
+                    {copied === img.url && <span className="library-copied">copied</span>}
+                  </div>
+                  <button type="button" className="btn btn-ghost library-delete" onClick={() => onDelete(img)}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
     </div>
   )
 }

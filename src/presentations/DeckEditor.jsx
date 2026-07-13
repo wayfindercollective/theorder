@@ -6,9 +6,10 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getDeck, saveDeck, humanizeError } from './presentationsApi.js'
-import { blankSlideForIndex } from './siteImages.js'
+import { blankCustomSlide, blankSlideForIndex } from './siteImages.js'
 import { PresHero } from './PresHero.jsx'
 import { Slide } from './Slide.jsx'
+import { ImagePicker } from './ImagePicker.jsx'
 
 const newId = () => crypto.randomUUID()
 // v2: rich-text drafts. The version suffix invalidates any stale pre-rich draft
@@ -33,6 +34,7 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
   const [savedTick, setSavedTick] = useState(false)
   const [present, setPresent] = useState(false)
   const [scrollToId, setScrollToId] = useState(null)
+  const [addPicker, setAddPicker] = useState(false)
   const deckRef = useRef(null)
   const dragIndex = useRef(null)
   // Bumped on every edit; lets save() detect edits that landed mid-request.
@@ -128,6 +130,16 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
   const addSlide = () => {
     const slide = blankSlideForIndex(deck.cursor, newId)
     update((d) => ({ ...d, cursor: d.cursor + 1, slides: [...d.slides, slide] }))
+    setScrollToId(slide.id)
+  }
+
+  // Add a slide on a hand-picked background: a painting-cycle index (number)
+  // or a library image src (string). The cycle cursor is NOT advanced, so the
+  // plain "+ Add slide" rotation continues exactly where it would have.
+  const addSlideWithBackground = (val) => {
+    setAddPicker(false)
+    const slide = typeof val === 'number' ? blankSlideForIndex(val, newId) : blankCustomSlide(val, newId)
+    update((d) => ({ ...d, slides: [...d.slides, slide] }))
     setScrollToId(slide.id)
   }
 
@@ -289,7 +301,18 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
 
         {!present && (
           <div className="pres-page pres-add-page">
-            <button type="button" className="pres-add-btn" onClick={addSlide}>+ Add slide</button>
+            <div className="pres-add-wrap">
+              <button type="button" className="pres-add-btn" onClick={addSlide}>+ Add slide</button>
+              <button type="button" className="pres-add-btn pres-add-btn-alt" onClick={() => setAddPicker(true)}>
+                + Add slide — pick its background…
+              </button>
+              <p className="pres-add-hint">
+                “Add slide” continues the painting cycle. “Pick its background” starts the new slide on any painting or library image instead.
+              </p>
+            </div>
+            {addPicker && (
+              <ImagePicker mode="background" onPick={addSlideWithBackground} onClose={() => setAddPicker(false)} />
+            )}
           </div>
         )}
       </div>

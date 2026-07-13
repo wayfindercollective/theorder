@@ -103,6 +103,10 @@ function sanitizeSlide(s) {
     siteImageIndex: clampInt(s?.siteImageIndex, 0, MAX_IMAGE_INDEX, 0),
     // key omitted entirely when unset — see bgAlign() note
     ...(bgAlign(s?.bgAlign) ? { bgAlign: bgAlign(s.bgAlign) } : {}),
+    // Custom background (a library/uploaded image overriding the painting
+    // cycle) — OPTIONAL and nullable like bgAlign: absent means "use the
+    // siteImageIndex painting". Same src allowlist as placed pictures.
+    ...(imageSrc(s?.bgSrc) ? { bgSrc: imageSrc(s.bgSrc) } : {}),
     // heading stays inline (one line); body allows block + bullet lists
     heading: sanitizeInline(s?.heading),
     body: sanitizeRich(s?.body),

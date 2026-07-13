@@ -64,25 +64,45 @@ export const SITE_IMAGES = DEFS.map((d) => ({
 
 export const SITE_IMAGE_COUNT = SITE_IMAGES.length
 
-// Pictures that can be PLACED on a slide (not backgrounds): Nico's own photos
-// and marks, bundled with the site under /images/pres-library/. The picker
-// shows these plus everything uploaded through /admin.
-export const PRES_LIBRARY = [
-  { src: '/images/pres-library/true-gentleman.jpg', label: 'The True Gentleman' },
-  { src: '/images/pres-library/regiment-afghanistan.jpg', label: 'The Regiment — Afghanistan' },
-  { src: '/images/pres-library/brotherhood-framed.jpg', label: 'Brotherhood (framed photo)' },
-  { src: '/images/pres-library/black-triumph.jpg', label: 'The Black Triumph' },
-  { src: '/images/pres-library/mountain-valley.jpg', label: 'Mountain valley' },
-  { src: '/images/pres-library/egypt-relief.jpg', label: 'Egyptian temple relief' },
-  { src: '/images/pres-library/desert-pyramid.jpg', label: 'Desert pyramid' },
-  { src: '/images/pres-library/bible-rosary.jpg', label: 'Bible & rosary' },
-  { src: '/images/pres-library/order-logo-aged.png', label: 'The Order logo (aged)' },
-]
+// (Placeable pictures — Nico's photo library — moved to src/lib/imageLibrary.js
+// as PRES_PHOTOS, the shared source of truth for every picker.)
 
 const mod = (i) => ((i % SITE_IMAGE_COUNT) + SITE_IMAGE_COUNT) % SITE_IMAGE_COUNT
 
 export function imageForIndex(i) {
   return SITE_IMAGES[mod(i)]
+}
+
+// A slide can override the cycle with a hand-picked library image
+// (slide.bgSrc). It renders full-bleed with a neutral oil grade
+// (.section-pres-custom in presentations.css) and a centred default box.
+const CUSTOM_BOX = { xPct: 27, yPct: 32, wPct: 46, hPct: 36 }
+
+export function customImage(src) {
+  return { key: 'custom', sectionClass: 'section-pres-custom', src, align: 'full', defaultBox: CUSTOM_BOX }
+}
+
+// A fresh blank slide sitting on a hand-picked library image instead of the
+// next cycle painting. siteImageIndex stays 0 as the fallback if the custom
+// background is ever cleared.
+export function blankCustomSlide(src, idgen) {
+  return {
+    id: idgen(),
+    siteImageIndex: 0,
+    bgSrc: src,
+    heading: '',
+    body: '',
+    extras: [],
+    images: [],
+    box: {
+      ...CUSTOM_BOX,
+      boxAlign: 'center',
+      headingAlign: 'center',
+      bodyAlign: 'center',
+      headingPx: 40,
+      bodyPx: 20,
+    },
+  }
 }
 
 // image right → box on the left; image left → box on the right; full → centred.
