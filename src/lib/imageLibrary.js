@@ -59,13 +59,13 @@ export const PRES_PAINTINGS = [
 
 export const PRES_PHOTOS = [
   { src: '/images/pres-library/true-gentleman.jpg', label: 'The True Gentleman' },
-  { src: '/images/pres-library/regiment-afghanistan.jpg', label: 'The Regiment — Afghanistan' },
-  { src: '/images/pres-library/brotherhood-framed.jpg', label: 'Brotherhood' },
-  { src: '/images/pres-library/black-triumph.jpg', label: 'The Black Triumph' },
-  { src: '/images/pres-library/mountain-valley.jpg', label: 'Mountain valley' },
-  { src: '/images/pres-library/egypt-relief.jpg', label: 'Egyptian temple relief' },
-  { src: '/images/pres-library/desert-pyramid.jpg', label: 'Desert pyramid' },
-  { src: '/images/pres-library/bible-rosary.jpg', label: 'Bible & rosary' },
+  { src: '/images/pres-library/regiment-afghanistan-oil.jpg', label: 'The Regiment — Afghanistan' },
+  { src: '/images/pres-library/brotherhood-oil.jpg', label: 'Brotherhood' },
+  { src: '/images/pres-library/black-triumph-oil.jpg', label: 'The Black Triumph' },
+  { src: '/images/pres-library/mountain-valley-oil.jpg', label: 'Mountain valley' },
+  { src: '/images/pres-library/egypt-relief-oil.jpg', label: 'Egyptian temple relief' },
+  { src: '/images/pres-library/desert-pyramid-oil.jpg', label: 'Desert pyramid' },
+  { src: '/images/pres-library/bible-rosary-oil.jpg', label: 'Bible & rosary' },
   { src: '/images/pres-library/order-logo-aged.png', label: 'The Order logo (aged)' },
   { src: '/images/pres-library/order-emblem-oil.jpg', label: 'The Order emblem (oil)' },
 ]
