@@ -58,20 +58,20 @@
       "subtitle": "",
       "options": [
         {
-          "label": "I have heavily invested time and resources in myself",
+          "label": "I have heavily invested time and resources in myself.",
           "value": "I have heavily invested time and resources in myself"
         },
         {
-          "label": "I am willing to invest time and resources into myself",
+          "label": "I am willing to invest time and resources into myself.",
           "value": "I am willing to invest time and resources into myself"
         },
         {
-          "label": "I wouldn't invest time and/or money in myself",
+          "label": "I wouldn't invest time and/or resources into myself",
           "value": "I wouldn't invest time and/or money in myself",
           "disqualify": true
         },
         {
-          "label": "I cannot invest time and/or money in myself right now",
+          "label": "I cannot invest time and/or resources into myself right now",
           "value": "I cannot invest time and/or money in myself right now",
           "disqualify": true
         }
