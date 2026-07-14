@@ -15,7 +15,7 @@ import { ClosingSection } from './components/sections/ClosingSection.jsx'
 import { FooterSection } from './components/sections/FooterSection.jsx'
 import { usePendingLeadsSync } from './hooks/usePendingLeadsSync.js'
 import { PendingLeadsAdmin } from './components/ui/PendingLeadsAdmin.jsx'
-import { captureUTMs } from './lib/utm.js'
+import { captureAttribution } from './lib/utm.js'
 import { bootAnalytics, track } from './lib/analytics.js'
 import { DESIGN_V2 } from './config/design.js'
 
@@ -71,8 +71,9 @@ function PublicSite() {
     }
     window.scrollTo(0, 0)
 
-    // UTM capture must run before anything can navigate away — keep it sync.
-    captureUTMs()
+    // Attribution capture (UTMs + referrer + vanity path) must run before
+    // anything can navigate away — keep it sync.
+    captureAttribution()
 
     // Analytics pulls in a chunk and hits the network; defer it to idle so it
     // never competes with first paint / hydration on a hard reload.

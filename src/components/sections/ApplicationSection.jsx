@@ -8,7 +8,7 @@ import { DeclineScreen } from '../ui/DeclineScreen.jsx'
 import { submitLead } from '../../lib/submitLead.js'
 import { newPendingId } from '../../lib/pendingLeads.js'
 import { normalizePhone } from '../../lib/phone.js'
-import { getUTMs, getLastCTA } from '../../lib/utm.js'
+import { getAttribution, getLastCTA } from '../../lib/utm.js'
 import { track } from '../../lib/analytics.js'
 import { useInView } from '../../hooks/useInView.js'
 import { bgImage } from '../../lib/img.js'
@@ -87,7 +87,9 @@ function buildPayload(formData) {
     submittedAt: new Date().toISOString(),
     timestamp: Date.now(),
     lastCTA: getLastCTA(),
-    ...getUTMs(),
+    // utm_source/medium/campaign/content/term, gclid, fbclid, referrer —
+    // first-touch preferred, empty keys omitted.
+    ...getAttribution(),
   }
 }
 
@@ -179,15 +181,25 @@ export function ApplicationSection() {
     return nameOk && emailOk && phoneOk
   }, [q, formData])
 
+  // Synchronous re-entry lock. A `submitting`-state guard alone is async — a
+  // fast double-click (or Enter + click) passes it twice before the re-render
+  // lands, and form_submitted below is a billed Meta Lead.
+  const submitLockRef = useRef(false)
+
   const handleSubmit = useCallback(async () => {
-    if (submitting) return
+    if (submitLockRef.current) return
+    submitLockRef.current = true
     // Honeypot — silently fake-success on bot fill
     const honey = (formData.contact || {}).company
     if (honey) {
       setSubmitted(true)
       return
     }
-    if (!contactValid) return
+    if (!contactValid) {
+      // The only exit the user can retry from — release the lock.
+      submitLockRef.current = false
+      return
+    }
     // The gate — BEFORE form_submitted (which maps to the Meta `Lead`
     // conversion) and before any payload is built. A disqualified applicant
     // fires application_declined instead, sees the negation screen, and no
@@ -217,7 +229,7 @@ export function ApplicationSection() {
     // Always advance — lead is queued locally either way
     setSubmitting(false)
     setSubmitted(true)
-  }, [submitting, contactValid, formData])
+  }, [contactValid, formData])
 
   const currentValue = q.type === 'contact' ? formData.contact : formData[q.id]
 

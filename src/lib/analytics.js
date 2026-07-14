@@ -8,6 +8,10 @@
  *   VITE_GA4_MEASUREMENT_ID  → Google Analytics 4  (G-XXXXXXXXXX — for the agency)
  *   VITE_META_PIXEL_ID       → Meta / Facebook Pixel (numeric — for ad optimization)
  *
+ * Exception: the Meta Pixel (1046054754782392) is installed by an inline
+ * snippet in index.html so PageView fires at first paint. bootMetaPixel()
+ * detects and adopts it; the env var is only a fallback.
+ *
  * All three ride the SAME track() calls already wired through the funnel
  * (session_start, form_started, form_submitted, …), so switching one on
  * instantly backfills it with the full existing event stream — including the
@@ -71,24 +75,43 @@ const META_STANDARD_EVENTS = {
   form_submitted: 'Lead',
 }
 
+// Meta's Business Tools Terms prohibit sending data that reveals financial
+// status or health/personal-hardship categories. These props still flow to
+// PostHog and GA4 above — they must never reach the pixel.
+const META_BLOCKED_PROPS = ['income_bracket', 'life_area']
+
+function metaSafe(props) {
+  if (!META_BLOCKED_PROPS.some((k) => k in props)) return props
+  const out = { ...props }
+  META_BLOCKED_PROPS.forEach((k) => { delete out[k] })
+  return out
+}
+
 function bootMetaPixel() {
-  if (!META_PIXEL_ID || _metaReady) return
-  // Canonical Meta Pixel bootstrap: stand up the fbq() queue synchronously,
-  // then load fbevents.js, which drains the queue once it's ready.
-  if (!window.fbq) {
-    const n = (window.fbq = function () {
-      n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-    })
-    if (!window._fbq) window._fbq = n
-    n.push = n
-    n.loaded = true
-    n.version = '2.0'
-    n.queue = []
-    const t = document.createElement('script')
-    t.async = true
-    t.src = 'https://connect.facebook.net/en_US/fbevents.js'
-    document.head.appendChild(t)
+  if (_metaReady) return
+  // The pixel is normally installed by the inline snippet in index.html
+  // (init + PageView already fired). Adopt it — a second init would
+  // double-count every PageView.
+  if (window.fbq) {
+    _metaReady = true
+    return
   }
+  if (!META_PIXEL_ID) return
+  // Env-var fallback if the inline snippet is ever removed: stand up the
+  // fbq() queue synchronously, then load fbevents.js, which drains the
+  // queue once it's ready.
+  const n = (window.fbq = function () {
+    n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+  })
+  if (!window._fbq) window._fbq = n
+  n.push = n
+  n.loaded = true
+  n.version = '2.0'
+  n.queue = []
+  const t = document.createElement('script')
+  t.async = true
+  t.src = 'https://connect.facebook.net/en_US/fbevents.js'
+  document.head.appendChild(t)
   window.fbq('init', META_PIXEL_ID)
   window.fbq('track', 'PageView')
   _metaReady = true
@@ -107,8 +130,9 @@ export function track(event, props = {}) {
     window.gtag('event', GA4_RENAME[event] || event, props)
   }
   if (_metaReady && window.fbq) {
-    window.fbq('trackCustom', event, props)
+    const safe = metaSafe(props)
+    window.fbq('trackCustom', event, safe)
     const standard = META_STANDARD_EVENTS[event]
-    if (standard) window.fbq('track', standard, props)
+    if (standard) window.fbq('track', standard, safe)
   }
 }
