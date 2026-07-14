@@ -213,6 +213,7 @@ const SECTION_DEFS = [
     fields: [
       { path: ['footer', 'email'],       label: 'Contact email', hint: 'Shown as a mailto link at the bottom of the page. e.g. info@theorder.global' },
       { path: ['footer', 'phone'],       label: 'Contact phone', hint: 'Shown as a tel link. Optional — leave blank to hide.' },
+      { path: ['footer', 'instagram'],   label: 'Instagram URL', hint: 'Full https:// URL. Shown as an Instagram icon. Leave blank to hide.' },
       { path: ['footer', 'copyright'],   label: 'Copyright', hint: 'Renders in uppercase monospace, small.' },
       { path: ['footer', 'privacyLabel'], label: 'Privacy link text', hint: 'The link text at the bottom of the page. Leave blank to hide the link.' },
       { path: ['footer', 'privacyHref'], label: 'Privacy link URL', hint: 'Full https:// URL.' },

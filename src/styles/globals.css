@@ -1950,6 +1950,15 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   letter-spacing: 0.08em;
 }
 .footer-contact-link:hover { color: var(--parchment); }
+.footer-social {
+  display: inline-flex;
+  align-items: center;
+  color: var(--brass-light);
+  padding: 0.35rem; /* keeps the tap target comfortable on mobile */
+  margin: -0.35rem;
+}
+.footer-social:hover { color: var(--parchment); }
+.footer-social svg { display: block; }
 .footer-copyright { color: var(--ash); }
 .footer-privacy { color: var(--ash); }
 .footer-privacy:hover { color: var(--brass-light); }
