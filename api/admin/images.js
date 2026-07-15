@@ -49,6 +49,17 @@ export default async function handler(req, res) {
     if (!target || typeof target !== 'string') {
       return res.status(400).json({ error: 'missing url' })
     }
+    // Only blobs this endpoint's own upload path creates (images/…) may be
+    // deleted — never anything else in the store (e.g. presentations/*.json).
+    let parsed = null
+    try { parsed = new URL(target) } catch { /* invalid URL */ }
+    const isUploadedImage = !!parsed
+      && parsed.protocol === 'https:'
+      && parsed.hostname.endsWith('.public.blob.vercel-storage.com')
+      && parsed.pathname.startsWith('/images/')
+    if (!isUploadedImage) {
+      return res.status(400).json({ error: 'not an uploaded image URL' })
+    }
     try {
       await del(target, { token })
       return res.status(200).json({ ok: true })

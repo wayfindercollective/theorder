@@ -127,10 +127,30 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
   const onBoxChange = useCallback((sid, boxChanges) =>
     update((d) => ({ ...d, slides: d.slides.map((s) => (s.id === sid ? { ...s, box: { ...s.box, ...boxChanges } } : s)) })), [update])
 
+  // Cycle position is read from the updater's own state (d.cursor), never the
+  // closed-over deck — fast repeated adds can't reuse the same painting index.
   const addSlide = () => {
-    const slide = blankSlideForIndex(deck.cursor, newId)
-    update((d) => ({ ...d, cursor: d.cursor + 1, slides: [...d.slides, slide] }))
-    setScrollToId(slide.id)
+    const sid = newId()
+    update((d) => ({
+      ...d,
+      cursor: d.cursor + 1,
+      slides: [...d.slides, { ...blankSlideForIndex(d.cursor, newId), id: sid }],
+    }))
+    setScrollToId(sid)
+  }
+
+  // Insert a fresh slide (continuing the painting cycle, same as Add) directly
+  // below an existing one — no more appending then walking it up the deck.
+  const insertSlideBelow = (sid) => {
+    const cid = newId()
+    update((d) => {
+      const i = d.slides.findIndex((s) => s.id === sid)
+      if (i < 0) return d
+      const arr = [...d.slides]
+      arr.splice(i + 1, 0, { ...blankSlideForIndex(d.cursor, newId), id: cid })
+      return { ...d, cursor: d.cursor + 1, slides: arr }
+    })
+    setScrollToId(cid)
   }
 
   // Add a slide on a hand-picked background: a painting-cycle index (number)
@@ -177,8 +197,12 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
     return { ...d, slides: arr }
   })
 
+  // Returns 'saved' (fully persisted, server copy adopted), 'partial' (edits
+  // landed mid-request — still dirty by design), 'error', or 'busy'. The back
+  // button uses this to know it is safe to close.
   const save = async () => {
-    if (!deck || saving) return
+    if (!deck || saving) return 'busy'
+    if (!dirty) return 'saved'
     const revAtSave = revRef.current
     setSaving(true)
     setError('')
@@ -190,18 +214,44 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
         setDirty(false)
         setSavedTick(true)
         try { localStorage.removeItem(draftKey(saved.id)) } catch { /* noop */ }
-      } else {
-        // Edits arrived mid-save — keep them, adopt only the server-owned
-        // metadata, and stay dirty so the next Save persists the newer state.
-        setDeck((d) => (d ? { ...d, createdAt: saved.createdAt } : d))
+        return 'saved'
       }
+      // Edits arrived mid-save — keep them, adopt only the server-owned
+      // metadata, and stay dirty so the next Save persists the newer state.
+      setDeck((d) => (d ? { ...d, createdAt: saved.createdAt } : d))
+      return 'partial'
     } catch (e) {
       setError(humanizeError(e))
+      return 'error'
     } finally {
       setSaving(false)
     }
   }
   saveRef.current = save
+
+  // Back saves first: close only once everything is persisted (or the user
+  // explicitly accepts leaving with the localStorage draft as the backstop).
+  const backSafely = async () => {
+    if (!dirty) { onClose(); return }
+    const r = await save()
+    if (r === 'saved') { onClose(); return }
+    if (r === 'error' && window.confirm(
+      'Saving failed — leave anyway? Your changes stay on this device and will be offered next time you open this presentation.'
+    )) onClose()
+    // 'partial' / 'busy': stay in the editor — it is still dirty; try again.
+  }
+
+  // Ctrl/Cmd+S saves, same as the toolbar button.
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault()
+        saveRef.current?.()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const enterPresent = () => {
     setPresent(true)
@@ -212,18 +262,30 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
     try { if (document.fullscreenElement) document.exitFullscreen?.() } catch { /* noop */ }
   }
 
-  // Present-mode keyboard: scroll between stages, Escape to exit.
+  // Present-mode keyboard: scroll between stages (←/→ included for clickers),
+  // Escape to exit.
   useEffect(() => {
     if (!present) return
     const onKey = (e) => {
       const el = deckRef.current
       if (e.key === 'Escape') { exitPresent(); return }
       if (!el) return
-      if (['ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); el.scrollBy({ top: el.clientHeight, behavior: 'smooth' }) }
-      if (['ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); el.scrollBy({ top: -el.clientHeight, behavior: 'smooth' }) }
+      if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); el.scrollBy({ top: el.clientHeight, behavior: 'smooth' }) }
+      if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); el.scrollBy({ top: -el.clientHeight, behavior: 'smooth' }) }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+  }, [present])
+
+  // Browsers exit fullscreen on Escape WITHOUT delivering the keydown — sync
+  // present mode to the real fullscreen state so the editor never strands
+  // chrome-less. (If fullscreen never engaged, no event fires; presenting in a
+  // plain window is unaffected.)
+  useEffect(() => {
+    if (!present) return
+    const onFsChange = () => { if (!document.fullscreenElement) setPresent(false) }
+    document.addEventListener('fullscreenchange', onFsChange)
+    return () => document.removeEventListener('fullscreenchange', onFsChange)
   }, [present])
 
   if (loading) {
@@ -244,7 +306,7 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
     <div className={`pres-editor${present ? ' is-present' : ''}`}>
       {!present && (
         <header className="pres-toolbar">
-          <button type="button" className="pres-btn pres-btn-ghost" onClick={onClose} title="Back to presentations">←</button>
+          <button type="button" className="pres-btn pres-btn-ghost" onClick={backSafely} title="Back to presentations (saves first)">←</button>
           <input
             className="pres-title-input"
             value={deck.title}
@@ -290,6 +352,7 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
               onBoxChange={(boxChanges) => onBoxChange(slide.id, boxChanges)}
               onDelete={() => deleteSlide(slide.id)}
               onDuplicate={() => duplicateSlide(slide.id)}
+              onInsertBelow={() => insertSlideBelow(slide.id)}
               onMove={(dir) => reorder(i, i + dir)}
               dragProps={{
                 onDragStart: () => { dragIndex.current = i },

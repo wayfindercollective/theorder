@@ -8,6 +8,10 @@
  *   textarea   — multiline plain text (rows defaults to 3, override with `rows`)
  *   markdown   — multiline markdown (with toolbar + preview)
  *   hint       — small grey caption under the field
+ *
+ * A `{ divider: 'Label' }` entry in a fields list renders a small labelled rule
+ * instead of a field — used to sub-group long blocks (the testimonial cards).
+ * Each section's `nav` is its short name in the "Jump to" chip row at the top.
  */
 
 import { MarkdownField } from '../MarkdownField.jsx'
@@ -16,7 +20,7 @@ import { richModeForPath } from '../../lib/richtext.js'
 
 const SECTION_DEFS = [
   {
-    key: 'meta',
+    key: 'meta', nav: 'Link preview',
     title: 'Link preview — when the site is shared',
     fields: [
       { path: ['meta', 'title'],       label: 'Share title', hint: 'The bold first line in iMessage / WhatsApp / Facebook previews. Also the browser tab title.' },
@@ -24,14 +28,14 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'brand',
+    key: 'brand', nav: 'Brand',
     title: 'Brand',
     fields: [
       { path: ['brand', 'wordmark'], label: 'Wordmark', hint: 'The brand name beside the logo in the top bar. Also used as the logo’s screen-reader text across the page.' },
     ],
   },
   {
-    key: 'hero',
+    key: 'hero', nav: 'Hero',
     title: 'Hero',
     fields: [
       { path: ['hero', 'eyebrow'],   label: 'Eyebrow', hint: 'Small text above the headline. Optional — leave blank to hide.' },
@@ -43,7 +47,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'truth',
+    key: 'truth', nav: 'The Truth',
     title: 'The Truth — provocation',
     fields: [
       { path: ['truth', 'eyebrow'],     label: 'Numeral / eyebrow', hint: 'Small numeral above the section. e.g. I' },
@@ -51,7 +55,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'code',
+    key: 'code', nav: 'Who We Are',
     title: 'Who We Are',
     fields: [
       { path: ['code', 'eyebrow'],     label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. II' },
@@ -62,14 +66,14 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'principles',
+    key: 'principles', nav: 'Principles',
     title: 'The Principles wall',
     fields: [
       { path: ['principles', 'eyebrow'], label: 'Numeral / eyebrow', hint: 'Small numeral above the values wall. e.g. III. Leave blank to hide. The values themselves are edited under Who We Are.' },
     ],
   },
   {
-    key: 'become',
+    key: 'become', nav: 'Offering',
     title: "We're Offering You",
     fields: [
       { path: ['become', 'eyebrow'],   label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VI' },
@@ -79,7 +83,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'considered',
+    key: 'considered', nav: 'Considered',
     title: 'Who Is Considered (hidden — fill to re-enable)',
     fields: [
       { path: ['considered', 'eyebrow'], label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. IV' },
@@ -89,7 +93,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'application',
+    key: 'application', nav: 'Application',
     title: 'Application — copy around the form',
     fields: [
       { path: ['application', 'eyebrow'],          label: 'Eyebrow', hint: 'Small label at the top of the form card. e.g. Apply Now' },
@@ -100,7 +104,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'form',
+    key: 'form', nav: 'Form labels',
     title: 'Application form — field labels & messages',
     fields: [
       { path: ['form', 'nameLabel'],        label: 'Name — label' },
@@ -120,27 +124,31 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'evidence',
+    key: 'evidence', nav: 'Testimonials',
     title: 'Testimonials',
     fields: [
       { path: ['evidence', 'eyebrow'], label: 'Numeral / eyebrow', hint: 'Small numeral above the heading.' },
       { path: ['evidence', 'heading'], label: 'Heading', hint: 'e.g. Testimonials' },
       { path: ['evidence', 'intro'],   label: 'Intro line', textarea: true, hint: 'Optional line under the heading. Leave blank to hide.' },
+      { divider: 'Testimonial 1' },
       { path: ['evidence', 'cards', 0, 'video'],       label: 'Testimonial 1 — video', hint: 'Path to a video file in /public, e.g. /testimonials/Tony.mp4. When set, this card plays the video instead of a text quote.' },
       { path: ['evidence', 'cards', 0, 'poster'],      label: 'Testimonial 1 — poster image', hint: 'Still frame shown before the clip loads, e.g. /testimonials/Tony-poster.jpg. Keep in step with the video.' },
       { path: ['evidence', 'cards', 0, 'title'],       label: 'Testimonial 1 — video title', hint: 'Caption shown under the video. e.g. Tony — Entrepreneur, coach and real estate developer' },
       { path: ['evidence', 'cards', 0, 'quote'],       label: 'Testimonial 1 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
       { path: ['evidence', 'cards', 0, 'attribution'], label: 'Testimonial 1 — name (text fallback)', hint: 'Who said it. e.g. — James, Selection 2025' },
+      { divider: 'Testimonial 2' },
       { path: ['evidence', 'cards', 1, 'video'],       label: 'Testimonial 2 — video', hint: 'Path to a video file in /public, e.g. /testimonials/testimonial-2.mp4. When set, this card plays the video instead of a text quote.' },
       { path: ['evidence', 'cards', 1, 'poster'],      label: 'Testimonial 2 — poster image', hint: 'Still frame shown before the clip loads. Keep in step with the video.' },
       { path: ['evidence', 'cards', 1, 'title'],       label: 'Testimonial 2 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
       { path: ['evidence', 'cards', 1, 'quote'],       label: 'Testimonial 2 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
       { path: ['evidence', 'cards', 1, 'attribution'], label: 'Testimonial 2 — name (text fallback)' },
+      { divider: 'Testimonial 3' },
       { path: ['evidence', 'cards', 2, 'video'],       label: 'Testimonial 3 — video', hint: 'Path to a video file in /public, e.g. /testimonials/testimonial-3.mp4. When set, this card plays the video instead of a text quote.' },
       { path: ['evidence', 'cards', 2, 'poster'],      label: 'Testimonial 3 — poster image', hint: 'Still frame shown before the clip loads. Keep in step with the video.' },
       { path: ['evidence', 'cards', 2, 'title'],       label: 'Testimonial 3 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
       { path: ['evidence', 'cards', 2, 'quote'],       label: 'Testimonial 3 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
       { path: ['evidence', 'cards', 2, 'attribution'], label: 'Testimonial 3 — name (text fallback)' },
+      { divider: 'Testimonial 4' },
       { path: ['evidence', 'cards', 3, 'video'],       label: 'Testimonial 4 — video', hint: 'Path to a video file in /public, e.g. /testimonials/testimonial-4.mp4. When set, this card plays the video instead of a text quote.' },
       { path: ['evidence', 'cards', 3, 'poster'],      label: 'Testimonial 4 — poster image', hint: 'Still frame shown before the clip loads. Keep in step with the video.' },
       { path: ['evidence', 'cards', 3, 'title'],       label: 'Testimonial 4 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
@@ -149,7 +157,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'founder',
+    key: 'founder', nav: 'Founder',
     title: 'Who Am I (Founder)',
     previewWrap: 'section-founder-preview',
     fields: [
@@ -165,7 +173,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'faq',
+    key: 'faq', nav: 'Questions',
     title: 'Questions a Serious Man Asks',
     fields: [
       { path: ['faq', 'eyebrow'],   label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VII' },
@@ -174,7 +182,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'howWeOperate',
+    key: 'howWeOperate', nav: 'How We Operate',
     title: 'How We Operate & What to Expect',
     fields: [
       { path: ['howWeOperate', 'eyebrow'],       label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VIII' },
@@ -190,14 +198,14 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'cta',
+    key: 'cta', nav: 'CTA button',
     title: 'Call to Action button',
     fields: [
       { path: ['cta', 'label'], label: 'Button label', hint: 'Used on every "Come this way" band across the page.' },
     ],
   },
   {
-    key: 'closing',
+    key: 'closing', nav: 'Closing',
     title: 'Closing (logo + verses)',
     fields: [
       { path: ['closing', 'wordmark'],          label: 'Wordmark', hint: 'Large word under the sigil. e.g. THE ORDER' },
@@ -208,7 +216,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'footer',
+    key: 'footer', nav: 'Footer',
     title: 'Footer',
     fields: [
       { path: ['footer', 'email'],       label: 'Contact email', hint: 'Shown as a mailto link at the bottom of the page. e.g. info@theorder.global' },
@@ -220,7 +228,7 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'finalScreen',
+    key: 'finalScreen', nav: 'Final screen',
     title: 'Final screen (after submitting application)',
     fields: [
       { path: ['finalScreen', 'heading'], label: 'Heading', hint: 'Display font, large.' },
@@ -259,11 +267,30 @@ export function SectionsTab({ sections, onChange }) {
 
   return (
     <div className="admin-tab-pane">
+      <nav className="admin-jump" aria-label="Jump to section">
+        {SECTION_DEFS.map((sec) => (
+          <button
+            key={sec.key}
+            type="button"
+            className="admin-jump-chip"
+            onClick={() =>
+              document.getElementById('admin-sec-' + sec.key)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+          >
+            {sec.nav || sec.title}
+          </button>
+        ))}
+      </nav>
+
       {SECTION_DEFS.map((sec) => (
-        <section key={sec.key} className="admin-section-block">
+        <section key={sec.key} id={'admin-sec-' + sec.key} className="admin-section-block">
           <h2 className="admin-section-title display">{sec.title}</h2>
           <div className="admin-fields">
-            {sec.fields.map((f) => {
+            {sec.fields.map((f, fi) => {
+              // Divider entries have no path — branch before any getAt().
+              if (f.divider) {
+                return <h3 key={'divider-' + fi} className="admin-fields-divider">{f.divider}</h3>
+              }
               const value = getAt(sections, f.path) ?? ''
               const id = sec.key + '-' + f.path.join('-')
 

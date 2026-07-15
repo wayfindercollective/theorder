@@ -24,17 +24,17 @@ const HERO_SRC = data.heroFilm?.frames?.[0]?.src || '/images/hero-horseman.jpg'
 
 // key | alignKey (design.js) | sectionClass (CSS) | painting src | default box footprint
 const DEFS = [
-  { key: 'hero',        alignKey: 'hero',        sectionClass: 'section-hero',        src: HERO_SRC,                imageAlign: null,                    box: { xPct: 27, yPct: 60, wPct: 46, hPct: 28 } },
-  { key: 'truth',       alignKey: 'truth',       sectionClass: 'section-truth',       src: data.truth?.image,       imageAlign: data.truth?.imageAlign,       box: { xPct: 27, yPct: 30, wPct: 46, hPct: 40 } },
-  { key: 'code',        alignKey: 'code',        sectionClass: 'section-code',        src: data.code?.image,        imageAlign: data.code?.imageAlign,        box: { xPct: 6,  yPct: 28, wPct: 42, hPct: 50 } },
-  { key: 'principles',  alignKey: 'principles',  sectionClass: 'section-principles',  src: data.principles?.image,  imageAlign: data.principles?.imageAlign,  box: { xPct: 27, yPct: 34, wPct: 46, hPct: 36 } },
-  { key: 'evidence',    alignKey: 'evidence',    sectionClass: 'section-evidence',    src: data.evidence?.image,    imageAlign: data.evidence?.imageAlign,    box: { xPct: 22, yPct: 30, wPct: 56, hPct: 44 } },
-  { key: 'founder',     alignKey: 'founder',     sectionClass: 'section-founder',     src: data.founder?.image,     imageAlign: data.founder?.imageAlign,     box: { xPct: 27, yPct: 34, wPct: 46, hPct: 40 } },
-  { key: 'become',      alignKey: 'become',      sectionClass: 'section-become',      src: data.become?.image,      imageAlign: data.become?.imageAlign,      box: { xPct: 52, yPct: 28, wPct: 42, hPct: 50 } },
-  { key: 'faq',         alignKey: 'faq',         sectionClass: 'section-faq',         src: data.faq?.image,         imageAlign: data.faq?.imageAlign,         box: { xPct: 6,  yPct: 24, wPct: 44, hPct: 56 } },
-  { key: 'how',         alignKey: 'howWeOperate', sectionClass: 'section-how',        src: data.howWeOperate?.image, imageAlign: data.howWeOperate?.imageAlign, box: { xPct: 52, yPct: 26, wPct: 42, hPct: 52 } },
-  { key: 'application', alignKey: 'application', sectionClass: 'section-application', src: data.application?.image,  imageAlign: data.application?.imageAlign,  box: { xPct: 28, yPct: 30, wPct: 44, hPct: 44 } },
-  { key: 'closing',     alignKey: 'closing',     sectionClass: 'section-closing',     src: data.closing?.image,     imageAlign: data.closing?.imageAlign,     box: { xPct: 27, yPct: 36, wPct: 46, hPct: 32 } },
+  { key: 'hero', label: 'Hero — the horseman',        alignKey: 'hero',        sectionClass: 'section-hero',        src: HERO_SRC,                imageAlign: null,                    box: { xPct: 27, yPct: 60, wPct: 46, hPct: 28 } },
+  { key: 'truth', label: 'The Truth',       alignKey: 'truth',       sectionClass: 'section-truth',       src: data.truth?.image,       imageAlign: data.truth?.imageAlign,       box: { xPct: 27, yPct: 30, wPct: 46, hPct: 40 } },
+  { key: 'code', label: 'Who We Are',        alignKey: 'code',        sectionClass: 'section-code',        src: data.code?.image,        imageAlign: data.code?.imageAlign,        box: { xPct: 6,  yPct: 28, wPct: 42, hPct: 50 } },
+  { key: 'principles', label: 'The Principles',  alignKey: 'principles',  sectionClass: 'section-principles',  src: data.principles?.image,  imageAlign: data.principles?.imageAlign,  box: { xPct: 27, yPct: 34, wPct: 46, hPct: 36 } },
+  { key: 'evidence', label: 'Testimonials',    alignKey: 'evidence',    sectionClass: 'section-evidence',    src: data.evidence?.image,    imageAlign: data.evidence?.imageAlign,    box: { xPct: 22, yPct: 30, wPct: 56, hPct: 44 } },
+  { key: 'founder', label: 'Who Am I',     alignKey: 'founder',     sectionClass: 'section-founder',     src: data.founder?.image,     imageAlign: data.founder?.imageAlign,     box: { xPct: 27, yPct: 34, wPct: 46, hPct: 40 } },
+  { key: 'become', label: "We're Offering You",      alignKey: 'become',      sectionClass: 'section-become',      src: data.become?.image,      imageAlign: data.become?.imageAlign,      box: { xPct: 52, yPct: 28, wPct: 42, hPct: 50 } },
+  { key: 'faq', label: 'Questions a Serious Man Asks',         alignKey: 'faq',         sectionClass: 'section-faq',         src: data.faq?.image,         imageAlign: data.faq?.imageAlign,         box: { xPct: 6,  yPct: 24, wPct: 44, hPct: 56 } },
+  { key: 'how', label: 'How We Operate',         alignKey: 'howWeOperate', sectionClass: 'section-how',        src: data.howWeOperate?.image, imageAlign: data.howWeOperate?.imageAlign, box: { xPct: 52, yPct: 26, wPct: 42, hPct: 52 } },
+  { key: 'application', label: 'Application', alignKey: 'application', sectionClass: 'section-application', src: data.application?.image,  imageAlign: data.application?.imageAlign,  box: { xPct: 28, yPct: 30, wPct: 44, hPct: 44 } },
+  { key: 'closing', label: 'Closing',     alignKey: 'closing',     sectionClass: 'section-closing',     src: data.closing?.image,     imageAlign: data.closing?.imageAlign,     box: { xPct: 27, yPct: 36, wPct: 46, hPct: 32 } },
 
   // --- Presentation-only extras, appended AFTER the 11 site mirrors so a deck
   //     cycles through 17 paintings before it repeats. These are DECOUPLED from
@@ -44,16 +44,17 @@ const DEFS = [
   //     the tail in this fixed order. `align` is explicit: 'full' for landscapes,
   //     'right' for the standing-operator portrait (box falls on the left). Grade
   //     + crop for each live in presentations.css, keyed by sectionClass. ---
-  { key: 'pres-soldier',  alignKey: null, sectionClass: 'section-pres-soldier',  src: '/images/pres-soldier.jpg',  imageAlign: null, align: 'full',  box: { xPct: 52, yPct: 14, wPct: 44, hPct: 34 } },
-  { key: 'pres-squad',    alignKey: null, sectionClass: 'section-pres-squad',    src: '/images/pres-squad.jpg',    imageAlign: null, align: 'full',  box: { xPct: 27, yPct: 58, wPct: 46, hPct: 30 } },
-  { key: 'pres-base',     alignKey: null, sectionClass: 'section-pres-base',     src: '/images/pres-base.jpg',     imageAlign: null, align: 'full',  box: { xPct: 28, yPct: 10, wPct: 44, hPct: 28 } },
-  { key: 'pres-dog',      alignKey: null, sectionClass: 'section-pres-dog',      src: '/images/pres-dog.jpg',      imageAlign: null, align: 'full',  box: { xPct: 5,  yPct: 30, wPct: 40, hPct: 42 } },
-  { key: 'pres-blade',    alignKey: null, sectionClass: 'section-pres-blade',    src: '/images/pres-blade.jpg',    imageAlign: null, align: 'full',  box: { xPct: 27, yPct: 12, wPct: 46, hPct: 30 } },
-  { key: 'pres-sentinel', alignKey: null, sectionClass: 'section-pres-sentinel', src: '/images/pres-sentinel.jpg', imageAlign: null, align: 'right', box: { xPct: 6,  yPct: 30, wPct: 40, hPct: 42 } },
+  { key: 'pres-soldier', label: 'Soldier at rest',  alignKey: null, sectionClass: 'section-pres-soldier',  src: '/images/pres-soldier.jpg',  imageAlign: null, align: 'full',  box: { xPct: 52, yPct: 14, wPct: 44, hPct: 34 } },
+  { key: 'pres-squad', label: 'The squad',    alignKey: null, sectionClass: 'section-pres-squad',    src: '/images/pres-squad.jpg',    imageAlign: null, align: 'full',  box: { xPct: 27, yPct: 58, wPct: 46, hPct: 30 } },
+  { key: 'pres-base', label: 'The base',     alignKey: null, sectionClass: 'section-pres-base',     src: '/images/pres-base.jpg',     imageAlign: null, align: 'full',  box: { xPct: 28, yPct: 10, wPct: 44, hPct: 28 } },
+  { key: 'pres-dog', label: 'Dog handler',      alignKey: null, sectionClass: 'section-pres-dog',      src: '/images/pres-dog.jpg',      imageAlign: null, align: 'full',  box: { xPct: 5,  yPct: 30, wPct: 40, hPct: 42 } },
+  { key: 'pres-blade', label: 'The blade',    alignKey: null, sectionClass: 'section-pres-blade',    src: '/images/pres-blade.jpg',    imageAlign: null, align: 'full',  box: { xPct: 27, yPct: 12, wPct: 46, hPct: 30 } },
+  { key: 'pres-sentinel', label: 'The sentinel', alignKey: null, sectionClass: 'section-pres-sentinel', src: '/images/pres-sentinel.jpg', imageAlign: null, align: 'right', box: { xPct: 6,  yPct: 30, wPct: 40, hPct: 42 } },
 ]
 
 export const SITE_IMAGES = DEFS.map((d) => ({
   key: d.key,
+  label: d.label || d.key,
   alignKey: d.alignKey,
   sectionClass: d.sectionClass,
   src: d.src,

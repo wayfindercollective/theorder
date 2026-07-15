@@ -13,8 +13,8 @@
  * Click any image to copy its URL.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { deleteImage, listImages, uploadImage, humanizeError } from '../adminApi.js'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { deleteImage, listImages, listPresentationImageRefs, uploadImage, humanizeError } from '../adminApi.js'
 import { websiteImagesFrom, PRES_PAINTINGS, PRES_PHOTOS, freshUploads } from '../../lib/imageLibrary.js'
 
 function bytes(n) {
@@ -29,12 +29,14 @@ function shortDate(s) {
   try { return new Date(s).toLocaleDateString() } catch { return s }
 }
 
-export function LibraryTab({ sections }) {
+export function LibraryTab({ sections, savedSections }) {
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState('')
+  // null = still checking, 'error' = could not check, Map = url → [deck titles]
+  const [deckRefs, setDeckRefs] = useState(null)
   const fileRef = useRef(null)
 
   const refresh = useCallback(async () => {
@@ -48,16 +50,27 @@ export function LibraryTab({ sections }) {
     } finally {
       setLoading(false)
     }
+    // Deck usage refreshes alongside the list; delete stays blocked until it
+    // resolves so a failed check can never let a deck-used image be deleted.
+    setDeckRefs(null)
+    try { setDeckRefs(await listPresentationImageRefs()) }
+    catch { setDeckRefs('error') }
   }, [])
 
   useEffect(() => { refresh() }, [refresh])
 
-  const inUse = useCallback((url) => {
-    // Walk sections.json and check if `url` appears anywhere as a string value.
-    // Cheap deep-string search — good enough to warn before delete.
-    const json = JSON.stringify(sections || {})
-    return json.includes(url)
-  }, [sections])
+  // Deep-string search across BOTH the draft being edited and the saved live
+  // content — an image removed in the draft but not yet saved is still live.
+  const draftJson = useMemo(() => JSON.stringify(sections || {}), [sections])
+  const savedJson = useMemo(() => JSON.stringify(savedSections || {}), [savedSections])
+  const inUse = useCallback(
+    (url) => draftJson.includes(url) || savedJson.includes(url),
+    [draftJson, savedJson],
+  )
+  const decksUsing = useCallback(
+    (url) => (deckRefs instanceof Map ? deckRefs.get(url) || [] : []),
+    [deckRefs],
+  )
 
   const copyUrl = async (url) => {
     try {
@@ -84,16 +97,31 @@ export function LibraryTab({ sections }) {
     setBusy(false)
   }
 
+  // Deleting a referenced image would leave broken pictures on the live site
+  // or inside saved presentations, so it is BLOCKED (not just warned) until
+  // every reference is replaced. Fails closed while deck usage is unknown.
   const onDelete = async (img) => {
-    if (inUse(img.url)) {
-      const ok = window.confirm(
-        'This image is referenced somewhere on the site. Delete anyway? (You should replace those references first to avoid broken images.)'
-      )
-      if (!ok) return
-    } else {
-      const ok = window.confirm('Delete this image from storage? This cannot be undone.')
-      if (!ok) return
+    const siteUse = inUse(img.url)
+    const deckTitles = decksUsing(img.url)
+    if (siteUse || deckTitles.length) {
+      const where = [
+        siteUse ? 'the website (see “On the website” above)' : '',
+        deckTitles.length
+          ? `presentation${deckTitles.length > 1 ? 's' : ''}: “${deckTitles.join('”, “')}”`
+          : '',
+      ].filter(Boolean).join(' and by ')
+      window.alert(`This image can’t be deleted — it is used by ${where}. Replace it there first, then delete it here.`)
+      return
     }
+    if (!(deckRefs instanceof Map)) {
+      window.alert(
+        deckRefs === 'error'
+          ? 'Deleting is unavailable right now — presentation usage could not be checked. Press Refresh to retry.'
+          : 'Still checking whether any presentation uses this image — try again in a moment.'
+      )
+      return
+    }
+    if (!window.confirm('Delete this image from storage? This cannot be undone.')) return
     try {
       await deleteImage(img.url)
       setImages((xs) => xs.filter((x) => x.url !== img.url))
@@ -174,7 +202,9 @@ export function LibraryTab({ sections }) {
         )}
         <div className="library-grid">
           {uploads.map((img) => {
-            const used = inUse(img.url)
+            const siteUse = inUse(img.url)
+            const deckUse = decksUsing(img.url).length > 0
+            const used = siteUse || deckUse
             return (
               <div key={img.url} className={'library-card' + (used ? ' is-used' : '')}>
                 <button
@@ -191,7 +221,11 @@ export function LibraryTab({ sections }) {
                     <span>{shortDate(img.uploadedAt)}</span>
                   </div>
                   <div className="library-meta-line">
-                    {used ? <span className="library-used">in use</span> : <span className="library-unused">unused</span>}
+                    {siteUse
+                      ? <span className="library-used">in use — site</span>
+                      : deckUse
+                        ? <span className="library-used">in use — presentation</span>
+                        : <span className="library-unused">unused</span>}
                     {copied === img.url && <span className="library-copied">copied</span>}
                   </div>
                   <button type="button" className="btn btn-ghost library-delete" onClick={() => onDelete(img)}>

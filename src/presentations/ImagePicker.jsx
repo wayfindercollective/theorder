@@ -135,7 +135,7 @@ export function ImagePicker({ mode, onPick, onClose }) {
             <>
               <PickerGroup
                 title="The painting cycle (what new slides rotate through)"
-                items={SITE_IMAGES.map((img, i) => ({ key: img.key, src: img.src, label: img.key.replace(/^pres-/, ''), value: i }))}
+                items={SITE_IMAGES.map((img, i) => ({ key: img.key, src: img.src, label: img.label || img.key.replace(/^pres-/, ''), value: i }))}
                 onPick={onPick}
               />
               <PickerGroup title="From the shared library" items={LIBRARY_EXTRAS} onPick={onPick} />

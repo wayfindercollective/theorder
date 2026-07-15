@@ -1,10 +1,11 @@
 /**
  * The presentations home: list saved decks, create a new one (a blank mirror of
- * the site), open / rename / delete. The list endpoint returns full decks, so
- * rename edits the in-hand object and re-saves without an extra round-trip.
+ * the site), open / rename / duplicate / delete. Rename goes through the
+ * title-only PATCH so it can never rewrite slide content; duplicate fetches the
+ * canonical deck and saves a fresh-id copy (the original blob is untouched).
  */
 import { useEffect, useState } from 'react'
-import { listDecks, deleteDeck, saveDeck, humanizeError } from './presentationsApi.js'
+import { listDecks, deleteDeck, getDeck, renameDeck, saveDeck, humanizeError } from './presentationsApi.js'
 import { buildDefaultDeck } from './siteImages.js'
 
 const newId = () => crypto.randomUUID()
@@ -32,8 +33,31 @@ export function DeckManager({ onOpen, onNew, onSignOut }) {
     const t = window.prompt('Presentation title', deck.title)
     if (t == null) return
     setBusy(true)
-    try { await saveDeck({ ...deck, title: t.trim() || deck.title }); await load() }
+    try { await renameDeck(deck.id, t.trim() || deck.title); await load() }
     catch (e) { setError(humanizeError(e)) }
+    finally { setBusy(false) }
+  }
+
+  // Deep copy with fresh ids throughout; the source deck is never rewritten.
+  const duplicate = async (deck) => {
+    setBusy(true)
+    setError('')
+    try {
+      const full = await getDeck(deck.id)
+      const copy = {
+        id: newId(),
+        title: `${full.title || 'Untitled Presentation'} (copy)`.slice(0, 120),
+        cursor: full.cursor,
+        slides: (full.slides || []).map((s) => ({
+          ...s,
+          id: newId(),
+          extras: (s.extras || []).map((x) => ({ ...x, id: newId() })),
+          images: (s.images || []).map((im) => ({ ...im, id: newId() })),
+        })),
+      }
+      await saveDeck(copy)
+      await load()
+    } catch (e) { setError(humanizeError(e)) }
     finally { setBusy(false) }
   }
 
@@ -77,6 +101,7 @@ export function DeckManager({ onOpen, onNew, onSignOut }) {
                 </button>
                 <div className="pres-deck-actions">
                   <button type="button" className="pres-btn pres-btn-ghost" disabled={busy} onClick={() => rename(deck)}>Rename</button>
+                  <button type="button" className="pres-btn pres-btn-ghost" disabled={busy} onClick={() => duplicate(deck)} title="Make a copy of this presentation">Duplicate</button>
                   <button type="button" className="pres-btn pres-btn-ghost pres-danger" disabled={busy} onClick={() => remove(deck)}>Delete</button>
                 </div>
               </li>

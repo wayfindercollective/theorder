@@ -25,7 +25,7 @@ const newId = () => crypto.randomUUID()
 const BG_ALIGN_CYCLE = [undefined, 'center', 'left', 'right']
 const BG_ALIGN_LABEL = { center: 'Centre', left: 'Left', right: 'Right' }
 
-export function Slide({ slide, index, total, present, onChange, onBoxChange, onDelete, onDuplicate, onMove, dragProps }) {
+export function Slide({ slide, index, total, present, onChange, onBoxChange, onDelete, onDuplicate, onInsertBelow, onMove, dragProps }) {
   // A hand-picked library image (bgSrc) overrides the painting cycle.
   const img = slide.bgSrc ? customImage(slide.bgSrc) : imageForIndex(slide.siteImageIndex)
   const [picker, setPicker] = useState(null) // 'image' | 'background' | null
@@ -108,6 +108,7 @@ export function Slide({ slide, index, total, present, onChange, onBoxChange, onD
             BG: {BG_ALIGN_LABEL[slide.bgAlign] || 'Auto'}
           </button>
           <i className="pres-tools-sep" />
+          <button type="button" onClick={onInsertBelow} title="Insert a new slide below this one">+⤵</button>
           <button type="button" onClick={onDuplicate} title="Duplicate this slide">⧉</button>
           <button type="button" onClick={() => onMove(-1)} disabled={index === 0} title="Move up">↑</button>
           <button type="button" onClick={() => onMove(1)} disabled={index === total - 1} title="Move down">↓</button>

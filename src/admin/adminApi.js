@@ -145,3 +145,28 @@ export async function deleteImage(url) {
 export async function getDeployStatus() {
   return await jsonFetch('/api/admin/deploy-status', { method: 'GET' })
 }
+
+/**
+ * Every image URL referenced by saved presentation decks (custom backgrounds
+ * and placed pictures), as a Map of url → [deck titles]. The presentations
+ * endpoint accepts the same admin JWT. Used by the Library tab to block
+ * deleting an upload a deck still needs.
+ */
+export async function listPresentationImageRefs() {
+  const { decks } = await jsonFetch('/api/presentations', { method: 'GET' })
+  const refs = new Map()
+  const add = (src, title) => {
+    if (!src || typeof src !== 'string') return
+    const titles = refs.get(src) || []
+    if (!titles.includes(title)) titles.push(title)
+    refs.set(src, titles)
+  }
+  for (const deck of decks || []) {
+    const title = deck?.title || 'Untitled Presentation'
+    for (const s of deck?.slides || []) {
+      add(s?.bgSrc, title)
+      for (const im of s?.images || []) add(im?.src, title)
+    }
+  }
+  return refs
+}

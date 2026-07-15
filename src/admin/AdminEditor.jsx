@@ -108,6 +108,12 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
   const [restorePrompt, setRestorePrompt] = useState(null) // { draft, savedAt } | null
   const [saveTrigger, setSaveTrigger] = useState(0)
   const baselineFpRef = useRef('')
+  // Bumped on every draft edit; lets handleSave detect edits that landed while
+  // the request was in flight (same guard DeckEditor uses).
+  const revRef = useRef(0)
+  // Set when such edits landed: the next content re-seed must keep the local
+  // draft instead of clobbering it with the just-saved (older) server copy.
+  const keepDraftRef = useRef(false)
 
   const deploy = useDeployStatus(saveTrigger)
 
@@ -116,6 +122,13 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
   useEffect(() => {
     if (!content) return
     const fp = fingerprint(content)
+    if (keepDraftRef.current) {
+      // Edits arrived mid-save — keep them; only adopt the new baseline so the
+      // still-dirty draft persists against the fresh server content.
+      keepDraftRef.current = false
+      baselineFpRef.current = fp
+      return
+    }
     baselineFpRef.current = fp
     const stored = readDraft()
     if (stored && stored.baselineFp === fp) {
@@ -163,27 +176,53 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
   }, [dirty])
 
   const handleSave = useCallback(async () => {
-    if (!dirty) return
+    if (!dirty || saveStatus.state === 'saving') return
     setSaveStatus({ state: 'saving', message: 'Saving…' })
+    const revAtSave = revRef.current
     const r = await onSave(draft)
     if (r.ok) {
-      clearDraft()
+      if (revRef.current === revAtSave) {
+        clearDraft()
+      } else {
+        // Keystrokes landed during the request — keep the newer draft (and its
+        // localStorage copy); the content re-seed effect must not replace it.
+        keepDraftRef.current = true
+      }
       setSaveStatus({ state: 'saved', message: 'Saved.' })
       setSaveTrigger((n) => n + 1)
       setTimeout(() => setSaveStatus((s) => (s.state === 'saved' ? { state: 'idle', message: '' } : s)), 4000)
     } else {
       setSaveStatus({ state: 'error', message: humanizeError({ message: r.error }) })
     }
-  }, [dirty, draft, onSave])
+  }, [dirty, draft, onSave, saveStatus.state])
+
+  // Ctrl/Cmd+S saves, same as the button.
+  const handleSaveRef = useRef(null)
+  handleSaveRef.current = handleSave
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault()
+        handleSaveRef.current?.()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const updateSections = useCallback((patch) => {
+    revRef.current += 1
     setDraft((d) => ({ ...d, sections: typeof patch === 'function' ? patch(d.sections) : patch }))
   }, [])
   const updateQuestions = useCallback((patch) => {
+    revRef.current += 1
     setDraft((d) => ({ ...d, questions: typeof patch === 'function' ? patch(d.questions) : patch }))
   }, [])
 
   const acceptRestore = useCallback(() => {
+    // A restore mutates the draft like any edit — bump the rev so a save that
+    // was in flight when it happened can't adopt the server copy over it.
+    revRef.current += 1
     if (restorePrompt?.draft) setDraft(restorePrompt.draft)
     setRestorePrompt(null)
   }, [restorePrompt])
@@ -262,7 +301,7 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
           />
         )}
         {tab === 'images'      && <ImagesTab      sections={draft.sections} onChange={updateSections} />}
-        {tab === 'library'     && <LibraryTab     sections={draft.sections} />}
+        {tab === 'library'     && <LibraryTab     sections={draft.sections} savedSections={content.sections} />}
         {tab === 'logo'        && <LogoTab        sections={draft.sections} onChange={updateSections} />}
         {tab === 'signature'   && <EmailSignatureTab />}
       </main>

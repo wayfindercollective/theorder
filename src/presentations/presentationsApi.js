@@ -75,6 +75,15 @@ export function saveDeck(deck) {
   return call('/api/presentations', { method: 'POST', body: JSON.stringify(deck) }).then((d) => d.deck)
 }
 
+// Title-only update — the server rewrites the stored deck verbatim apart from
+// title/updatedAt, so renaming can never touch slide content.
+export function renameDeck(id, title) {
+  return call(`/api/presentations?id=${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ title }),
+  }).then((d) => d.deck)
+}
+
 export function deleteDeck(id) {
   return call(`/api/presentations?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }

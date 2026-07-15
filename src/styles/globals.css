@@ -2619,6 +2619,45 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  /* jump-nav targets land below the sticky topbar, not under it */
+  scroll-margin-top: 90px;
+}
+
+/* "Jump to" chip row at the top of the Sections tab */
+.admin-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.admin-jump-chip {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash);
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--iron);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition: color 180ms var(--ease-order), border-color 180ms var(--ease-order);
+}
+.admin-jump-chip:hover {
+  color: var(--brass-light);
+  border-color: var(--brass-deep);
+}
+
+/* Labelled rule sub-grouping fields inside a long block (testimonial cards) */
+.admin-fields-divider {
+  margin: 0.8rem 0 0;
+  padding-bottom: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-light);
+  border-bottom: 1px solid var(--iron);
 }
 
 .admin-section-title {

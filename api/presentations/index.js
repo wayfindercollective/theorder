@@ -9,6 +9,8 @@
  *   GET    /api/presentations            → { decks: [full deck, ...] }
  *   GET    /api/presentations?id=<uuid>  → { deck }
  *   POST   /api/presentations  body=deck → validates, preserves createdAt, { ok, deck }
+ *   PATCH  /api/presentations?id=<uuid>  body={ title } → rename ONLY (stored
+ *          slides rewritten verbatim, never re-sanitised) → { ok, deck }
  *   DELETE /api/presentations?id=<uuid>  → { ok }
  *
  * Blob notes (verified against @vercel/blob 0.27.3):
@@ -57,6 +59,12 @@ function str(v, max) {
 function align(v) {
   return v === 'center' || v === 'right' ? v : 'left'
 }
+// Box alignment additionally knows 'free' — set when the box was hand-dragged.
+// Coercing it (the old behaviour) made the toolbar highlight "L" after a
+// reload as if the box were left-aligned.
+function boxAlignVal(v) {
+  return v === 'center' || v === 'right' || v === 'free' ? v : 'left'
+}
 // Background alignment override is OPTIONAL — absent means "use the painting's
 // own alignment". Unlike align() this MUST stay nullable: defaulting it (e.g.
 // to 'left') would stamp an override onto every pre-existing slide on its next
@@ -86,7 +94,7 @@ function sanitizeBox(b) {
     yPct: clampNum(b.yPct, 0, 100, 60),
     wPct: clampNum(b.wPct, 5, 100, 46),
     hPct: clampNum(b.hPct, 5, 100, 30),
-    boxAlign: align(b.boxAlign),
+    boxAlign: boxAlignVal(b.boxAlign),
     // Heading and body align independently; migrate old shared `textAlign`.
     headingAlign: align(b.headingAlign ?? b.textAlign),
     bodyAlign: align(b.bodyAlign ?? b.textAlign),
@@ -147,15 +155,10 @@ function sanitizeDeckForRead(deck) {
 }
 
 async function resolveBlob(token, id) {
+  // The exact path is itself a valid prefix — no need to page the whole store.
   const path = pathFor(id)
-  let cursor
-  do {
-    const page = await list({ prefix: PREFIX, cursor, limit: 1000, token })
-    const hit = (page.blobs || []).find((b) => b.pathname === path)
-    if (hit) return hit
-    cursor = page.cursor
-  } while (cursor)
-  return null
+  const page = await list({ prefix: path, limit: 10, token })
+  return (page.blobs || []).find((b) => b.pathname === path) || null
 }
 
 async function fetchDeck(blob) {
@@ -181,15 +184,18 @@ export default async function handler(req, res) {
         if (!blob) return res.status(404).json({ error: 'not found' })
         return res.status(200).json({ deck: sanitizeDeckForRead(await fetchDeck(blob)) })
       }
-      const decks = []
+      const blobs = []
       let cursor
       do {
         const page = await list({ prefix: PREFIX, cursor, limit: 1000, token })
-        for (const b of page.blobs || []) {
-          try { decks.push(sanitizeDeckForRead(await fetchDeck(b))) } catch { /* skip unreadable */ }
-        }
+        blobs.push(...(page.blobs || []))
         cursor = page.cursor
       } while (cursor)
+      // Fetch in parallel; an unreadable deck resolves to null and is skipped
+      // individually, exactly like the old serial loop.
+      const decks = (
+        await Promise.all(blobs.map((b) => fetchDeck(b).then(sanitizeDeckForRead).catch(() => null)))
+      ).filter(Boolean)
       decks.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))
       return res.status(200).json({ decks })
     } catch (err) {
@@ -248,6 +254,39 @@ export default async function handler(req, res) {
     }
   }
 
+  // ---- PATCH (rename only) ----
+  // Rewrites title + updatedAt on the STORED JSON verbatim — slides are never
+  // re-run through sanitizeSlide here, so a rename can't alter deck content.
+  if (req.method === 'PATCH') {
+    const id = req.query?.id
+    if (!UUID_RE.test(String(id || ''))) return res.status(400).json({ error: 'bad id' })
+    let body = req.body
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body) } catch { body = {} }
+    }
+    try {
+      const blob = await resolveBlob(token, id)
+      if (!blob) return res.status(404).json({ error: 'not found' })
+      const stored = await fetchDeck(blob)
+      const title = str(body?.title, 120).trim()
+      const deck = {
+        ...stored,
+        title: title || stored.title || 'Untitled Presentation',
+        updatedAt: new Date().toISOString(),
+      }
+      await put(pathFor(id), JSON.stringify(deck), {
+        access: 'public',
+        contentType: 'application/json',
+        addRandomSuffix: false,
+        cacheControlMaxAge: 0,
+        token,
+      })
+      return res.status(200).json({ ok: true, deck: sanitizeDeckForRead(deck) })
+    } catch (err) {
+      return res.status(500).json({ error: err?.message || 'rename failed' })
+    }
+  }
+
   // ---- DELETE ----
   if (req.method === 'DELETE') {
     const id = req.query?.id
@@ -261,6 +300,6 @@ export default async function handler(req, res) {
     }
   }
 
-  res.setHeader('Allow', 'GET, POST, DELETE')
+  res.setHeader('Allow', 'GET, POST, PATCH, DELETE')
   return res.status(405).json({ error: 'method not allowed' })
 }

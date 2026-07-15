@@ -427,6 +427,8 @@
   z-index: 10;
 }
 .pres-stage:hover .pres-slide-tools { opacity: 1; }
+/* touch / keyboard: tapping into a text box (no hover) also reveals the tools */
+.pres-stage:focus-within .pres-slide-tools { opacity: 1; }
 .pres-slide-tools button, .pres-slide-drag {
   font-family: var(--font-mono);
   font-size: 13px;
