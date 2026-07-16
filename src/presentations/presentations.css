@@ -314,6 +314,14 @@
 .pres-b li > p,
 .pres-rt-b .rt-content .ProseMirror li > p { margin: 0; }
 
+/* Adjacent same-type lists are an artefact of the old delete behaviour (a
+   middle-bullet delete used to split the list in two). New edits auto-join
+   them; this smooths decks saved before that fix so they present as one. */
+.pres-b ul + ul,
+.pres-b ol + ol,
+.pres-rt-b .rt-content .ProseMirror ul + ul,
+.pres-rt-b .rt-content .ProseMirror ol + ol { margin-top: 0; }
+
 /* editable fields share the rendered look exactly */
 .pres-h-input, .pres-b-input {
   background: transparent;

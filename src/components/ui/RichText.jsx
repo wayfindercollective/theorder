@@ -30,6 +30,8 @@ import HardBreak from '@tiptap/extension-hard-break'
 import Link from '@tiptap/extension-link'
 import { TextStyle, FontSize } from '@tiptap/extension-text-style'
 import { BulletList, OrderedList, ListItem, ListKeymap } from '@tiptap/extension-list'
+import { Plugin } from '@tiptap/pm/state'
+import { canJoin } from '@tiptap/pm/transform'
 import { FONT_SIZE_STEPS, isRichEmpty, richText } from '../../lib/richtext.js'
 
 // Numeric font-size mark → <span data-fs="N">. The number's rendered size comes
@@ -50,6 +52,81 @@ const FsNum = Mark.create({
   },
   renderHTML({ HTMLAttributes }) {
     return ['span', HTMLAttributes, 0]
+  },
+})
+
+// ── List behaviour fixes (slide bodies, withLists only) ─────────────────────
+//
+// 1. Typing "- " / "1. " no longer auto-converts into a list. The conversion
+//    fired in plain paragraphs but not inside list items, so typed hyphens
+//    survived in some lines and became • bullets in others — the "irregular
+//    hyphens". Hyphens now always stay exactly as typed; bullets come from
+//    the toolbar buttons.
+const BulletListManual = BulletList.extend({ addInputRules: () => [] })
+const OrderedListManual = OrderedList.extend({ addInputRules: () => [] })
+
+const isListNode = (n) => !!n && (n.type.name === 'bulletList' || n.type.name === 'orderedList')
+
+// 2. Deleting the FIRST bullet lifts it into an empty paragraph ABOVE the
+//    list. At the top of the box, Backspace in that paragraph then did
+//    nothing at all, forever — the line could never be removed ("stuck in a
+//    loop"). Backspace/Delete in an empty top-level paragraph that touches a
+//    list now removes the paragraph (the caret lands in the list).
+// 3. Deleting a middle bullet splits one list into two adjacent lists —
+//    identical-looking in the editor, but with doubled margins and restarted
+//    numbering when presented. Adjacent same-type lists auto-join.
+const ListFixes = Extension.create({
+  name: 'rtListFixes',
+  priority: 110, // ahead of ListKeymap (100) so these keys are seen first
+
+  addKeyboardShortcuts() {
+    const removeEmptyParaTouchingList = (editor, { needListOrEdgeAbove }) => {
+      const { state } = editor
+      const { $from, empty } = state.selection
+      if (!empty || $from.depth !== 1) return false
+      const para = $from.parent
+      if (para.type.name !== 'paragraph' || para.childCount !== 0) return false
+      const index = $from.index(0)
+      const after = index + 1 < state.doc.childCount ? state.doc.child(index + 1) : null
+      const before = index > 0 ? state.doc.child(index - 1) : null
+      if (!isListNode(after)) return false
+      if (needListOrEdgeAbove && before && !isListNode(before)) return false
+      const pos = $from.before(1)
+      return editor.chain().deleteRange({ from: pos, to: pos + para.nodeSize }).run()
+    }
+    return {
+      // Backspace steps in only where the default did nothing (top of the
+      // box) or sits between two lists; under a paragraph it joins normally.
+      Backspace: ({ editor }) => removeEmptyParaTouchingList(editor, { needListOrEdgeAbove: true }),
+      // Forward-delete from the empty line would unwrap the first bullet
+      // into it; removing the line is what the key means here.
+      Delete: ({ editor }) => removeEmptyParaTouchingList(editor, { needListOrEdgeAbove: false }),
+    }
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        appendTransaction: (transactions, _oldState, state) => {
+          if (!transactions.some((t) => t.docChanged)) return null
+          const { doc } = state
+          const boundaries = []
+          let pos = 0
+          for (let i = 0; i < doc.childCount - 1; i++) {
+            const child = doc.child(i)
+            pos += child.nodeSize
+            if (isListNode(child) && doc.child(i + 1).type === child.type) boundaries.push(pos)
+          }
+          if (!boundaries.length) return null
+          // End-to-start so earlier boundary positions stay valid after joins.
+          const tr = state.tr
+          for (let i = boundaries.length - 1; i >= 0; i--) {
+            if (canJoin(tr.doc, boundaries[i])) tr.join(boundaries[i])
+          }
+          return tr.steps.length ? tr : null
+        },
+      }),
+    ]
   },
 })
 
@@ -207,8 +284,10 @@ export function RichText({
       DocNode, Paragraph, Text, Bold, Italic, Underline, History, HardBreak,
       TextStyle, FontSize, // legacy em spans (first release) still parse
       FsNum,
-      // Lists (opt-in). ListKeymap makes Backspace/Delete at item edges behave.
-      ...(withLists ? [BulletList, OrderedList, ListItem, ListKeymap] : []),
+      // Lists (opt-in). ListKeymap makes Backspace/Delete at item edges behave;
+      // ListFixes patches its gaps (stuck empty line, split lists) and the
+      // manual variants drop the surprise "- " auto-conversion.
+      ...(withLists ? [BulletListManual, OrderedListManual, ListItem, ListKeymap, ListFixes] : []),
       ...(withLink ? [Link.configure({ openOnClick: false, autolink: false })] : []),
       enterBehavior,
     ],
