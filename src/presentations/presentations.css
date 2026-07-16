@@ -322,6 +322,26 @@
 .pres-rt-b .rt-content .ProseMirror ul + ul,
 .pres-rt-b .rt-content .ProseMirror ol + ol { margin-top: 0; }
 
+/* Centred / right-aligned bodies (.pres-align-* set from the box's body
+   alignment): bullets and numbers travel WITH the text — like PowerPoint —
+   instead of staying pinned to the box's left edge. The item's paragraph
+   goes inline because a block <p> would push an inside-marker onto its own
+   line. Left-aligned bodies keep the classic outside marker + hanging indent. */
+.pres-b.pres-align-center ul, .pres-b.pres-align-right ul,
+.pres-b.pres-align-center ol, .pres-b.pres-align-right ol,
+.pres-rt-b.pres-align-center .rt-content .ProseMirror ul,
+.pres-rt-b.pres-align-right .rt-content .ProseMirror ul,
+.pres-rt-b.pres-align-center .rt-content .ProseMirror ol,
+.pres-rt-b.pres-align-right .rt-content .ProseMirror ol {
+  list-style-position: inside;
+  padding-left: 0;
+}
+.pres-b.pres-align-center li > p, .pres-b.pres-align-right li > p,
+.pres-rt-b.pres-align-center .rt-content .ProseMirror li > p,
+.pres-rt-b.pres-align-right .rt-content .ProseMirror li > p {
+  display: inline;
+}
+
 /* editable fields share the rendered look exactly */
 .pres-h-input, .pres-b-input {
   background: transparent;

@@ -243,6 +243,9 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
   const style = { left: `${b.xPct}%`, top: `${b.yPct}%`, width: `${b.wPct}%`, minHeight: `${b.hPct}%` }
   const headStyle = { fontSize: cqw(b.headingPx), textAlign: headingAlign }
   const bodyStyle = { fontSize: cqw(b.bodyPx), textAlign: bodyAlign }
+  // Lets CSS move list markers WITH centred/right text instead of pinning
+  // them to the box's left edge (presentations.css .pres-align-* rules).
+  const bodyAlignClass = ` pres-align-${bodyAlign}`
 
   return (
     <>
@@ -289,7 +292,7 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
           <>
             {!isRichEmpty(slide.heading) && <h2 className="pres-h display" style={headStyle} dangerouslySetInnerHTML={renderPresent(slide.heading)} />}
             {/* div, not p: the body can now hold block content (paragraphs, lists) */}
-            {!isRichEmpty(slide.body) && <div className="pres-b" style={bodyStyle} dangerouslySetInnerHTML={renderPresent(slide.body)} />}
+            {!isRichEmpty(slide.body) && <div className={'pres-b' + bodyAlignClass} style={bodyStyle} dangerouslySetInnerHTML={renderPresent(slide.body)} />}
           </>
         ) : (
           <>
@@ -310,7 +313,7 @@ export function TextBox({ slide, present, onChange, onBoxChange, onDelete }) {
               value={slide.body}
               baseStyle={bodyStyle}
               placeholder="Body…"
-              className="pres-rt pres-rt-b"
+              className={'pres-rt pres-rt-b' + bodyAlignClass}
               onChange={(v) => onChange({ body: v })}
               externalToolbar
               onEditorReady={setBodyEd}
