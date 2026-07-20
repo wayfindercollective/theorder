@@ -361,6 +361,11 @@ export function EmailSignatureTab() {
         )}
 
         <p className="admin-field-hint">
+          <b>Don’t paste into iCloud.com web mail</b> — its signature box is plain-text only and
+          strips the logo no matter what. Paste into the <b>Mail app</b> on Mac/iPhone or
+          <b> Gmail on the web</b> instead; both keep the formatting.
+        </p>
+        <p className="admin-field-hint">
           Every design’s images load from the live site, so they always display for the people you
           email. Heads-up on Version 3: some versions of Outlook strip its black background —
           Version 4 was built to be immune to that.
