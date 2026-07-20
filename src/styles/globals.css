@@ -2685,6 +2685,9 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   flex-wrap: wrap;
 }
 
+.sig-version-desc { margin: -0.5rem 0 0.9rem; }
+.sig-version-copy { margin-top: 0.9rem; }
+
 .sig-status {
   font-size: 0.85rem;
   letter-spacing: 0.04em;

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Order — Every Email Signature Version</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #0a0908;
+    color: #e8e0d0;
+    font-family: 'EB Garamond', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px 80px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 {
+    font-family: Georgia, serif;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 18px;
+    color: #c4a45f;
+    margin: 0 0 4px;
+  }
+  .sub { color: #7a7468; font-size: 14px; margin: 0 0 32px; line-height: 1.6; }
+  .card {
+    background: #171513;
+    border: 1px solid #2a2420;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .card h2 {
+    font-family: Georgia, serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #a6884a;
+    margin: 0 0 6px;
+  }
+  .card .desc { font-size: 13px; color: #7a7468; margin: 0 0 16px; line-height: 1.6; }
+  label { display: block; font-size: 12px; color: #c2b9a6; margin: 0 0 6px; letter-spacing: 0.04em; }
+  .field { margin-bottom: 16px; }
+  input[type="text"] {
+    width: 100%;
+    background: #0e0c0a;
+    border: 1px solid #3a342e;
+    border-radius: 6px;
+    color: #e8e0d0;
+    font-family: Georgia, serif;
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+  input[type="text"]:focus { outline: none; border-color: #a6884a; }
+
+  /* The white "email" preview frame */
+  .email-frame {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 28px 26px;
+    color: #1a1a1a;
+    overflow-x: auto;
+  }
+
+  .btnrow { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+  button.copybtn {
+    background: linear-gradient(180deg, #c4a45f 0%, #a6884a 60%, #7d6635 100%);
+    color: #1a120a;
+    border: none;
+    border-radius: 6px;
+    font-family: Georgia, serif;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+    font-size: 14px;
+    padding: 11px 22px;
+    cursor: pointer;
+  }
+  button.copybtn:active { transform: translateY(1px); }
+  .status { font-size: 13px; color: #8fae74; min-height: 18px; }
+  .note { font-size: 13px; color: #7a7468; line-height: 1.6; margin-top: 28px; }
+  .note b { color: #e8e0d0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>The Order — Every Signature Version</h1>
+  <p class="sub">
+    All four signature designs we've made, oldest first. Type your name and role once — every
+    preview updates. Find the one you want, click its <b>Copy</b> button, then paste it into your
+    email settings (instructions at the bottom).
+  </p>
+
+  <!-- Shared details -->
+  <div class="card">
+    <h2>Your details</h2>
+    <div class="field">
+      <label for="name">Name</label>
+      <input type="text" id="name" value="Nico Seedsman" />
+    </div>
+    <div class="field">
+      <label for="role">Role</label>
+      <input type="text" id="role" value="CEO and Founder" />
+    </div>
+    <div class="field">
+      <label for="signoff">Sign-off (optional — appears above the signature)</label>
+      <input type="text" id="signoff" value="God Wills It," />
+    </div>
+  </div>
+
+  <!-- V1 -->
+  <div class="card">
+    <h2>Version 1 · Crest — the original</h2>
+    <p class="desc">Tall crest on the left, gold “THE ORDER” wordmark in the text block. This is the one Nico uses.</p>
+    <div class="email-frame"><div class="sig" id="sig-v1"></div></div>
+    <div class="btnrow">
+      <button class="copybtn" type="button" data-target="sig-v1">Copy Version 1</button>
+      <span class="status" id="status-sig-v1"></span>
+    </div>
+  </div>
+
+  <!-- V2 -->
+  <div class="card">
+    <h2>Version 2 · Horizontal lockup</h2>
+    <p class="desc">Wide crest-and-wordmark lockup with a divider line, dark text.</p>
+    <div class="email-frame"><div class="sig" id="sig-v2"></div></div>
+    <div class="btnrow">
+      <button class="copybtn" type="button" data-target="sig-v2">Copy Version 2</button>
+      <span class="status" id="status-sig-v2"></span>
+    </div>
+  </div>
+
+  <!-- V3 -->
+  <div class="card">
+    <h2>Version 3 · Dark plate</h2>
+    <p class="desc">The full black plate with cream text — the most dramatic one. Note: some
+    mail apps (mainly Outlook) can strip the black background, which is why Version 4 exists.</p>
+    <div class="email-frame"><div class="sig" id="sig-v3"></div></div>
+    <div class="btnrow">
+      <button class="copybtn" type="button" data-target="sig-v3">Copy Version 3</button>
+      <span class="status" id="status-sig-v3"></span>
+    </div>
+  </div>
+
+  <!-- V4 -->
+  <div class="card">
+    <h2>Version 4 · Badge (current)</h2>
+    <p class="desc">Self-contained dark badge plus dark text — safest across every mail app.</p>
+    <div class="email-frame"><div class="sig" id="sig-v4"></div></div>
+    <div class="btnrow">
+      <button class="copybtn" type="button" data-target="sig-v4">Copy Version 4</button>
+      <span class="status" id="status-sig-v4"></span>
+    </div>
+  </div>
+
+  <p class="note">
+    <b>To install on your phone (Apple Mail):</b> copy the version you want (or have it emailed to
+    you and copy it from that email), then go to <b>Settings → Apps → Mail → Signature</b>, choose
+    <b>Per Account</b>, tap the theorder.global box, and paste. If it pastes as plain text,
+    <b>shake the phone and tap “Undo Change Attributes”</b> — that restores the logo and formatting.<br /><br />
+    <b>Gmail:</b> set it once in Gmail on the web (Settings → See all settings → General →
+    Signature → paste → Save). The Gmail iPhone app then uses it automatically, as long as no
+    “Mobile signature” is set in the app.<br /><br />
+    All images load from the live theorder.global site, so every version displays correctly for
+    the people you email.
+  </p>
+
+</div>
+
+<script>
+  var ORIGIN = "https://www.theorder.global";
+  var SERIF = "Georgia,'Times New Roman',serif";
+
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  // V1 — vertical crest + gold THE ORDER wordmark (commit ffbe02e)
+  function buildV1(name, role){
+    return ''
+    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + SERIF + ';">'
+    +   '<tr>'
+    +     '<td style="vertical-align:middle;padding:0 18px 0 0;border-right:1px solid #d9cfb8;">'
+    +       '<img src="' + ORIGIN + '/images/logo-mark.png" alt="The Order" width="52" height="107" style="display:block;width:52px;height:107px;border:0;outline:none;" />'
+    +     '</td>'
+    +     '<td style="vertical-align:middle;padding:0 0 0 18px;">'
+    +       '<div style="font-family:' + SERIF + ';font-size:17px;font-weight:bold;color:#1a1a1a;line-height:1.2;">' + name + '</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:13px;color:#6b6b6b;letter-spacing:0.03em;padding-top:2px;">' + role + '</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:13px;font-weight:bold;letter-spacing:0.22em;text-transform:uppercase;color:#7d6635;padding-top:12px;">THE&nbsp;ORDER</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:12px;padding-top:3px;"><a href="' + ORIGIN + '" style="color:#8a8a8a;text-decoration:none;">theorder.global</a></div>'
+    +     '</td>'
+    +   '</tr>'
+    + '</table>';
+  }
+
+  // V2 — horizontal lockup, light background (commit 7088a03)
+  function buildV2(name, role){
+    return ''
+    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + SERIF + ';">'
+    +   '<tr>'
+    +     '<td style="vertical-align:middle;padding:0 20px 0 0;border-right:1px solid #d9cfb8;">'
+    +       '<img src="' + ORIGIN + '/images/signature-lockup.png" alt="The Order" width="226" height="55" style="display:block;width:226px;height:55px;border:0;outline:none;" />'
+    +     '</td>'
+    +     '<td style="vertical-align:middle;padding:0 0 0 20px;">'
+    +       '<div style="font-family:' + SERIF + ';font-size:18px;font-weight:bold;color:#1a1a1a;line-height:1.2;">' + name + '</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:13px;color:#6b6b6b;letter-spacing:0.03em;padding-top:3px;">' + role + '</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:12px;padding-top:8px;"><a href="' + ORIGIN + '" style="color:#7d6635;text-decoration:none;">theorder.global</a></div>'
+    +     '</td>'
+    +   '</tr>'
+    + '</table>';
+  }
+
+  // V3 — dark plate with cream text (commit fe7f182)
+  function buildV3(name, role){
+    return ''
+    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
+    +   '<tr>'
+    +     '<td bgcolor="#0a0908" style="background-color:#0a0908;padding:18px 24px;border-radius:8px;">'
+    +       '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + SERIF + ';">'
+    +         '<tr>'
+    +           '<td style="vertical-align:middle;padding:0 22px 0 0;">'
+    +             '<img src="' + ORIGIN + '/images/signature-lockup-dark.png" alt="The Order" width="226" height="55" style="display:block;width:226px;height:55px;border:0;outline:none;-ms-interpolation-mode:bicubic;" />'
+    +           '</td>'
+    +           '<td style="width:1px;background-color:#4a3f2e;font-size:1px;line-height:1px;">&nbsp;</td>'
+    +           '<td style="vertical-align:middle;padding:0 0 0 22px;">'
+    +             '<div style="font-family:' + SERIF + ';font-size:18px;font-weight:bold;color:#f2ead8;line-height:1.2;">' + name + '</div>'
+    +             '<div style="font-family:' + SERIF + ';font-size:13px;color:#c2b9a6;letter-spacing:0.03em;padding-top:3px;">' + role + '</div>'
+    +             '<div style="font-family:' + SERIF + ';font-size:12px;padding-top:8px;"><a href="' + ORIGIN + '" style="color:#c4a45f;text-decoration:none;">theorder.global</a></div>'
+    +           '</td>'
+    +         '</tr>'
+    +       '</table>'
+    +     '</td>'
+    +   '</tr>'
+    + '</table>';
+  }
+
+  // V4 — self-contained dark badge + dark text (current, commit cc7acd9)
+  function buildV4(name, role){
+    return ''
+    + '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:' + SERIF + ';">'
+    +   '<tr>'
+    +     '<td style="vertical-align:middle;padding:0 22px 0 0;">'
+    +       '<img src="' + ORIGIN + '/images/signature-badge.png" alt="The Order" width="262" height="83" style="display:block;width:262px;height:83px;border:0;outline:none;-ms-interpolation-mode:bicubic;" />'
+    +     '</td>'
+    +     '<td style="vertical-align:middle;">'
+    +       '<div style="font-family:' + SERIF + ';font-size:18px;font-weight:bold;color:#1a1a1a;line-height:1.2;">' + name + '</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:13px;color:#4a4a4a;letter-spacing:0.03em;padding-top:3px;">' + role + '</div>'
+    +       '<div style="font-family:' + SERIF + ';font-size:12px;padding-top:8px;"><a href="' + ORIGIN + '" style="color:#7d6635;text-decoration:none;">theorder.global</a></div>'
+    +     '</td>'
+    +   '</tr>'
+    + '</table>';
+  }
+
+  // "God Wills It, / Nico" above the block — part of the signature so one
+  // paste reproduces the whole thing. First name comes from the Name field.
+  function buildSignoff(signoff, name){
+    if (!signoff) return '';
+    var firstName = esc(String(name).trim().split(/\s+/)[0] || '');
+    return '<div style="font-family:' + SERIF + ';font-size:14px;color:#1a1a1a;line-height:1.5;margin:0 0 18px;">' + signoff + '<br />' + firstName + '</div>';
+  }
+
+  var builders = { 'sig-v1': buildV1, 'sig-v2': buildV2, 'sig-v3': buildV3, 'sig-v4': buildV4 };
+  var nameEl = document.getElementById('name');
+  var roleEl = document.getElementById('role');
+  var signoffEl = document.getElementById('signoff');
+
+  function renderAll(){
+    var name = esc(nameEl.value || '');
+    var role = esc(roleEl.value || '');
+    var signoff = esc(signoffEl.value.trim());
+    Object.keys(builders).forEach(function(id){
+      document.getElementById(id).innerHTML = buildSignoff(signoff, nameEl.value) + builders[id](name, role);
+    });
+  }
+  nameEl.addEventListener('input', renderAll);
+  roleEl.addEventListener('input', renderAll);
+  signoffEl.addEventListener('input', renderAll);
+  renderAll();
+
+  // Copy a rendered signature as rich HTML.
+  function copySig(id){
+    var sigEl = document.getElementById(id);
+    var status = document.getElementById('status-' + id);
+    var done = function(ok){ status.textContent = ok ? "✓ Copied — now paste into your mail settings." : "Couldn't auto-copy. Select the preview manually and press Cmd+C / Ctrl+C."; };
+
+    // Preferred: select the node and copy (keeps rich HTML for mail apps).
+    try {
+      var range = document.createRange();
+      range.selectNode(sigEl);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      var ok = document.execCommand('copy');
+      sel.removeAllRanges();
+      if (ok) { done(true); return; }
+    } catch (e) {}
+
+    // Fallback: modern clipboard API with explicit HTML.
+    if (navigator.clipboard && window.ClipboardItem) {
+      var item = new ClipboardItem({
+        "text/html": new Blob([sigEl.innerHTML], {type:"text/html"}),
+        "text/plain": new Blob([sigEl.innerText], {type:"text/plain"})
+      });
+      navigator.clipboard.write([item]).then(function(){ done(true); }, function(){ done(false); });
+    } else {
+      done(false);
+    }
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.copybtn'), function(btn){
+    btn.addEventListener('click', function(){ copySig(btn.getAttribute('data-target')); });
+  });
+</script>
+</body>
+</html>
