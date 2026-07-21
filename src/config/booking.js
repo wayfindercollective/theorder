@@ -11,4 +11,4 @@
  */
 export const BOOKING_URL =
   import.meta.env.VITE_WAYFINDER_BOOKING_URL ||
-  'https://wayfindercollective.io/book/nico-seedsman'
+  'https://wayfindercollective.io/book/nico-seedsman-the-order'
