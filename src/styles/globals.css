@@ -2281,6 +2281,10 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   letter-spacing: 0.05em;
   line-height: 1.2;
 }
+/* Bolded phrase opening a paragraph ("AND YOU START HERE:") — promoted to its
+   own line at pull-quote size, held snug to the paragraph it introduces. */
+.how-leadin-group { display: flex; flex-direction: column; gap: 0.55rem; }
+.how-leadin { margin: 0.2rem 0 0; }
 
 /* Closing — sigil + wordmark + verses + CTA */
 .section-closing {
