@@ -70,7 +70,7 @@ function cardName(card) {
 
 /* ── Clip picker ─────────────────────────────────────────────────────────── */
 
-function VideoPickerModal({ open, sections, onPick, onClose }) {
+function VideoPickerModal({ open, sections, savedSections, onPick, onClose }) {
   const [uploads, setUploads] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -97,12 +97,14 @@ function VideoPickerModal({ open, sections, onPick, onClose }) {
 
   const known = videoLibraryFrom(sections)
   const fresh = freshVideoUploads(uploads, known)
-  // A clip still referenced anywhere in the draft must not be deletable — the
-  // same fail-closed rule the image library uses.
+  // A clip referenced by the draft OR the saved live content must not be
+  // deletable — removed-in-draft is still live until Save, and deleting it
+  // would break the live site. Same fail-closed rule the image library uses.
   const draftJson = JSON.stringify(sections || {})
+  const savedJson = JSON.stringify(savedSections || {})
 
   const removeUpload = async (video) => {
-    if (draftJson.includes(video.url)) {
+    if (draftJson.includes(video.url) || savedJson.includes(video.url)) {
       window.alert('This clip can’t be deleted — a testimonial still uses it. Remove that testimonial first.')
       return
     }
@@ -183,7 +185,7 @@ function VideoPickerModal({ open, sections, onPick, onClose }) {
 
 /* ── One testimonial ─────────────────────────────────────────────────────── */
 
-function TestimonialCard({ card, index, total, sections, onPatch, onMove, onRemove }) {
+function TestimonialCard({ card, index, total, sections, savedSections, onPatch, onMove, onRemove }) {
   const fileRef = useRef(null)
   const posterFileRef = useRef(null)
   const [busy, setBusy] = useState('')      // '' | 'video' | 'poster'
@@ -479,6 +481,7 @@ function TestimonialCard({ card, index, total, sections, onPatch, onMove, onRemo
       <VideoPickerModal
         open={clipPickerOpen}
         sections={sections}
+        savedSections={savedSections}
         onPick={pickClip}
         onClose={() => setClipPickerOpen(false)}
       />
@@ -494,9 +497,24 @@ function TestimonialCard({ card, index, total, sections, onPatch, onMove, onRemo
 
 /* ── The tab ─────────────────────────────────────────────────────────────── */
 
-export function TestimonialsTab({ sections, onChange }) {
+export function TestimonialsTab({ sections, savedSections, onChange }) {
   const evidence = sections?.evidence || {}
   const cards = evidence.cards || []
+
+  // Stable client-side identity per card, parallel to the cards array. A clip
+  // upload finishes tens of seconds after it starts, and by then the card may
+  // have been reordered — or a card above it deleted — so the upload must land
+  // by KEY, never by the index captured when it began. The keys never touch the
+  // draft, so nothing extra is ever saved into sections.json. Also used as the
+  // React key so per-card state (progress, errors, open pickers) follows the
+  // card through a reorder instead of sticking to its old position.
+  const keysRef = useRef([])
+  const nextKeyRef = useRef(1)
+  if (keysRef.current.length !== cards.length) {
+    // Cards changed outside our handlers (first render, draft restore) —
+    // re-key by position; every handler below keeps the two in step itself.
+    keysRef.current = cards.map((_, i) => keysRef.current[i] ?? nextKeyRef.current++)
+  }
 
   const updateEvidence = useCallback((patch) => {
     onChange((cur) => ({ ...cur, evidence: { ...(cur.evidence || {}), ...patch } }))
@@ -509,17 +527,27 @@ export function TestimonialsTab({ sections, onChange }) {
     }))
   }, [onChange])
 
-  const patchCard = (i, patch) =>
+  const patchCardByKey = useCallback((key, patch) => {
+    const i = keysRef.current.indexOf(key)
+    if (i === -1) return // card deleted while its upload was in flight
     updateCards((list) => list.map((c, j) => (j === i ? { ...c, ...patch } : c)))
+  }, [updateCards])
 
-  const moveCard = (i, dir) => updateCards((list) => moveItem(list, i, i + dir))
+  const moveCard = (i, dir) => {
+    keysRef.current = moveItem(keysRef.current, i, i + dir)
+    updateCards((list) => moveItem(list, i, i + dir))
+  }
 
   const removeCard = (i) => {
     if (!window.confirm(`Remove testimonial ${i + 1} — ${cardName(cards[i] || {})}?\n\nThe clip itself stays in storage; only this card goes.`)) return
+    keysRef.current = keysRef.current.filter((_, j) => j !== i)
     updateCards((list) => list.filter((_, j) => j !== i))
   }
 
-  const addCard = (type) => updateCards((list) => [...list, { ...EMPTY_CARD, type }])
+  const addCard = (type) => {
+    keysRef.current = [...keysRef.current, nextKeyRef.current++]
+    updateCards((list) => [...list, { ...EMPTY_CARD, type }])
+  }
 
   const live = cards.filter((c) =>
     cardType(c) === 'video' ? !!c.video : !!c.quote?.trim(),
@@ -581,18 +609,25 @@ export function TestimonialsTab({ sections, onChange }) {
         </p>
       )}
 
-      {cards.map((card, i) => (
-        <TestimonialCard
-          key={i}
-          card={card}
-          index={i}
-          total={cards.length}
-          sections={sections}
-          onPatch={(patch) => patchCard(i, patch)}
-          onMove={(dir) => moveCard(i, dir)}
-          onRemove={() => removeCard(i)}
-        />
-      ))}
+      {cards.map((card, i) => {
+        // Bind the key VALUE here: an in-flight upload holds this render's
+        // onPatch, and the value keeps following the card however the list is
+        // shuffled — reading keysRef.current[i] at call time would not.
+        const cardKey = keysRef.current[i]
+        return (
+          <TestimonialCard
+            key={cardKey}
+            card={card}
+            index={i}
+            total={cards.length}
+            sections={sections}
+            savedSections={savedSections}
+            onPatch={(patch) => patchCardByKey(cardKey, patch)}
+            onMove={(dir) => moveCard(i, dir)}
+            onRemove={() => removeCard(i)}
+          />
+        )
+      })}
 
       <div className="admin-q-footer">
         <div className="tm-actions">

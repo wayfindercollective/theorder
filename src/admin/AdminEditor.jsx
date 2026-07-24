@@ -302,7 +302,7 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
             onSectionsChange={updateSections}
           />
         )}
-        {tab === 'testimonials' && <TestimonialsTab sections={draft.sections} onChange={updateSections} />}
+        {tab === 'testimonials' && <TestimonialsTab sections={draft.sections} savedSections={content.sections} onChange={updateSections} />}
         {tab === 'images'      && <ImagesTab      sections={draft.sections} onChange={updateSections} />}
         {tab === 'library'     && <LibraryTab     sections={draft.sections} savedSections={content.sections} />}
         {tab === 'logo'        && <LogoTab        sections={draft.sections} onChange={updateSections} />}

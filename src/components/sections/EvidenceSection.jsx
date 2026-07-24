@@ -131,9 +131,16 @@ function EvidenceVideo({ src, poster, title, onEngagedChange, ariaHidden }) {
  * tab so a card switched to a written quote keeps its clip (flip back and it's
  * still there); cards saved before that field existed have no `type` and fall
  * back to "video if it has one" — how this section always decided.
+ *
+ * The kind is decided FIRST, then completeness within that kind — the same
+ * order the admin uses. A video card with no clip yet must not fall through to
+ * whatever quote text it still carries: the admin promises it "will NOT appear
+ * on the site", and this is what keeps that promise.
  */
-const isVideoCard = (c) => !!c?.video && (c.type || 'video') === 'video'
-const isFilledCard = (c) => isVideoCard(c) || !!(c?.quote && c.quote.trim())
+const cardKind = (c) => c?.type || (c?.video ? 'video' : 'quote')
+const isVideoCard = (c) => cardKind(c) === 'video' && !!c?.video
+const isFilledCard = (c) =>
+  cardKind(c) === 'video' ? !!c?.video : !!(c?.quote && c.quote.trim())
 
 export function EvidenceSection() {
   const { ref, inView } = useInView()
