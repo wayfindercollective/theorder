@@ -126,6 +126,15 @@ function EvidenceVideo({ src, poster, title, onEngagedChange, ariaHidden }) {
   )
 }
 
+/**
+ * Which half of a card to render. `type` is written by the admin's Testimonials
+ * tab so a card switched to a written quote keeps its clip (flip back and it's
+ * still there); cards saved before that field existed have no `type` and fall
+ * back to "video if it has one" — how this section always decided.
+ */
+const isVideoCard = (c) => !!c?.video && (c.type || 'video') === 'video'
+const isFilledCard = (c) => isVideoCard(c) || !!(c?.quote && c.quote.trim())
+
 export function EvidenceSection() {
   const { ref, inView } = useInView()
   const railRef = useRef(null)
@@ -134,9 +143,7 @@ export function EvidenceSection() {
   // actively playing with sound; otherwise it drifts
   const hoveringRef = useRef(false)
   const engagedCountRef = useRef(0)
-  const cards = (evidenceContent.cards || []).filter(
-    (c) => c.video || (c.quote && c.quote.trim()),
-  )
+  const cards = (evidenceContent.cards || []).filter(isFilledCard)
 
   // Seamless continuous marquee: the tiles are rendered twice (see `loop` below)
   // and the rail is translated by exactly one set width, looping forever. The
@@ -207,6 +214,10 @@ export function EvidenceSection() {
   // duplicate the set so the loop wraps with no visible gap
   const loop = cards.concat(cards)
 
+  // Every testimonial removed in the CMS — show nothing rather than a heading
+  // over an empty rail.
+  if (cards.length === 0) return null
+
   return (
     <section className="section section-evidence" ref={ref}>
       <SectionPainting image={evidenceContent.image} />
@@ -232,7 +243,7 @@ export function EvidenceSection() {
           <div ref={railRef} className={'evidence-rail' + (paused ? ' is-paused' : '')}>
             {loop.map((c, i) => {
               const dup = i >= cards.length
-              return c.video ? (
+              return isVideoCard(c) ? (
                 <EvidenceVideo
                   key={i}
                   src={c.video}

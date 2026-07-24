@@ -122,6 +122,8 @@ function isAdminRoute(){ return typeof window!=='undefined' && window.location.p
 - **Same renderer both sides:** public site uses `mdInline`/`renderInlineMarkdown` (it already wraps text in `<p>`/`<span>`); admin preview uses block `renderMarkdown`. Don't introduce a second markdown lib or preview drifts from reality.
 - **Markdown is HTML-escaped before tokenizing**, and links are scheme-validated (`http(s):`/`mailto:` only). Keep it — it's the XSS guard for `dangerouslySetInnerHTML`.
 - **Local dev:** Vite dev server doesn't run the Vercel functions; use `vercel dev` to exercise `/admin` auth + save locally.
+- **Video can't go through a function.** A serverless request body caps out near 4.5 MB, and clips are 6–20 MB, so anything bigger than an image must use a Vercel Blob *client upload*: `upload()` from `@vercel/blob/client` asks a route running `handleUpload` for a short-lived token, then PUTs straight to Blob. That handshake carries no `Authorization` header of yours — put the admin JWT in `clientPayload` and verify it in `onBeforeGenerateToken`, or the route is an open upload endpoint. `onUploadCompleted` never fires on localhost (Blob can't reach your machine), so no logic may depend on it.
+- **Repeated card slots don't scale.** Anything the client will want *more* of (testimonials, offerings) needs its own tab with add/remove/reorder, not N hard-coded `SECTION_DEFS` paths — `evidence.cards` started as four fixed slots and a fifth testimonial needed a developer.
 - **Don't break the live site infra.** This CMS only commits to `content/*.json` — verify the deployment infra (registrar/DNS/mail) is untouched by any of this.
 
 ## Suggested build order

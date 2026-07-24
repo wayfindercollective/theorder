@@ -10,7 +10,8 @@
  *   hint       — small grey caption under the field
  *
  * A `{ divider: 'Label' }` entry in a fields list renders a small labelled rule
- * instead of a field — used to sub-group long blocks (the testimonial cards).
+ * instead of a field — used to sub-group long blocks. A section-level `note`
+ * renders one line of guidance under the title (e.g. pointing at another tab).
  * Each section's `nav` is its short name in the "Jump to" chip row at the top.
  */
 
@@ -124,37 +125,13 @@ const SECTION_DEFS = [
     ],
   },
   {
+    // Testimonials moved to their own tab when the four fixed card slots here
+    // stopped being enough — that tab adds, removes and reorders them, and
+    // uploads the clips. Left as a signpost so the jump row still lists it.
     key: 'evidence', nav: 'Testimonials',
     title: 'Testimonials',
-    fields: [
-      { path: ['evidence', 'eyebrow'], label: 'Numeral / eyebrow', hint: 'Small numeral above the heading.' },
-      { path: ['evidence', 'heading'], label: 'Heading', hint: 'e.g. Testimonials' },
-      { path: ['evidence', 'intro'],   label: 'Intro line', textarea: true, hint: 'Optional line under the heading. Leave blank to hide.' },
-      { divider: 'Testimonial 1' },
-      { path: ['evidence', 'cards', 0, 'video'],       label: 'Testimonial 1 — video', hint: 'Path to a video file in /public, e.g. /testimonials/Tony.mp4. When set, this card plays the video instead of a text quote.' },
-      { path: ['evidence', 'cards', 0, 'poster'],      label: 'Testimonial 1 — poster image', hint: 'Still frame shown before the clip loads, e.g. /testimonials/Tony-poster.jpg. Keep in step with the video.' },
-      { path: ['evidence', 'cards', 0, 'title'],       label: 'Testimonial 1 — video title', hint: 'Caption shown under the video. e.g. Tony — Entrepreneur, coach and real estate developer' },
-      { path: ['evidence', 'cards', 0, 'quote'],       label: 'Testimonial 1 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
-      { path: ['evidence', 'cards', 0, 'attribution'], label: 'Testimonial 1 — name (text fallback)', hint: 'Who said it. e.g. — James, Selection 2025' },
-      { divider: 'Testimonial 2' },
-      { path: ['evidence', 'cards', 1, 'video'],       label: 'Testimonial 2 — video', hint: 'Path to a video file in /public, e.g. /testimonials/testimonial-2.mp4. When set, this card plays the video instead of a text quote.' },
-      { path: ['evidence', 'cards', 1, 'poster'],      label: 'Testimonial 2 — poster image', hint: 'Still frame shown before the clip loads. Keep in step with the video.' },
-      { path: ['evidence', 'cards', 1, 'title'],       label: 'Testimonial 2 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
-      { path: ['evidence', 'cards', 1, 'quote'],       label: 'Testimonial 2 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
-      { path: ['evidence', 'cards', 1, 'attribution'], label: 'Testimonial 2 — name (text fallback)' },
-      { divider: 'Testimonial 3' },
-      { path: ['evidence', 'cards', 2, 'video'],       label: 'Testimonial 3 — video', hint: 'Path to a video file in /public, e.g. /testimonials/testimonial-3.mp4. When set, this card plays the video instead of a text quote.' },
-      { path: ['evidence', 'cards', 2, 'poster'],      label: 'Testimonial 3 — poster image', hint: 'Still frame shown before the clip loads. Keep in step with the video.' },
-      { path: ['evidence', 'cards', 2, 'title'],       label: 'Testimonial 3 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
-      { path: ['evidence', 'cards', 2, 'quote'],       label: 'Testimonial 3 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
-      { path: ['evidence', 'cards', 2, 'attribution'], label: 'Testimonial 3 — name (text fallback)' },
-      { divider: 'Testimonial 4' },
-      { path: ['evidence', 'cards', 3, 'video'],       label: 'Testimonial 4 — video', hint: 'Path to a video file in /public, e.g. /testimonials/testimonial-4.mp4. When set, this card plays the video instead of a text quote.' },
-      { path: ['evidence', 'cards', 3, 'poster'],      label: 'Testimonial 4 — poster image', hint: 'Still frame shown before the clip loads. Keep in step with the video.' },
-      { path: ['evidence', 'cards', 3, 'title'],       label: 'Testimonial 4 — video title', hint: 'Caption shown under the video. e.g. Name — role.' },
-      { path: ['evidence', 'cards', 3, 'quote'],       label: 'Testimonial 4 — quote (text fallback)', textarea: true, rows: 4, hint: 'Used only when no video is set above.' },
-      { path: ['evidence', 'cards', 3, 'attribution'], label: 'Testimonial 4 — name (text fallback)' },
-    ],
+    note: 'Testimonials have their own tab — “Testimonials”, up at the top. Everything about them is edited there: the heading and intro line, the clips and quotes, and the order they appear in.',
+    fields: [],
   },
   {
     key: 'founder', nav: 'Founder',
@@ -285,6 +262,7 @@ export function SectionsTab({ sections, onChange }) {
       {SECTION_DEFS.map((sec) => (
         <section key={sec.key} id={'admin-sec-' + sec.key} className="admin-section-block">
           <h2 className="admin-section-title display">{sec.title}</h2>
+          {sec.note && <p className="restraint admin-tab-intro">{sec.note}</p>}
           <div className="admin-fields">
             {sec.fields.map((f, fi) => {
               // Divider entries have no path — branch before any getAt().

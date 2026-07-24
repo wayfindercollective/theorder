@@ -3267,6 +3267,103 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 
 .library-grid-modal { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 
+/* ── Testimonials tab ────────────────────────────────────────────────────── */
+
+/* Clip / written-quote switch on each card */
+.tm-type { display: flex; gap: 0; }
+.tm-type-btn {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ash);
+  background: transparent;
+  border: 1px solid var(--iron);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: color 180ms var(--ease-order), border-color 180ms var(--ease-order);
+}
+.tm-type-btn + .tm-type-btn { border-left: none; }
+.tm-type-btn:hover { color: var(--parchment); }
+.tm-type-btn.is-active {
+  color: var(--brass-light);
+  border-color: var(--brass-deep);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Preview beside the fields; stacks under 900px (see the mobile block). */
+.tm-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.4rem;
+  align-items: start;
+}
+
+.tm-preview {
+  background: var(--bg-leather);
+  border: 1px solid var(--iron);
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+/* contain, not cover: clips arrive portrait AND landscape */
+.tm-preview video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+
+.tm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+.tm-actions .btn { padding: 0.55rem 0.9rem; font-size: 0.7rem; }
+
+.tm-poster-thumb {
+  width: 84px;
+  height: 56px;
+  flex: 0 0 auto;
+  background: var(--bg-leather);
+  border: 1px solid var(--iron);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.tm-poster-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.admin-image-src-input {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.tm-progress {
+  height: 3px;
+  background: var(--iron);
+  overflow: hidden;
+}
+.tm-progress span {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+  transition: width 200ms linear;
+}
+
+.tm-note { color: var(--brass-light); }
+.tm-warn { color: #c86; }
+
+/* Clip picker tiles */
+.tm-pick-thumb {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: #000;
+  display: block;
+  overflow: hidden;
+}
+.tm-pick-thumb video { width: 100%; height: 100%; object-fit: cover; }
+.tm-pick-upload { display: flex; flex-direction: column; gap: 0.35rem; }
+.tm-pick-upload .library-meta-line { padding: 0 0.2rem; align-items: center; }
+
 /* Mobile */
 
 @media (max-width: 720px) {
@@ -3317,6 +3414,8 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   .admin-restore-actions { justify-content: center; }
   .library-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.8rem; }
   .library-modal { padding: 1rem; }
+  .tm-body { grid-template-columns: 1fr; }
+  .tm-preview { aspect-ratio: 4 / 3; }
   .md-toolbar { flex-wrap: wrap; }
   .admin-save-btn { padding: 0.6rem 1rem; }
   .admin-logout   { padding: 0.6rem 0.9rem; }

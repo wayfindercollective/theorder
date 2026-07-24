@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SectionsTab } from './tabs/SectionsTab.jsx'
 import { ApplicationTab } from './tabs/ApplicationTab.jsx'
+import { TestimonialsTab } from './tabs/TestimonialsTab.jsx'
 import { ImagesTab } from './tabs/ImagesTab.jsx'
 import { LogoTab } from './tabs/LogoTab.jsx'
 import { LibraryTab } from './tabs/LibraryTab.jsx'
@@ -10,6 +11,7 @@ import { getDeployStatus, humanizeError } from './adminApi.js'
 const TABS = [
   { id: 'sections',    label: 'Sections' },
   { id: 'application', label: 'Application' },
+  { id: 'testimonials', label: 'Testimonials' },
   { id: 'images',      label: 'Images' },
   { id: 'library',     label: 'Library' },
   { id: 'logo',        label: 'Logo' },
@@ -300,6 +302,7 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
             onSectionsChange={updateSections}
           />
         )}
+        {tab === 'testimonials' && <TestimonialsTab sections={draft.sections} onChange={updateSections} />}
         {tab === 'images'      && <ImagesTab      sections={draft.sections} onChange={updateSections} />}
         {tab === 'library'     && <LibraryTab     sections={draft.sections} savedSections={content.sections} />}
         {tab === 'logo'        && <LogoTab        sections={draft.sections} onChange={updateSections} />}

@@ -3,6 +3,7 @@
  * Token is stored in localStorage. All protected calls include the Bearer header.
  */
 
+import { upload } from '@vercel/blob/client'
 import { optimizeImage } from './imageOptimize.js'
 
 const TOKEN_KEY = 'order_admin_token'
@@ -69,6 +70,15 @@ export function humanizeError(err) {
   if (/file too large/i.test(msg)) {
     return 'That image is too large. Try one under 8 MB.'
   }
+  if (/content type|allowedContentTypes/i.test(msg)) {
+    return 'That file type isn’t accepted. Use an MP4 (or MOV / WebM) video.'
+  }
+  if (/maximum.*size|maximumSizeInBytes/i.test(msg)) {
+    return 'That video is too large to upload. Have it compressed first.'
+  }
+  if (/retrieve the client token/i.test(msg)) {
+    return 'Video upload could not start. Sign out and back in, then try again.'
+  }
   if (/^HTTP 5\d\d/.test(msg)) {
     return 'The server hiccuped. Try once more — if it keeps failing, tell Nathan.'
   }
@@ -130,6 +140,48 @@ export async function uploadImage(file) {
     throw err
   }
   return data
+}
+
+/**
+ * Upload a testimonial clip STRAIGHT to Vercel Blob from the browser.
+ *
+ * Videos are 6–20 MB, well past the ~4.5 MB a serverless request body can
+ * carry, so they can't go through /api/admin/upload like images do. The SDK
+ * asks /api/admin/upload-video for a short-lived client token (our JWT rides
+ * in clientPayload — the handshake has no Authorization header of ours) and
+ * then PUTs the file to Blob directly.
+ *
+ * `onProgress` receives 0–100.
+ */
+export async function uploadVideo(file, onProgress) {
+  const token = getToken()
+  if (!token) throw new Error('Your session expired. Sign in again.')
+  const safe = (file.name || 'clip.mp4')
+    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+    .replace(/^[^A-Za-z0-9]+/, '')
+    .slice(-96) || 'clip.mp4'
+  const { url, pathname } = await upload(`videos/${Date.now()}-${safe}`, file, {
+    access: 'public',
+    handleUploadUrl: '/api/admin/upload-video',
+    clientPayload: token,
+    // Parallel parts + per-part retry — worth it once a clip is big enough
+    // that a single PUT dropping means starting the whole thing again.
+    multipart: file.size > 20 * 1024 * 1024,
+    onUploadProgress: onProgress
+      ? (e) => onProgress(Math.round(e.percentage))
+      : undefined,
+  })
+  return { url, pathname }
+}
+
+export async function listVideos() {
+  return await jsonFetch('/api/admin/videos', { method: 'GET' })
+}
+
+export async function deleteVideo(url) {
+  return await jsonFetch(`/api/admin/videos?url=${encodeURIComponent(url)}`, {
+    method: 'DELETE',
+  })
 }
 
 export async function listImages() {
