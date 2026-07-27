@@ -12,8 +12,11 @@
  * applicant who picks a flagged answer finishes the form, sees the negation
  * screen (edited here too), and no lead is sent to the CRM.
  *
- * The contact step is pinned last (the form's submit lives on it) and can't
- * be removed or moved.
+ * There is no contact step any more: the form is multiple-choice only, and
+ * applicants type their name, email and phone into the booking calendar that
+ * follows the last question. A lead only exists once they book. If an old
+ * saved copy still carries a contact step it is shown here so it can be
+ * removed — the public site ignores it.
  */
 
 import { useState } from 'react'
@@ -111,7 +114,9 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
         them below, and changing them changes how leads are scored. Tick
         “Declines the application” on an answer to turn away anyone who picks it:
         they finish the form, see the negation screen below, and are NOT sent to the
-        CRM.
+        CRM. Everyone else goes straight to the booking calendar — and only a booked
+        call creates a lead, so someone who answers every question but never books
+        never reaches the CRM at all.
       </p>
 
       <section className="admin-section-block">
@@ -159,22 +164,26 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
             <h2 className="admin-section-title display">
               Q{qi + 1} — {q.id}{q.type === 'contact' ? ' (contact step)' : ''}
             </h2>
-            {q.type === 'choice' && (
-              <div className="admin-q-toolbar">
-                <button
-                  type="button" className="admin-mini-btn" title="Move up" aria-label="Move question up"
-                  onClick={() => moveQuestion(qi, -1)} disabled={qi === 0}
-                >↑</button>
-                <button
-                  type="button" className="admin-mini-btn" title="Move down" aria-label="Move question down"
-                  onClick={() => moveQuestion(qi, 1)} disabled={qi >= lastChoiceIndex}
-                >↓</button>
-                <button
-                  type="button" className="admin-mini-btn admin-mini-danger" title="Remove question" aria-label="Remove question"
-                  onClick={() => removeQuestion(qi)}
-                >✕</button>
-              </div>
-            )}
+            {/* A leftover contact step can be removed but not reordered —
+                nothing renders it, so its position is meaningless. */}
+            <div className="admin-q-toolbar">
+              {q.type === 'choice' && (
+                <>
+                  <button
+                    type="button" className="admin-mini-btn" title="Move up" aria-label="Move question up"
+                    onClick={() => moveQuestion(qi, -1)} disabled={qi === 0}
+                  >↑</button>
+                  <button
+                    type="button" className="admin-mini-btn" title="Move down" aria-label="Move question down"
+                    onClick={() => moveQuestion(qi, 1)} disabled={qi >= lastChoiceIndex}
+                  >↓</button>
+                </>
+              )}
+              <button
+                type="button" className="admin-mini-btn admin-mini-danger" title="Remove question" aria-label="Remove question"
+                onClick={() => removeQuestion(qi)}
+              >✕</button>
+            </div>
           </div>
 
           <div className="admin-fields">
@@ -291,9 +300,10 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
           )}
 
           {q.type === 'contact' && (
-            <p className="restraint admin-tab-intro">
-              (Contact step — name, email, phone, SMS consent. Field labels and messages
-              are edited under Sections → “Application form — field labels &amp; messages”.)
+            <p className="restraint admin-tab-intro" style={{ color: '#c86' }}>
+              ⚠ Left over from the old form. The application no longer asks for name,
+              email or phone — applicants enter those in the booking calendar. This step
+              is not shown to anyone; remove it with the ✕ above.
             </p>
           )}
         </section>

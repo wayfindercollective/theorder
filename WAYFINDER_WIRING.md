@@ -1,5 +1,13 @@
 # Wayfinder OS Wiring — The Order
 
+> **Partly superseded by [BOOKING_GATED_LEADS.md](BOOKING_GATED_LEADS.md).**
+> The payload contract below is still current (dual-shape answers, phone as a
+> string, attribution, the local retry queue). What changed: the funnel is
+> booking-gated, so there is no contact step, the lead is created only when a
+> call is booked, and the POST goes through our own `/api/funnel-lead` instead
+> of straight from the browser with a `VITE_` key. Read that doc first — in
+> particular, the "No booking page" decision below is dead.
+
 Reconciles two source docs against the current build:
 - **Doc 1 ("from the OS")** — the canonical Wayfinder OS funnel-mailbox spec (cites live source: `convex/http.ts`, `convex/crm/funnelLeads.ts`). Scored answers via a `responses` object; consent via `smsConsentMarketing` / `smsConsentOperational`.
 - **Doc 2 ("the other funnel")** — the battle-tested Jeff handoff. Flat top-level scored fields; single `smsConsent`. The current Order build was derived from this.

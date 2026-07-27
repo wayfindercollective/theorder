@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { questions } from '../../config/questions.js'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { questions as allQuestions } from '../../config/questions.js'
 import { applicationCopy } from '../../config/sectionContent.js'
-import { countryCodes } from '../../config/countryCodes.js'
 import { QuestionSlide } from '../ui/QuestionSlide.jsx'
 import { FinalScreen } from '../ui/FinalScreen.jsx'
 import { DeclineScreen } from '../ui/DeclineScreen.jsx'
 import { submitLead } from '../../lib/submitLead.js'
 import { newPendingId } from '../../lib/pendingLeads.js'
-import { normalizePhone } from '../../lib/phone.js'
 import { getAttribution, getLastCTA } from '../../lib/utm.js'
 import { track } from '../../lib/analytics.js'
 import { useInView } from '../../hooks/useInView.js'
@@ -16,14 +14,18 @@ import { bgImage } from '../../lib/img.js'
 const FUNNEL_SLUG = import.meta.env.VITE_FUNNEL_SLUG || 'the-order'
 const SOURCE = import.meta.env.VITE_SITE_DOMAIN || 'theorder.global'
 
-// Phone is optional (email carries the lead). A junk partial ("5") must never
-// ship as "+15": only a number with enough digits is kept, else empty string.
-// Wayfinder drops sub-7-digit numbers server-side anyway (WAYFINDER_WIRING.md).
-function normalizedPhoneOrEmpty(rawPhone, country) {
-  const digits = (rawPhone || '').replace(/\D/g, '')
-  if (digits.length < 7) return { phone: '', phoneCountry: '' }
-  return normalizePhone(rawPhone, country)
-}
+// BOOKING-GATED FUNNEL (see BOOKING_GATED_LEADS.md).
+//
+// This form asks multiple-choice questions ONLY — no name, email or phone.
+// The answers are held in React state and go nowhere until the applicant
+// books: contact details are typed on the Wayfinder booking page inside the
+// iframe, and only its `wf-booking-confirmed` message releases the lead
+// (server-side, via /api/funnel-lead). No booking → nothing reaches the CRM.
+//
+// The retired contact step is filtered out rather than trusted absent: /admin
+// saves the whole of questions.json, so a client editing from a stale tab
+// could re-introduce it. It must never render.
+const questions = allQuestions.filter((q) => q.type !== 'contact')
 
 // The business gate: true when any answered choice question's selected option
 // carries `disqualify: true` (set per-option in /admin → Application).
@@ -36,18 +38,16 @@ function isDisqualified(formData) {
   return false
 }
 
-function buildPayload(formData) {
-  const contact = formData.contact || {}
-  const fullName = (contact.fullName || '').trim()
+// `booking` is the validated `wf-booking-confirmed` payload — the ONLY source
+// of contact details in this funnel. Its name/email/phone are what the
+// applicant typed on the Wayfinder booking page, so they are already the
+// values attached to the booking; we never re-normalise them (that would risk
+// sending a number that differs from the one the CRM has).
+function buildPayload(formData, booking) {
+  const fullName = (booking.name || '').trim()
   const [firstName, ...rest] = fullName.split(/\s+/)
   const lastName = rest.join(' ')
-  // `country` is only written to formData once the user opens the picker; the
-  // input itself defaults to countryCodes[0] (US). Mirror that default here so
-  // default-country submits still get a dial code + phoneCountry.
-  const country = contact.country || countryCodes[0]
-  const { phone, phoneCountry } = normalizedPhoneOrEmpty(contact.phone, country)
-  // SMS consent is meaningless (and TCPA noise) without a number to consent for.
-  const consent = !!contact.smsConsent && !!phone
+  const phone = typeof booking.phone === 'string' ? booking.phone.trim() : ''
 
   // Scored answers — sent BOTH flat (Jeff-funnel handler) AND nested in
   // `responses` (current Wayfinder OS handler). Whichever the funnel reads
@@ -67,17 +67,28 @@ function buildPayload(formData) {
 
   return {
     pendingId: newPendingId(),
-    email: (contact.email || '').trim().toLowerCase(),
+    // Booking identity — `bookingId` is what makes the OS enrich the booking's
+    // existing deal instead of creating a second one, and it is the permanent
+    // idempotency key for retries.
+    bookingId: booking.bookingId || '',
+    bookingSlug: booking.slug || '',
+    bookingStartTime: booking.startTime || null,
+    bookingTimezone: booking.timezone || '',
+    email: (booking.email || '').trim().toLowerCase(),
     firstName: firstName || '',
     lastName: lastName || '',
     name: fullName,
     fullName,
     phone,
-    phoneCountry,
-    // Consent — all three keys to satisfy both handler versions.
-    smsConsent: consent,
-    smsConsentMarketing: consent,
-    smsConsentOperational: consent,
+    // SMS consent — deliberately conservative. This funnel no longer asks for
+    // consent (there is no contact step); the number is typed on the Wayfinder
+    // booking page, which owns its own consent copy. Claiming marketing
+    // consent we did not collect would be a TCPA misstatement, so marketing is
+    // false and only operational (appointment reminders for the call they just
+    // booked) is asserted, and only when a number exists.
+    smsConsent: false,
+    smsConsentMarketing: false,
+    smsConsentOperational: !!phone,
     // Scored answers — flat …
     ...responses,
     // … and nested.
@@ -99,9 +110,11 @@ export function ApplicationSection() {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({})
   const [faded, setFaded] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  // `finished` = the questionnaire is done. From here the applicant either
+  // sees the negation screen or the booking calendar; there is no submit.
+  const [finished, setFinished] = useState(() => questions.length === 0)
   const [declined, setDeclined] = useState(false)
+  const [booking, setBooking] = useState(null)
   const [formStarted, setFormStarted] = useState(false)
   const [questionViewedFor, setQuestionViewedFor] = useState(0)
 
@@ -109,30 +122,58 @@ export function ApplicationSection() {
   const q = questions[step - 1]
 
   useEffect(() => {
-    if (!inView) return
+    if (!inView || finished || !q) return
     if (questionViewedFor === step) return
     setQuestionViewedFor(step)
     track('question_viewed', { step, field: q.id })
-  }, [step, inView, questionViewedFor, q.id])
+  }, [step, inView, finished, questionViewedFor, q])
 
   const handleChange = useCallback((patch) => {
-    setFormData((prev) => {
-      if (q.type === 'contact') {
-        return { ...prev, contact: { ...(prev.contact || {}), ...patch } }
-      }
-      return { ...prev, ...patch }
-    })
+    setFormData((prev) => ({ ...prev, ...patch }))
     if (!formStarted) {
       setFormStarted(true)
       track('form_started', { last_cta_location: getLastCTA() })
     }
-  }, [q, formStarted])
+  }, [formStarted])
 
-  const advance = useCallback(() => {
-    if (step >= total) return
+  // Called with the answer that completes the form, because setFormData is
+  // async — reading `formData` here would miss the last choice.
+  const finish = useCallback((finalData) => {
+    // The gate. A declining answer ends the application here: no calendar, no
+    // contact details ever collected, nothing sent to the CRM.
+    if (isDisqualified(finalData)) {
+      track('application_declined', {
+        income_bracket: finalData.income || '',
+        last_cta_location: getLastCTA(),
+      })
+      setDeclined(true)
+      setFinished(true)
+      return
+    }
+    // NOT the billed conversion — that fires on booking (see handleBooked).
+    // This is the only signal we get for booking-step drop-off, which is
+    // invisible to the OS by design.
+    track('questionnaire_completed', {
+      income_bracket: finalData.income || '',
+      life_area: finalData.mainChallenge || '',
+      last_cta_location: getLastCTA(),
+    })
+    setFinished(true)
+  }, [])
+
+  const advance = useCallback((patch) => {
     setFaded(true)
-    track('question_completed', { step, field: q.id })
+    track('question_completed', { step, field: q?.id })
+    const nextData = { ...formData, ...(patch || {}) }
     setTimeout(() => {
+      if (step >= total) {
+        finish(nextData)
+        requestAnimationFrame(() => {
+          scrollToCard(formRef.current)
+          setFaded(false)
+        })
+        return
+      }
       setStep((s) => s + 1)
       requestAnimationFrame(() => {
         // scroll the question card into view, slow
@@ -140,12 +181,12 @@ export function ApplicationSection() {
         setFaded(false)
       })
     }, 220)
-  }, [step, total, q.id])
+  }, [step, total, q, formData, finish])
 
   const goBack = useCallback(() => {
     if (step <= 1) return
     setFaded(true)
-    track('question_back', { step, field: q.id })
+    track('question_back', { step, field: q?.id })
     setTimeout(() => {
       setStep((s) => s - 1)
       // clear the prior answer (Jeff handoff: users hit back to change, not verify)
@@ -163,58 +204,23 @@ export function ApplicationSection() {
         setFaded(false)
       })
     }, 220)
-  }, [step, q.id])
+  }, [step, q])
 
-  const contactValid = useMemo(() => {
-    if (q.type !== 'contact') return true
-    const c = formData.contact || {}
-    const fullName = (c.fullName || '').trim()
-    const nameOk = fullName.length >= 2
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email || '')
-    // Phone is OPTIONAL (name + email is enough to submit) — deliberately not
-    // advertised in the UI. But a half-typed number still blocks: garbage like
-    // "5" must never ride into the CRM as a contact number.
-    const digits = (c.phone || '').replace(/\D/g, '')
-    const phoneOk = digits.length === 0 || digits.length >= 7
-    // SMS consent is OPTIONAL — it does NOT gate submission. The value is still
-    // captured truthfully in the payload (smsConsent*); unticked = consent false.
-    return nameOk && emailOk && phoneOk
-  }, [q, formData])
+  // Synchronous re-entry lock. `wf-booking-confirmed` is documented as
+  // fire-once, but a duplicate would double-count a billed Meta Lead AND
+  // double-post the lead — and a state guard is async, so it would not hold.
+  const bookedLockRef = useRef(false)
 
-  // Synchronous re-entry lock. A `submitting`-state guard alone is async — a
-  // fast double-click (or Enter + click) passes it twice before the re-render
-  // lands, and form_submitted below is a billed Meta Lead.
-  const submitLockRef = useRef(false)
+  const handleBooked = useCallback(async (message) => {
+    if (bookedLockRef.current) return
+    bookedLockRef.current = true
+    setBooking(message)
 
-  const handleSubmit = useCallback(async () => {
-    if (submitLockRef.current) return
-    submitLockRef.current = true
-    // Honeypot — silently fake-success on bot fill
-    const honey = (formData.contact || {}).company
-    if (honey) {
-      setSubmitted(true)
-      return
-    }
-    if (!contactValid) {
-      // The only exit the user can retry from — release the lock.
-      submitLockRef.current = false
-      return
-    }
-    // The gate — BEFORE form_submitted (which maps to the Meta `Lead`
-    // conversion) and before any payload is built. A disqualified applicant
-    // fires application_declined instead, sees the negation screen, and no
-    // lead of any kind reaches Wayfinder.
-    if (isDisqualified(formData)) {
-      track('application_declined', {
-        income_bracket: formData.income || '',
-        last_cta_location: getLastCTA(),
-      })
-      setDeclined(true)
-      setSubmitted(true)
-      return
-    }
-    setSubmitting(true)
-    const payload = buildPayload(formData)
+    const payload = buildPayload(formData, message)
+    // The billed conversion — fired here, at the booking, because a booking is
+    // the only thing this funnel now counts as a lead. At intent (before the
+    // POST), never on POST-success: counting only successes would starve the
+    // optimizer during an outage. Delivery is the queue's job.
     track('form_submitted', {
       income_bracket: formData.income || '',
       life_area: formData.mainChallenge || '',
@@ -226,12 +232,7 @@ export function ApplicationSection() {
     } else {
       track('wayfinder_lead_failed', { queued: !!result.queued, status: result.status })
     }
-    // Always advance — lead is queued locally either way
-    setSubmitting(false)
-    setSubmitted(true)
-  }, [contactValid, formData])
-
-  const currentValue = q.type === 'contact' ? formData.contact : formData[q.id]
+  }, [formData])
 
   return (
     <section id="application" className="section section-application" ref={sectionRef}>
@@ -242,64 +243,46 @@ export function ApplicationSection() {
           aria-hidden="true"
         />
       )}
-      {/* The submitted card widens: the booking calendar needs more room
+      {/* The finished card widens: the booking calendar needs more room
           than the reading column gives the questionnaire. (Not on the decline
           screen — there is no calendar there.) */}
-      <div className={'shell-narrow application-shell' + (submitted && !declined ? ' application-shell--booking' : '')}>
-        {!submitted && (
-          <>
-            <div className="application-card card card-stitched nailed" ref={formRef}>
-              <span className="nail-tl" />
-              <span className="nail-br" />
-              <div className="eyebrow application-eyebrow">
-                <span className="brass-rule" /> {applicationCopy.eyebrow} <span className="brass-rule" />
-              </div>
-              <div className="progress-track application-progress" aria-hidden="true">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${submitting ? 100 : ((step - 1) / total) * 100}%` }}
-                />
-              </div>
-              <QuestionSlide
-                question={q}
-                step={step}
-                total={total}
-                value={currentValue}
-                onChange={handleChange}
-                onAdvance={advance}
-                onBack={goBack}
-                canAdvance={contactValid}
-                faded={faded}
-                onSubmit={handleSubmit}
-                submitting={submitting}
-              />
-              <div className="application-step restraint" aria-hidden="true">
-                {applicationCopy.stepLabel ?? 'Step'} {step} / {total}
-              </div>
+      <div className={'shell-narrow application-shell' + (finished && !declined ? ' application-shell--booking' : '')}>
+        {!finished && q && (
+          <div className="application-card card card-stitched nailed" ref={formRef}>
+            <span className="nail-tl" />
+            <span className="nail-br" />
+            <div className="eyebrow application-eyebrow">
+              <span className="brass-rule" /> {applicationCopy.eyebrow} <span className="brass-rule" />
             </div>
-          </>
+            <div className="progress-track application-progress" aria-hidden="true">
+              <div
+                className="progress-fill"
+                style={{ width: `${((step - 1) / total) * 100}%` }}
+              />
+            </div>
+            <QuestionSlide
+              question={q}
+              step={step}
+              value={formData[q.id]}
+              onChange={handleChange}
+              onAdvance={advance}
+              onBack={goBack}
+              faded={faded}
+            />
+            <div className="application-step restraint" aria-hidden="true">
+              {applicationCopy.stepLabel ?? 'Step'} {step} / {total}
+            </div>
+          </div>
         )}
 
-        {submitted && (
-          <div className="application-card card card-stitched nailed">
+        {finished && (
+          <div className="application-card card card-stitched nailed" ref={formRef}>
             <span className="nail-tl" />
             <span className="nail-br" />
             {declined ? (
               <DeclineScreen />
             ) : (
-              <FinalScreen
-                contact={{
-                  name: (formData.contact?.fullName || '').trim(),
-                  email: (formData.contact?.email || '').trim().toLowerCase(),
-                  // Same normalisation + guard as the lead payload — the
-                  // calendar gets the E.164 number or nothing, never a junk
-                  // partial.
-                  phone: normalizedPhoneOrEmpty(
-                    formData.contact?.phone,
-                    formData.contact?.country || countryCodes[0]
-                  ).phone,
-                }}
-              />
+              <FinalScreen onBooked={handleBooked} booking={booking} />
             )}
           </div>
         )}

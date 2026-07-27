@@ -80,13 +80,6 @@
           "disqualify": true
         }
       ]
-    },
-    {
-      "id": "contact",
-      "type": "contact",
-      "scored": false,
-      "question": "How do we reach you?",
-      "subtitle": ""
     }
   ]
 }

@@ -33,5 +33,8 @@ export const declineScreenContent = data.declineScreen || {
   body: 'Please return when you have made progress and are willing to go all in.',
   notice: 'Your information has not been stored.',
 }
-export const formCopy         = data.form
-export const submitConsent    = data.consent
+// `data.form` (name/email/phone labels) retired with the contact step — the
+// application is choice-only now and contact details are typed on the booking
+// page. `consent` survives: its SMS/privacy/terms lines render under the
+// calendar, which is where details are actually collected.
+export const submitConsent    = data.consent || {}

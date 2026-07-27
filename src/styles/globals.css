@@ -1550,6 +1550,26 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .booking-escape a { color: var(--brass-light); text-decoration: underline; }
 .booking-escape a:hover { color: var(--parchment); }
 
+/* Shown once the calendar reports a confirmed booking. */
+.final-booked-note {
+  margin: 0 0 1.4rem;
+  text-align: center;
+  color: var(--parchment-mute);
+}
+.final-booked-note strong { color: var(--brass-light); font-weight: 600; }
+
+/* Contact details are typed inside the frame, so the SMS/appointment
+   disclosure sits with it — small, quiet, but present at the point of
+   collection. */
+.booking-sms-note {
+  margin-top: 0.9rem;
+  text-align: center;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--parchment-mute);
+  opacity: 0.72;
+}
+
 /* ============================================================
    FOUNDER
    ============================================================ */

@@ -1,6 +1,9 @@
 /**
- * The Wayfinder OS booking calendar, embedded on the application's final
- * screen so an applicant books their call in the same breath as applying.
+ * The Wayfinder OS booking calendar, embedded after the last application
+ * question. In this funnel it is not a nicety — it is the gate: the applicant
+ * types their name, email and phone HERE, and the booking it produces is the
+ * only thing that releases a lead to the CRM (see BOOKING_GATED_LEADS.md).
+ * Nothing is prefilled, because we no longer collect contact details.
  *
  * Realities of this embed (learned on clearmind-clearlife, re-verified
  * against the Wayfinder OS source for this build):
@@ -8,15 +11,18 @@
  *  - The calendar emits NO resize postMessage and is cross-origin, so the
  *    frame cannot shrink-wrap its content. It gets a tall fixed height and
  *    the OUTER page scrolls — an inner scrollbar reads as broken.
- *  - It DOES read ?name= &email= &phone= and prefills its contact step
- *    (URL params deliberately beat stale session data — confirmed in
- *    BookingPageClient.tsx), so we pass the applicant's details through.
  *  - It autofocuses a control on load, which scroll-jacks the page past the
  *    confirmation heading. We restore the final screen into view once on
  *    load (immediately + again at 250ms; the calendar focuses late).
  *  - A CSP frame-ancestors block fails SILENTLY — the load event still
  *    fires on an empty document, so no timeout can catch it. The "open in
- *    a new tab" link below the frame is therefore always visible.
+ *    a new tab" link below the frame is therefore always visible. NOTE: a
+ *    booking made in that new tab cannot post back to this page, so it
+ *    produces a booking with no questionnaire enrichment. The allowlist
+ *    (BOOKING_FRAME_ANCESTORS on the OS) must include this site's origins.
+ *  - On a successful booking it posts `wf-booking-confirmed` to the parent,
+ *    ONCE, and does not re-emit it if the iframe reloads onto its
+ *    confirmation screen. Act on first receipt.
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKING_URL } from '../../config/booking.js'
@@ -27,23 +33,50 @@ import { track } from '../../lib/analytics.js'
 // slot on a busy day — fits without an inner scrollbar. Tune here.
 const FRAME_HEIGHT = 1120
 
-export function BookingWidget({ name, email, phone, scrollAnchorRef }) {
+// The exact origin the confirmation message must come from. Derived from the
+// booking URL so a preview override (VITE_WAYFINDER_BOOKING_URL) keeps working.
+const BOOKING_ORIGIN = (() => {
+  try {
+    return new URL(BOOKING_URL).origin
+  } catch {
+    return null
+  }
+})()
+
+export function BookingWidget({ onBooked, scrollAnchorRef }) {
   const [loaded, setLoaded] = useState(false)
   const [timedOut, setTimedOut] = useState(false)
   const resetOnce = useRef(false)
+  const frameRef = useRef(null)
+  const bookedRef = useRef(false)
+  // Kept in a ref so a re-created callback never re-subscribes the listener
+  // (and so the fire-once guard survives any re-render).
+  const onBookedRef = useRef(onBooked)
+  onBookedRef.current = onBooked
 
-  const url = useMemo(() => {
-    const params = new URLSearchParams()
-    if (name) params.set('name', name)
-    if (email) params.set('email', email)
-    if (phone) params.set('phone', phone)
-    const qs = params.toString()
-    return qs ? `${BOOKING_URL}?${qs}` : BOOKING_URL
-  }, [name, email, phone])
+  const url = BOOKING_URL
 
   useEffect(() => {
     const t = setTimeout(() => setTimedOut(true), 10000)
     return () => clearTimeout(t)
+  }, [])
+
+  // The booking confirmation. All three checks — origin, source frame, message
+  // type — before anything is trusted: this handler releases a real lead and
+  // fires a billed conversion, so any window on the page must not be able to
+  // spoof it.
+  useEffect(() => {
+    const onMessage = (event) => {
+      if (!BOOKING_ORIGIN || event.origin !== BOOKING_ORIGIN) return
+      if (!frameRef.current || event.source !== frameRef.current.contentWindow) return
+      if (event.data?.type !== 'wf-booking-confirmed') return
+      if (bookedRef.current) return
+      bookedRef.current = true
+      track('booking_confirmed', { slug: event.data.slug || '' })
+      onBookedRef.current?.(event.data)
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
   }, [])
 
   const onLoad = () => {
@@ -75,6 +108,7 @@ export function BookingWidget({ name, email, phone, scrollAnchorRef }) {
             it, so a slow load that lands late still replaces the fallback
             with the working calendar. */}
         <iframe
+          ref={frameRef}
           src={url}
           title="Book your call"
           onLoad={onLoad}
@@ -100,6 +134,35 @@ export function BookingWidget({ name, email, phone, scrollAnchorRef }) {
           </div>
         )}
       </div>
+
+      {/* The real confirmation can only come from inside a cross-origin frame,
+          so it cannot be exercised on localhost. This fires the same handler
+          with a fake payload — enough to test the relay, the CRM record and
+          the confirmed state end to end. `import.meta.env.DEV` is replaced at
+          build time, so none of this reaches production. */}
+      {import.meta.env.DEV && (
+        <button
+          type="button"
+          className="btn btn-ghost"
+          style={{ marginTop: '0.9rem' }}
+          onClick={() => {
+            if (bookedRef.current) return
+            bookedRef.current = true
+            onBookedRef.current?.({
+              type: 'wf-booking-confirmed',
+              slug: 'dev-simulated',
+              bookingId: `dev_${Date.now()}`,
+              email: 'dev.test@theorder.global',
+              name: 'Dev Test',
+              phone: '+15551234567',
+              startTime: Date.now() + 86400000,
+              timezone: 'Australia/Brisbane',
+            })
+          }}
+        >
+          Simulate booking confirmation (dev only)
+        </button>
+      )}
 
       {/* Escape hatch — must ALWAYS be visible (see CSP note above). */}
       <p className="booking-escape restraint">

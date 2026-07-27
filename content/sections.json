@@ -69,8 +69,6 @@
   "application": {
     "eyebrow": "Apply Now",
     "image": "/images/oil-naval.jpg",
-    "submitButton": "Submit",
-    "submittingButton": "Submitting…",
     "stepLabel": "Step",
     "backButton": "← Back"
   },
@@ -201,18 +199,10 @@
     "bookingSlowMessage": "The calendar is taking longer than usual to load.",
     "bookingSlowButton": "Book Your Call",
     "bookingEscapeLine": "Calendar not loading?",
-    "bookingEscapeLink": "Open it in a new tab"
-  },
-  "form": {
-    "nameLabel": "Name",
-    "namePlaceholder": "Name",
-    "emailLabel": "Email",
-    "emailPlaceholder": "example@gmail.com",
-    "phoneLabel": "Phone",
-    "phonePlaceholder": "Number",
-    "emailError": "That email does not look right.",
-    "phoneError": "That number does not look right.",
-    "countrySearchPlaceholder": "Search country or code…"
+    "bookingEscapeLink": "Open it in a new tab",
+    "bookedEyebrow": "Confirmed",
+    "bookedHeading": "Your Call Is Booked",
+    "bookedSub": "Check your email for the confirmation and calendar invite."
   },
   "consent": {
     "smsLine": "By providing your phone number, you agree to receive SMS appointment reminders, booking confirmations, and account updates from The Order. Message frequency may vary. Standard Message and Data Rates may apply. Reply STOP to opt out. Reply HELP for help. We will not share mobile information with third parties for promotional or marketing purposes.",
