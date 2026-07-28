@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "crop:saturday": "node scripts/crop-saturday.mjs",
     "migrate:images": "node scripts/migrate-images-to-blob.mjs",
+    "make:favicon": "node scripts/make-favicon.mjs",
     "make:signature-lockup": "node scripts/make-signature-lockup.mjs",
     "optimize:paintings": "node scripts/optimize-paintings.mjs",
     "optimize:videos": "node scripts/optimize-videos.mjs"
