@@ -91,7 +91,7 @@ export function FinalScreen({ onBooked, booking }) {
             {finalScreenContent.bookedSub || 'Check your email for the confirmation and calendar invite.'}
           </p>
         )}
-        <BookingWidget onBooked={onBooked} scrollAnchorRef={rootRef} />
+        <BookingWidget onBooked={onBooked} booked={!!booking} scrollAnchorRef={rootRef} />
 
         {/* Contact details are typed inside the frame, so the disclosures
             belong here — this is the point of collection. */}

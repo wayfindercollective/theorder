@@ -1570,6 +1570,8 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .gate-button {
   font-size: clamp(0.85rem, 1.8vh, 1rem);
   padding: clamp(0.75rem, 1.7vh, 1rem) clamp(1.6rem, 4vw, 2.4rem);
+  /* Never shrink below a comfortable thumb target, however short the window. */
+  min-height: 46px;
 }
 
 /* ---- Booking calendar on the final screen ---- */
@@ -1593,15 +1595,30 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 
 .booking-widget { width: 100%; }
-/* Cross-origin frame with no resize postMessage → tall FIXED height (inline
-   style) and the page scrolls; never a scrollbar inside the frame. */
+/* Cross-origin frame with no resize postMessage → a fixed height per
+   breakpoint, and the PAGE does the scrolling.
+   ⚠ These numbers are the whole mobile experience. If the frame is shorter
+   than the calendar, the calendar gets its own inner scroll area and the two
+   surfaces fight: dragging moves the calendar, not the page, and reaching the
+   dates feels glitchy. Too tall only costs some empty space, so err generous.
+   The calendar stacks vertically on a phone, so it needs roughly twice the
+   desktop height. Tune HERE — nothing else needs to change. */
 .booking-frame-wrap {
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(166, 136, 74, 0.35);
   border-radius: 6px;
   background: rgba(8, 7, 6, 0.5);
+  height: 1120px;
 }
+@media (max-width: 900px) { .booking-frame-wrap { height: 1500px; } }
+@media (max-width: 600px) { .booking-frame-wrap { height: 1900px; } }
+
+/* After booking the frame holds the short confirmation screen, not the month
+   grid — without this the mobile height leaves a screen of dead space. */
+.booking-frame-wrap--confirmed { height: 900px; }
+@media (max-width: 900px) { .booking-frame-wrap--confirmed { height: 1150px; } }
+@media (max-width: 600px) { .booking-frame-wrap--confirmed { height: 1350px; } }
 .booking-frame { display: block; width: 100%; height: 100%; border: 0; }
 
 .booking-frame-status {
@@ -1651,6 +1668,25 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   color: var(--parchment-mute);
   opacity: 0.72;
 }
+
+/* ---- Mobile: get to the calendar sooner ----
+   The ceremony (mark, wordmark, gilt line) is a full screen of scrolling on a
+   phone before the calendar even starts. Tighten it so the applicant reaches
+   the dates with one swipe instead of three. Long values (an email in the
+   confirmation line) wrap rather than run past the card edge. */
+@media (max-width: 600px) {
+  .final-screen { padding: 0.75rem 0 0.5rem; }
+  .final-logo { height: clamp(90px, 24vw, 130px); }
+  .final-heading { margin-top: 1rem; }
+  .final-sub { margin-top: 0.6rem; }
+  .final-booking { margin-top: 0.8rem; }
+  .final-booking-heading { margin: 0.5rem 0 0.8rem; }
+  .final-booked-note { margin-bottom: 1rem; }
+}
+
+.final-booked-note,
+.booking-escape,
+.booking-sms-note { overflow-wrap: anywhere; }
 
 /* ============================================================
    FOUNDER

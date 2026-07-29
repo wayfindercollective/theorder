@@ -10,7 +10,10 @@
  *
  *  - The calendar emits NO resize postMessage and is cross-origin, so the
  *    frame cannot shrink-wrap its content. It gets a tall fixed height and
- *    the OUTER page scrolls — an inner scrollbar reads as broken.
+ *    the OUTER page scrolls — an inner scrollbar reads as broken. The
+ *    heights live in globals.css (`.booking-frame-wrap`), per breakpoint,
+ *    because the calendar stacks vertically on a phone and needs far more
+ *    room there than on a desktop.
  *  - It autofocuses a control on load, which scroll-jacks the page past the
  *    confirmation heading. We restore the final screen into view once on
  *    load (immediately + again at 250ms; the calendar focuses late).
@@ -29,9 +32,8 @@ import { BOOKING_URL } from '../../config/booking.js'
 import { finalScreenContent } from '../../config/sectionContent.js'
 import { track } from '../../lib/analytics.js'
 
-// Tall enough that the whole calendar card — including the last evening
-// slot on a busy day — fits without an inner scrollbar. Tune here.
-const FRAME_HEIGHT = 1120
+// Frame height is CSS now (see `.booking-frame-wrap` in globals.css) so it can
+// differ per breakpoint — a phone needs roughly twice a desktop's height.
 
 // The exact origin the confirmation message must come from. Derived from the
 // booking URL so a preview override (VITE_WAYFINDER_BOOKING_URL) keeps working.
@@ -43,7 +45,7 @@ const BOOKING_ORIGIN = (() => {
   }
 })()
 
-export function BookingWidget({ onBooked, scrollAnchorRef }) {
+export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
   const [loaded, setLoaded] = useState(false)
   const [timedOut, setTimedOut] = useState(false)
   const resetOnce = useRef(false)
@@ -98,7 +100,10 @@ export function BookingWidget({ onBooked, scrollAnchorRef }) {
 
   return (
     <div className="booking-widget">
-      <div className="booking-frame-wrap" style={{ height: FRAME_HEIGHT }}>
+      {/* Once booked the frame shows the calendar's short confirmation screen
+          instead of the full month + slot list, so it shrinks — otherwise the
+          mobile height leaves a screen of dead space under the confirmation. */}
+      <div className={'booking-frame-wrap' + (booked ? ' booking-frame-wrap--confirmed' : '')}>
         {!loaded && !timedOut && (
           <div className="booking-frame-status" aria-hidden="true">
             <span className="booking-spinner" />
