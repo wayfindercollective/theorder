@@ -1612,14 +1612,14 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   height: 1120px;
 }
 @media (max-width: 900px) { .booking-frame-wrap { height: 1500px; } }
-/* PHONES: tall enough for the ENTIRE calendar page, with headroom.
-   This was briefly capped to the viewport, which cut the dates off just above
-   the "Calendar not loading?" line and read as a broken widget. The whole
-   point is that the calendar never scrolls inside itself: the applicant just
-   scrolls the page and arrives at the dates. Spare space at the bottom sits
-   inside the frame's border, so it reads as part of the widget — cutting the
-   dates off does not. Err tall. */
-@media (max-width: 600px) { .booking-frame-wrap { height: 2000px; } }
+/* PHONES. There is no correct number here — the calendar is a different
+   height in every state, so this trades "dates cut off" (bad: looks broken)
+   against "dead space below the calendar" (annoying but harmless). 2000px
+   fitted the expanded date+time view but left a screenful of nothing in the
+   collapsed one; 1500 is the middle, still well above the 1120 that cut the
+   dates off. Overridden entirely, and exactly, the moment the OS posts a
+   height — see BookingWidget.jsx. */
+@media (max-width: 600px) { .booking-frame-wrap { height: 1500px; } }
 
 /* After booking the frame holds the short confirmation screen, not the month
    grid — without this the mobile height leaves a screen of dead space. */

@@ -8,12 +8,18 @@
  * Realities of this embed (learned on clearmind-clearlife, re-verified
  * against the Wayfinder OS source for this build):
  *
- *  - The calendar emits NO resize postMessage and is cross-origin, so the
- *    frame cannot shrink-wrap its content. It gets a tall fixed height and
- *    the OUTER page scrolls — an inner scrollbar reads as broken. The
- *    heights live in globals.css (`.booking-frame-wrap`), per breakpoint,
- *    because the calendar stacks vertically on a phone and needs far more
- *    room there than on a desktop.
+ *  - The calendar sends no resize postMessage and is cross-origin, so the
+ *    frame cannot shrink-wrap its content and no fixed height is ever right:
+ *    the page is a different height collapsed, with dates open, with times
+ *    listed, and confirmed. Too short cuts the dates off; too tall leaves a
+ *    dead area below the calendar. The fixed heights in globals.css
+ *    (`.booking-frame-wrap`, per breakpoint) are a compromise between those
+ *    two failures — a phone needs far more room than a desktop because the
+ *    calendar stacks vertically.
+ *    THE REAL FIX is one line on the OS side: post the content height (they
+ *    already post `wf-booking-confirmed` from the same page). Support for
+ *    that is implemented below — the moment such a message arrives the frame
+ *    sizes itself exactly and every fixed height stops mattering.
  *  - It autofocuses a control on load, which scroll-jacks the page past the
  *    confirmation heading. We restore the final screen into view once on
  *    load (immediately + again at 250ms; the calendar focuses late).
@@ -45,8 +51,30 @@ const BOOKING_ORIGIN = (() => {
   }
 })()
 
+// If the calendar ever posts its content height, use it — that is the only way
+// to be exactly right, since the page is a different height in every state
+// (collapsed, dates open, times listed, confirmed) and a fixed frame is
+// therefore always too tall or too short for something. Accepts the shapes a
+// resize message plausibly takes; ignores anything that isn't a sane pixel
+// number. Costs nothing while the OS sends no such message.
+const MIN_AUTO_HEIGHT = 320
+const MAX_AUTO_HEIGHT = 5000
+
+function resizeHeight(data) {
+  if (!data || typeof data !== 'object') return 0
+  const type = typeof data.type === 'string' ? data.type.toLowerCase() : ''
+  if (type && !type.includes('resize') && !type.includes('height')) return 0
+  const raw = data.height ?? data.payload?.height ?? data.value
+  const n = Math.round(Number(raw))
+  if (!Number.isFinite(n) || n < MIN_AUTO_HEIGHT) return 0
+  // A couple of px of slack so a sub-pixel rounding difference doesn't leave
+  // the frame one line short and reintroduce an inner scrollbar.
+  return Math.min(n + 8, MAX_AUTO_HEIGHT)
+}
+
 export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
   const [loaded, setLoaded] = useState(false)
+  const [autoHeight, setAutoHeight] = useState(0)
   const [timedOut, setTimedOut] = useState(false)
   const resetOnce = useRef(false)
   const frameRef = useRef(null)
@@ -71,6 +99,10 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
     const onMessage = (event) => {
       if (!BOOKING_ORIGIN || event.origin !== BOOKING_ORIGIN) return
       if (!frameRef.current || event.source !== frameRef.current.contentWindow) return
+      // Height first — a resize message is not a booking, and shrink-wrapping
+      // the frame beats every fixed height in the stylesheet.
+      const h = resizeHeight(event.data)
+      if (h) setAutoHeight(h)
       if (event.data?.type !== 'wf-booking-confirmed') return
       if (bookedRef.current) return
       bookedRef.current = true
@@ -115,7 +147,10 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
       {/* Once booked the frame shows the calendar's short confirmation screen
           instead of the full month + slot list, so it shrinks — otherwise the
           mobile height leaves a screen of dead space under the confirmation. */}
-      <div className={'booking-frame-wrap' + (booked ? ' booking-frame-wrap--confirmed' : '')}>
+      <div
+        className={'booking-frame-wrap' + (booked ? ' booking-frame-wrap--confirmed' : '')}
+        style={autoHeight ? { height: autoHeight } : undefined}
+      >
         {!loaded && !timedOut && (
           <div className="booking-frame-status" aria-hidden="true">
             <span className="booking-spinner" />
