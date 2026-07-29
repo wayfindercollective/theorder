@@ -42,7 +42,12 @@ export function CommitmentGate({ onProceed }) {
         <button
           type="button"
           className="btn btn-primary gate-button"
-          onClick={onProceed}
+          onClick={(e) => {
+            // Defensive: nothing here should ever navigate or submit, and a
+            // stray default on this button costs the applicant their answers.
+            e.preventDefault()
+            onProceed()
+          }}
         >
           {commitmentGateContent.button}
         </button>

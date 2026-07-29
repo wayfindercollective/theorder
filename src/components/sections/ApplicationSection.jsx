@@ -28,6 +28,27 @@ const SOURCE = import.meta.env.VITE_SITE_DOMAIN || 'theorder.global'
 // could re-introduce it. It must never render.
 const questions = allQuestions.filter((q) => q.type !== 'contact')
 
+// Where the applicant is, mirrored to sessionStorage.
+//
+// The answers live only in React state, so ANY reload used to drop a
+// half-finished applicant back at question one with nothing kept — and a phone
+// can reload a tab on its own, without the user doing anything, when memory
+// runs short. On the booking step that is the worst possible moment to lose
+// them. Restoring puts them back exactly where they were, including on the
+// calendar. Session-scoped: it dies with the tab, so a genuinely new visit
+// always starts clean.
+const STATE_KEY = 'order_application_state'
+
+function loadState() {
+  try {
+    const raw = sessionStorage.getItem(STATE_KEY)
+    const s = raw ? JSON.parse(raw) : null
+    return s && typeof s === 'object' && !Array.isArray(s) ? s : null
+  } catch {
+    return null
+  }
+}
+
 // The business gate: true when any answered choice question's selected option
 // carries `disqualify: true` (set per-option in /admin → Application).
 function isDisqualified(formData) {
@@ -108,22 +129,35 @@ function buildPayload(formData, booking) {
 export function ApplicationSection() {
   const { ref: sectionRef, inView } = useInView({ threshold: 0.2 })
   const formRef = useRef(null)
-  const [step, setStep] = useState(1)
-  const [formData, setFormData] = useState({})
+  // Read once, on mount, before any other state initialiser depends on it.
+  const [saved] = useState(loadState)
+  const [step, setStep] = useState(() => saved?.step || 1)
+  const [formData, setFormData] = useState(() => saved?.formData || {})
   const [faded, setFaded] = useState(false)
   // `finished` = the questionnaire is done. From here the applicant either
   // sees the negation screen or the commitment gate; there is no submit.
-  const [finished, setFinished] = useState(() => questions.length === 0)
-  const [declined, setDeclined] = useState(false)
+  const [finished, setFinished] = useState(() => saved?.finished ?? questions.length === 0)
+  const [declined, setDeclined] = useState(() => !!saved?.declined)
   // The gate stands between the last question and the calendar: the applicant
   // has to accept the terms of the call before a single time slot is shown.
-  const [gatePassed, setGatePassed] = useState(false)
-  const [booking, setBooking] = useState(null)
+  const [gatePassed, setGatePassed] = useState(() => !!saved?.gatePassed)
+  const [booking, setBooking] = useState(() => saved?.booking || null)
   const [formStarted, setFormStarted] = useState(false)
   const [questionViewedFor, setQuestionViewedFor] = useState(0)
 
   const total = questions.length
   const q = questions[step - 1]
+
+  // Mirror progress to sessionStorage on every change, so a reload — whether
+  // the browser's doing or the applicant's — resumes instead of restarting.
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        STATE_KEY,
+        JSON.stringify({ step, formData, finished, declined, gatePassed, booking })
+      )
+    } catch { /* private mode / quota — resuming is a nicety, never a blocker */ }
+  }, [step, formData, finished, declined, gatePassed, booking])
 
   useEffect(() => {
     if (!inView || finished || !q) return
@@ -213,7 +247,10 @@ export function ApplicationSection() {
   // Synchronous re-entry lock. `wf-booking-confirmed` is documented as
   // fire-once, but a duplicate would double-count a billed Meta Lead AND
   // double-post the lead — and a state guard is async, so it would not hold.
-  const bookedLockRef = useRef(false)
+  // Seeded from the restored session too: if this tab already booked before a
+  // reload, a second confirmation must not re-fire the billed conversion or
+  // re-send the lead.
+  const bookedLockRef = useRef(!!saved?.booking)
 
   const handleBooked = useCallback(async (message) => {
     if (bookedLockRef.current) return

@@ -1612,13 +1612,36 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   height: 1120px;
 }
 @media (max-width: 900px) { .booking-frame-wrap { height: 1500px; } }
-@media (max-width: 600px) { .booking-frame-wrap { height: 1900px; } }
+/* PHONES: bounded to the viewport, deliberately NOT a huge pixel height.
+   A ~1900px cross-origin frame on top of this page's full-screen paintings is
+   a very large composited layer, and a phone under memory pressure answers
+   that by discarding the tab — which reloads the page and throws the
+   applicant back to the top mid-application. Capping at the viewport keeps
+   the calendar as one full screen: while it fills the display there is
+   nothing else visible to scroll, so the two surfaces stop competing. */
+@media (max-width: 600px) {
+  /* vh first, dvh behind @supports — a plain duplicate declaration gets
+     deduped by the CSS minifier, which would drop the fallback and leave
+     older iOS with no height at all. */
+  .booking-frame-wrap {
+    height: 82vh;
+    min-height: 520px;
+  }
+  @supports (height: 100dvh) {
+    .booking-frame-wrap { height: 82dvh; }
+  }
+}
 
 /* After booking the frame holds the short confirmation screen, not the month
    grid — without this the mobile height leaves a screen of dead space. */
 .booking-frame-wrap--confirmed { height: 900px; }
 @media (max-width: 900px) { .booking-frame-wrap--confirmed { height: 1150px; } }
-@media (max-width: 600px) { .booking-frame-wrap--confirmed { height: 1350px; } }
+@media (max-width: 600px) {
+  .booking-frame-wrap--confirmed { height: 82vh; }
+  @supports (height: 100dvh) {
+    .booking-frame-wrap--confirmed { height: 82dvh; }
+  }
+}
 .booking-frame { display: block; width: 100%; height: 100%; border: 0; }
 
 .booking-frame-status {

@@ -88,14 +88,26 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
     resetOnce.current = true
     // The calendar autofocuses a control → the browser scrolls it into view,
     // hiding the confirmation heading. Bring the final screen back.
-    const restore = () => {
+    //
+    // ONE correction, after the autofocus has happened — not the two instant
+    // jumps this used to fire. Back to back they read as the page glitching
+    // or reloading, especially on a phone where the browser is also moving
+    // the view for the focused control. Skipped entirely if the applicant has
+    // already started scrolling themselves: yanking the page out from under a
+    // deliberate scroll is worse than a slightly off starting position.
+    let cancelled = false
+    const stop = () => { cancelled = true }
+    window.addEventListener('wheel', stop, { passive: true, once: true })
+    window.addEventListener('touchstart', stop, { passive: true, once: true })
+    setTimeout(() => {
+      window.removeEventListener('wheel', stop)
+      window.removeEventListener('touchstart', stop)
+      if (cancelled) return
       const el = scrollAnchorRef?.current
       if (!el) return
       const top = window.scrollY + el.getBoundingClientRect().top - 90
-      window.scrollTo({ top })
-    }
-    restore()
-    setTimeout(restore, 250)
+      window.scrollTo({ top, behavior: 'smooth' })
+    }, 320)
   }
 
   return (
