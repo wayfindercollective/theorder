@@ -24,7 +24,9 @@ Now: **no booking, nothing enters the CRM.**
 1. The form asks multiple-choice questions only — no name, email or phone.
    Answers are held in React state and sent nowhere.
 2. After the last question the applicant either sees the negation screen (a
-   declining answer — unchanged) or the Wayfinder booking calendar.
+   declining answer — unchanged) or the **commitment gate**: the scarcity line,
+   the one-shot rule, and the challenge, with a single "Book My Call" button.
+   Nothing is collected or sent there — pressing it only reveals the calendar.
 3. They type their details into the calendar and book.
 4. The calendar posts `wf-booking-confirmed` to our page. That message — and
    only that message — releases the lead.
@@ -42,6 +44,7 @@ titled with the funnel name, enriched with the questionnaire and attribution.
 | Choice questions, answers held in state | [ApplicationSection.jsx](src/components/sections/ApplicationSection.jsx) |
 | One question, no contact fields, no submit | [QuestionSlide.jsx](src/components/ui/QuestionSlide.jsx) |
 | Disqualify gate → negation screen | `finish()` in [ApplicationSection.jsx](src/components/sections/ApplicationSection.jsx) |
+| Commitment gate → reveals the calendar | [CommitmentGate.jsx](src/components/ui/CommitmentGate.jsx) |
 | Calendar embed + `wf-booking-confirmed` listener | [BookingWidget.jsx](src/components/ui/BookingWidget.jsx) |
 | Confirmed state + legal lines | [FinalScreen.jsx](src/components/ui/FinalScreen.jsx) |
 | Payload build + billed conversion | `buildPayload()` / `handleBooked()` in [ApplicationSection.jsx](src/components/sections/ApplicationSection.jsx) |
@@ -87,12 +90,16 @@ Browser → `POST /api/funnel-lead` (same-origin, no key) →
 `X-API-Key: <webhookSecret>` (and `Authorization: Bearer` with the same value —
 the two handler generations disagree; sending both is free).
 
-**Check the slug.** `the-order-funnel` is what the retired webhook URL used
-(`https://fine-shrimp-886.convex.site/api/funnel/the-order-funnel/lead`), and
-it is *not* the same string as `VITE_FUNNEL_SLUG=the-order`, which is only a
-payload field. Confirm it against the funnel's settings; override with
-`WAYFINDER_FUNNEL_SLUG`, or point at the Convex host directly with
-`WAYFINDER_LEAD_URL`, if it has changed.
+**Which URL it actually posts to**, in order: `WAYFINDER_LEAD_URL` if set,
+else the existing `VITE_WAYFINDER_WEBHOOK_URL` read server-side, else
+`WAYFINDER_OS_ORIGIN` + `WAYFINDER_FUNNEL_SLUG`. The middle rung is deliberate:
+the OS's app-host route ships with their `feature/crm` promotion, so until that
+lands the relay keeps using the Convex endpoint that is already live in
+production. Leads therefore keep flowing through the cutover; `bookingId`
+enrichment simply starts working once the OS side is deployed.
+
+Note `the-order-funnel` — the slug in the URL — is *not* the same string as
+`VITE_FUNNEL_SLUG=the-order`, which is only a payload field.
 
 The relay sanitizes before forwarding: scalars only, strings capped at 800
 chars, ≤60 keys, ≤32 KB body, and an `Origin` — if the request carries one —

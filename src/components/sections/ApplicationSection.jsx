@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { questions as allQuestions } from '../../config/questions.js'
 import { applicationCopy } from '../../config/sectionContent.js'
 import { QuestionSlide } from '../ui/QuestionSlide.jsx'
+import { CommitmentGate } from '../ui/CommitmentGate.jsx'
 import { FinalScreen } from '../ui/FinalScreen.jsx'
 import { DeclineScreen } from '../ui/DeclineScreen.jsx'
 import { submitLead } from '../../lib/submitLead.js'
@@ -111,9 +112,12 @@ export function ApplicationSection() {
   const [formData, setFormData] = useState({})
   const [faded, setFaded] = useState(false)
   // `finished` = the questionnaire is done. From here the applicant either
-  // sees the negation screen or the booking calendar; there is no submit.
+  // sees the negation screen or the commitment gate; there is no submit.
   const [finished, setFinished] = useState(() => questions.length === 0)
   const [declined, setDeclined] = useState(false)
+  // The gate stands between the last question and the calendar: the applicant
+  // has to accept the terms of the call before a single time slot is shown.
+  const [gatePassed, setGatePassed] = useState(false)
   const [booking, setBooking] = useState(null)
   const [formStarted, setFormStarted] = useState(false)
   const [questionViewedFor, setQuestionViewedFor] = useState(0)
@@ -234,6 +238,14 @@ export function ApplicationSection() {
     }
   }, [formData])
 
+  // Accepting the terms of the call is what reveals the calendar. Nothing is
+  // collected or sent here — it is a decision, not a submission.
+  const passGate = useCallback(() => {
+    track('commitment_gate_passed', { last_cta_location: getLastCTA() })
+    setGatePassed(true)
+    requestAnimationFrame(() => scrollToCard(formRef.current))
+  }, [])
+
   return (
     <section id="application" className="section section-application" ref={sectionRef}>
       {applicationCopy.image && (
@@ -243,10 +255,10 @@ export function ApplicationSection() {
           aria-hidden="true"
         />
       )}
-      {/* The finished card widens: the booking calendar needs more room
-          than the reading column gives the questionnaire. (Not on the decline
-          screen — there is no calendar there.) */}
-      <div className={'shell-narrow application-shell' + (finished && !declined ? ' application-shell--booking' : '')}>
+      {/* The card widens only once the calendar is actually on screen — it
+          needs more room than the reading column gives. The questionnaire, the
+          gate and the decline screen all stay in the narrow column. */}
+      <div className={'shell-narrow application-shell' + (finished && !declined && gatePassed ? ' application-shell--booking' : '')}>
         {!finished && q && (
           <div className="application-card card card-stitched nailed" ref={formRef}>
             <span className="nail-tl" />
@@ -281,8 +293,10 @@ export function ApplicationSection() {
             <span className="nail-br" />
             {declined ? (
               <DeclineScreen />
-            ) : (
+            ) : gatePassed ? (
               <FinalScreen onBooked={handleBooked} booking={booking} />
+            ) : (
+              <CommitmentGate onProceed={passGate} />
             )}
           </div>
         )}

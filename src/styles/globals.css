@@ -1492,6 +1492,73 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   max-width: none;
 }
 
+/* ---- Commitment gate (between the last question and the calendar) ---- */
+/* The moment the applicant commits to the call. All three lines are large and
+   gold — the seal line carries the same brass gradient as "God Wills It", the
+   warning is solid brass so the terms stay legible, and the challenge is the
+   italic question they answer by pressing the button. */
+.commitment-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0 0.5rem;
+}
+
+.gate-line {
+  margin: 0;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
+}
+.gate-line.in { opacity: 1; transform: translateY(0); }
+
+.gate-line--seal {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.6vw, 2.3rem);
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(196, 164, 95, 0.3));
+  max-width: 18ch;
+}
+
+.gate-line--warning {
+  margin-top: 1.8rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2.1vw, 1.35rem);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--brass-light);
+  max-width: 40ch;
+}
+
+.gate-divider { margin: 2.4rem 0; width: 100%; }
+
+.gate-line--challenge {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  font-style: italic;
+  color: var(--brass);
+  max-width: 34ch;
+}
+
+.gate-action {
+  margin-top: 2.6rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
+}
+.gate-action.in { opacity: 1; transform: translateY(0); }
+.gate-button { font-size: 1rem; padding: 1rem 2.4rem; }
+
 /* ---- Booking calendar on the final screen ---- */
 /* Once submitted, the shell widens past the reading column so the embedded
    calendar gets room to lay out its month + time slots side by side. */

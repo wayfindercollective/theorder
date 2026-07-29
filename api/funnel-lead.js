@@ -62,6 +62,14 @@ const MAX_BODY_BYTES = 32 * 1024
 function leadUrl() {
   const explicit = process.env.WAYFINDER_LEAD_URL
   if (explicit) return explicit
+  // The pre-cutover webhook URL, read server-side. It is the endpoint proven
+  // live in production today, so preferring it means the cutover does not
+  // depend on the OS's new app-host route (which ships with their `feature/crm`
+  // promotion) already being deployed. It is the same funnel lead API — the
+  // booking enrichment simply starts working once their side lands. Set
+  // WAYFINDER_LEAD_URL to move off it deliberately.
+  const legacy = process.env.VITE_WAYFINDER_WEBHOOK_URL
+  if (legacy && !legacy.includes('placeholder.invalid')) return legacy
   const origin = (process.env.WAYFINDER_OS_ORIGIN || DEFAULT_OS_ORIGIN).replace(/\/+$/, '')
   const slug = process.env.WAYFINDER_FUNNEL_SLUG || DEFAULT_SLUG
   return `${origin}/api/funnel/${encodeURIComponent(slug)}/lead`

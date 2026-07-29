@@ -33,6 +33,14 @@ export const declineScreenContent = data.declineScreen || {
   body: 'Please return when you have made progress and are willing to go all in.',
   notice: 'Your information has not been stored.',
 }
+// The commitment gate between the last question and the calendar. Fallbacks
+// keep it render-safe if a stale content deploy lacks the block.
+export const commitmentGateContent = data.commitmentGate || {
+  line1: 'We are inundated with applications',
+  line2: 'This will be your only enquiry call, failure to attend will result in no further consideration to your application.',
+  line3: 'You answered the questionnaire, are you a man of your word indeed?',
+  button: 'Book My Call',
+}
 // `data.form` (name/email/phone labels) retired with the contact step — the
 // application is choice-only now and contact details are typed on the booking
 // page. `consent` survives: its SMS/privacy/terms lines render under the
