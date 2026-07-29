@@ -108,7 +108,7 @@ const SECTION_DEFS = [
     note: 'The screen between the final question and the booking calendar. Applicants read this and press the button to reveal the calendar — nothing is collected here. Anyone who picked a declining answer never sees it.',
     fields: [
       { path: ['commitmentGate', 'line1'], label: 'Line 1 — the seal', textarea: true, hint: 'The biggest line, gold and uppercase. Keep it short — it wraps around 18 characters per line. e.g. We are inundated with applications' },
-      { path: ['commitmentGate', 'line2'], label: 'Line 2 — the terms', textarea: true, rows: 4, hint: 'The rule of the call, under the seal line. Gold, slightly smaller.' },
+      { path: ['commitmentGate', 'line2'], label: 'Line 2 — the terms', textarea: true, rows: 4, hint: 'The rule of the call, under the seal line. White, slightly smaller than the gold lines either side of it.' },
       { path: ['commitmentGate', 'line3'], label: 'Line 3 — the challenge', textarea: true, rows: 3, hint: 'The question they answer by pressing the button. Renders italic, below a divider.' },
       { path: ['commitmentGate', 'button'], label: 'Button text', hint: 'Reveals the booking calendar. e.g. Book Your Call' },
     ],

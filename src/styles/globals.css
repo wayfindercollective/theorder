@@ -1493,10 +1493,10 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 
 /* ---- Commitment gate (between the last question and the calendar) ---- */
-/* The moment the applicant commits to the call. All three lines are large and
-   gold — the seal line carries the same brass gradient as "God Wills It", the
-   warning is solid brass so the terms stay legible, and the challenge is the
-   italic question they answer by pressing the button. */
+/* The moment the applicant commits to the call. The seal line carries the same
+   brass gradient as "God Wills It" and the challenge is the italic gold
+   question they answer by pressing the button; between them the terms of the
+   call are plain white, so the two gold lines keep all the weight. */
 /* Every size here is capped against viewport HEIGHT as well as width. The
    section is min-height:100vh and centres its card, so type that only scales
    with vw pushes the button below the fold on a short window — which is
@@ -1541,7 +1541,10 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   font-size: clamp(0.9rem, min(1.7vw, 1.95vh), 1.15rem);
   line-height: 1.45;
   letter-spacing: 0.04em;
-  color: var(--brass-light);
+  /* White, not gold (Nico, 2026-07-29) — the terms of the call read as plain
+     fact between the two gold lines, which keeps the seal and the challenge as
+     the only gilded moments. */
+  color: var(--parchment);
   max-width: 48ch;
 }
 
