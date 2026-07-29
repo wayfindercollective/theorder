@@ -39,7 +39,7 @@ export const commitmentGateContent = data.commitmentGate || {
   line1: 'We are inundated with applications',
   line2: 'This will be your only enquiry call, failure to attend will result in no further consideration to your application.',
   line3: 'You answered the questionnaire, are you a man of your word indeed?',
-  button: 'Book My Call',
+  button: 'Book Your Call',
 }
 // `data.form` (name/email/phone labels) retired with the contact step — the
 // application is choice-only now and contact details are typed on the booking

@@ -1497,12 +1497,17 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
    gold — the seal line carries the same brass gradient as "God Wills It", the
    warning is solid brass so the terms stay legible, and the challenge is the
    italic question they answer by pressing the button. */
+/* Every size here is capped against viewport HEIGHT as well as width. The
+   section is min-height:100vh and centres its card, so type that only scales
+   with vw pushes the button below the fold on a short window — which is
+   exactly what happened at 100% zoom on a 16:10 laptop. min(Xvw, Yvh) keeps
+   the whole gate — seal, terms, challenge and button — on one screen. */
 .commitment-gate {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1rem 0 0.5rem;
+  padding: 0.25rem 0 0;
 }
 
 .gate-line {
@@ -1515,9 +1520,9 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 
 .gate-line--seal {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3.6vw, 2.3rem);
-  letter-spacing: 0.12em;
-  line-height: 1.2;
+  font-size: clamp(1.15rem, min(3vw, 3.4vh), 1.95rem);
+  letter-spacing: 0.1em;
+  line-height: 1.18;
   text-transform: uppercase;
   background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
   -webkit-background-clip: text;
@@ -1525,39 +1530,44 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   -webkit-text-fill-color: transparent;
   color: transparent;
   filter: drop-shadow(0 0 14px rgba(196, 164, 95, 0.3));
-  max-width: 18ch;
+  /* Wide enough that "WE ARE INUNDATED / WITH APPLICATIONS" breaks over two
+     lines rather than three. */
+  max-width: 22ch;
 }
 
 .gate-line--warning {
-  margin-top: 1.8rem;
+  margin-top: clamp(0.9rem, 2.2vh, 1.5rem);
   font-family: var(--font-display);
-  font-size: clamp(1.05rem, 2.1vw, 1.35rem);
-  line-height: 1.5;
+  font-size: clamp(0.9rem, min(1.7vw, 1.95vh), 1.15rem);
+  line-height: 1.45;
   letter-spacing: 0.04em;
   color: var(--brass-light);
-  max-width: 40ch;
+  max-width: 48ch;
 }
 
-.gate-divider { margin: 2.4rem 0; width: 100%; }
+.gate-divider { margin: clamp(1rem, 2.4vh, 1.7rem) 0; width: 100%; }
 
 .gate-line--challenge {
   font-family: var(--font-display);
-  font-size: clamp(1.2rem, 2.6vw, 1.6rem);
-  line-height: 1.4;
+  font-size: clamp(1rem, min(2vw, 2.3vh), 1.35rem);
+  line-height: 1.35;
   letter-spacing: 0.05em;
   font-style: italic;
   color: var(--brass);
-  max-width: 34ch;
+  max-width: 40ch;
 }
 
 .gate-action {
-  margin-top: 2.6rem;
+  margin-top: clamp(1.1rem, 2.8vh, 2rem);
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
 }
 .gate-action.in { opacity: 1; transform: translateY(0); }
-.gate-button { font-size: 1rem; padding: 1rem 2.4rem; }
+.gate-button {
+  font-size: clamp(0.85rem, 1.8vh, 1rem);
+  padding: clamp(0.75rem, 1.7vh, 1rem) clamp(1.6rem, 4vw, 2.4rem);
+}
 
 /* ---- Booking calendar on the final screen ---- */
 /* Once submitted, the shell widens past the reading column so the embedded
@@ -1566,7 +1576,9 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 
 .final-booking {
   width: 100%;
-  margin-top: 2.5rem;
+  /* Tight to the gilt line above it — with no encouragement copy there is
+     nothing between them, and the old 2.5rem read as a dead gap. */
+  margin-top: 1.2rem;
   opacity: 0;
   transition: opacity 1200ms var(--ease-order) 250ms;
 }
@@ -1574,7 +1586,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .final-booking-heading {
   font-size: clamp(1.4rem, 3vw, 1.9rem);
   letter-spacing: 0.05em;
-  margin: 1.2rem 0 1.4rem;
+  margin: 0.7rem 0 1.1rem;
 }
 
 .booking-widget { width: 100%; }

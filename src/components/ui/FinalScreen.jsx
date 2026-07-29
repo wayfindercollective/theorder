@@ -53,10 +53,18 @@ export function FinalScreen({ onBooked, booking }) {
       <p className={'final-sub final-sub--gilded' + (stage >= 2 ? ' in' : '')}>
         {finalScreenContent.sub}
       </p>
-      <div className="section-divider" style={{ marginTop: '3rem', marginBottom: '3rem' }} />
-      <p className={'final-begin' + (stage >= 3 ? ' in' : '')}>
-        {finalScreenContent.begin}
-      </p>
+      {/* The encouragement line is optional and is currently empty. Rendering
+          it regardless left an empty paragraph between two 3rem dividers — a
+          dead void between "God Wills It" and the booking step. Only render
+          the divider + line when there is actually copy. */}
+      {finalScreenContent.begin && (
+        <>
+          <div className="section-divider" style={{ marginTop: '2.2rem', marginBottom: '2.2rem' }} />
+          <p className={'final-begin' + (stage >= 3 ? ' in' : '')}>
+            {finalScreenContent.begin}
+          </p>
+        </>
+      )}
 
       {/* The booking calendar — mounted immediately so the iframe starts
           loading during the ceremony, revealed with the final stage. Copy
