@@ -923,22 +923,23 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .header-instagram:hover { color: var(--parchment); }
 .header-instagram svg { display: block; flex-shrink: 0; }
 .header-instagram-label {
-  font-size: 0.78rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
+  font-size: 0.82rem;
+  /* the handle, as typed — lowercase, handle-style, not shouted */
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
   /* tracking pads the right edge of the last letter — pull the glyph back in
      so the visual gap matches the declared one */
-  margin-right: -0.3em;
+  margin-right: -0.14em;
 }
 @media (max-width: 600px) {
   .header-wordmark { font-size: 0.95rem; letter-spacing: 0.2em; }
   .header-mark { gap: 0.6rem; }
-  .header-instagram-label { font-size: 0.7rem; letter-spacing: 0.2em; margin-right: -0.2em; }
+  .header-instagram-label { font-size: 0.72rem; letter-spacing: 0.08em; margin-right: -0.08em; }
   .header-instagram svg { width: 16px; height: 16px; }
 }
-/* Narrowest phones — the logo mark still carries the brand; the wordmark
-   yields so INSTAGRAM stays readable, per Nico. */
-@media (max-width: 400px) {
+/* Phones — the logo mark still carries the brand; the wordmark yields so the
+   full handle stays readable, per Nico. */
+@media (max-width: 480px) {
   .header-wordmark { display: none; }
 }
 
