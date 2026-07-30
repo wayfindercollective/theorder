@@ -18,7 +18,7 @@
         {
           "label": "I hesitate long before I act.",
           "value": "I hesitate a lot before taking action",
-          "disqualify": true
+          "disqualify": false
         },
         {
           "label": "Even when I care, I struggle to follow through.",
@@ -45,7 +45,7 @@
         {
           "label": "I am still exploring my options.",
           "value": "I am exploring and trying to understand my options",
-          "disqualify": true
+          "disqualify": false
         },
         {
           "label": "I am not ready to change yet.",
