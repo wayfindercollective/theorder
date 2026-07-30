@@ -910,6 +910,37 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   color: var(--parchment);
   text-transform: uppercase;
 }
+/* Instagram — pinned top-right so it rides with the header on scroll.
+   Name to the left, glyph to the right, brass so it reads as an invitation. */
+.header-instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+  color: var(--brass-light);
+  transition: color 320ms var(--ease-order);
+}
+.header-instagram:hover { color: var(--parchment); }
+.header-instagram svg { display: block; flex-shrink: 0; }
+.header-instagram-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  /* tracking pads the right edge of the last letter — pull the glyph back in
+     so the visual gap matches the declared one */
+  margin-right: -0.3em;
+}
+@media (max-width: 600px) {
+  .header-wordmark { font-size: 0.95rem; letter-spacing: 0.2em; }
+  .header-mark { gap: 0.6rem; }
+  .header-instagram-label { font-size: 0.7rem; letter-spacing: 0.2em; margin-right: -0.2em; }
+  .header-instagram svg { width: 16px; height: 16px; }
+}
+/* Narrowest phones — the logo mark still carries the brand; the wordmark
+   yields so INSTAGRAM stays readable, per Nico. */
+@media (max-width: 400px) {
+  .header-wordmark { display: none; }
+}
 
 
 /* ============================================================
