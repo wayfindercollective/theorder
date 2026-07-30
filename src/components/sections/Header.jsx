@@ -46,12 +46,15 @@ export function Header() {
             rel="noopener noreferrer"
             aria-label="The Order on Instagram"
           >
-            <span className="display header-instagram-label">
-              {footerContent.instagram.replace(/\/+$/, '').split('/').pop()}
+            <span className="header-instagram-lockup">
+              <span className="display header-instagram-kicker">Instagram</span>
+              <span className="header-instagram-handle">
+                {footerContent.instagram.replace(/\/+$/, '').split('/').pop()}
+              </span>
             </span>
             <svg
-              width="18"
-              height="18"
+              width="22"
+              height="22"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"

@@ -922,24 +922,45 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 .header-instagram:hover { color: var(--parchment); }
 .header-instagram svg { display: block; flex-shrink: 0; }
-.header-instagram-label {
-  font-size: 0.82rem;
-  /* the handle, as typed — lowercase, handle-style, not shouted */
-  letter-spacing: 0.14em;
-  text-transform: lowercase;
-  /* tracking pads the right edge of the last letter — pull the glyph back in
-     so the visual gap matches the declared one */
-  margin-right: -0.14em;
+/* Two lines, right-aligned so both sit flush to the glyph: the brand name
+   INSTAGRAM as a tracked display kicker, the handle beneath it in mono so it
+   reads as an address. Stacked rather than strung out in a row — it is the
+   narrower lockup, which is what buys both lines room on a phone. */
+.header-instagram-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.16rem;
+  line-height: 1;
 }
+.header-instagram-kicker {
+  font-size: 0.66rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  /* tracking pads the right of the last letter — pull it back so the ragged
+     right edge lines up with the handle below */
+  margin-right: -0.34em;
+}
+.header-instagram-handle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--parchment-mute);
+  transition: color 320ms var(--ease-order);
+}
+.header-instagram:hover .header-instagram-handle { color: var(--parchment); }
+
 @media (max-width: 600px) {
   .header-wordmark { font-size: 0.95rem; letter-spacing: 0.2em; }
   .header-mark { gap: 0.6rem; }
-  .header-instagram-label { font-size: 0.72rem; letter-spacing: 0.08em; margin-right: -0.08em; }
-  .header-instagram svg { width: 16px; height: 16px; }
+  .header-instagram { gap: 0.45rem; }
+  .header-instagram-kicker { font-size: 0.58rem; letter-spacing: 0.26em; margin-right: -0.26em; }
+  .header-instagram-handle { font-size: 0.66rem; }
+  .header-instagram svg { width: 19px; height: 19px; }
 }
-/* Phones — the logo mark still carries the brand; the wordmark yields so the
-   full handle stays readable, per Nico. */
-@media (max-width: 480px) {
+/* Narrowest phones — the logo mark still carries the brand, so the wordmark
+   yields rather than crowding the Instagram lockup. */
+@media (max-width: 400px) {
   .header-wordmark { display: none; }
 }
 
