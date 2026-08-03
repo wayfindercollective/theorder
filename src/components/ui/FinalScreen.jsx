@@ -28,6 +28,7 @@ function formatBookedTime(startTime, timezone) {
 // arrived, and only switches this screen into its confirmed state.
 export function FinalScreen({ onBooked, booking }) {
   const rootRef = useRef(null)
+  const confirmedRef = useRef(null)
   const [stage, setStage] = useState(0)
   useEffect(() => {
     const t1 = setTimeout(() => setStage(1), 350)
@@ -35,6 +36,76 @@ export function FinalScreen({ onBooked, booking }) {
     const t3 = setTimeout(() => setStage(3), 1900)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [])
+
+  // Once the call is booked, the calendar's own "booking confirmed" panel is
+  // NOT the message that matters — the ceremony above it is ("God Wills It",
+  // the interview line, the booked time). The applicant is left looking at the
+  // frame, which is mid-page and, on a phone, a screen or two below that copy.
+  // So on confirmation we bring the block from the mark down to the booked-time
+  // line into view: centred when it fits the viewport, top-aligned when it does
+  // not, which is what makes this work on both a phone and a desktop.
+  //
+  // The calendar re-focuses a control on its confirmation screen and the frame
+  // also changes height (`.booking-frame-wrap--confirmed`), either of which can
+  // drag the page afterwards — hence the two correction passes. Both bail the
+  // moment the applicant scrolls themselves; yanking the page out from under a
+  // deliberate scroll is worse than a slightly off position.
+  useEffect(() => {
+    if (!booking) return
+    let cancelled = false
+    const stop = () => { cancelled = true }
+    window.addEventListener('wheel', stop, { passive: true, once: true })
+    window.addEventListener('touchstart', stop, { passive: true, once: true })
+
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+
+    const targetTop = () => {
+      const root = rootRef.current
+      if (!root) return null
+      const rootRect = root.getBoundingClientRect()
+      const endRect = (confirmedRef.current || root).getBoundingClientRect()
+      const top = window.scrollY + rootRect.top
+      const height = Math.max(0, window.scrollY + endRect.bottom - top)
+      const vh = window.innerHeight || 0
+      // Centre the whole block when there is room; otherwise pin its top just
+      // under the viewport edge so the copy reads from the first line down.
+      const pad = height && height + 48 <= vh ? (vh - height) / 2 : 16
+      return Math.max(0, top - pad)
+    }
+
+    const goTo = (behavior) => {
+      const top = targetTop()
+      if (top === null) return
+      window.scrollTo({ top, behavior })
+    }
+
+    // First pass after a paint, so the confirmed copy is in the DOM and the
+    // block is measured at its real height.
+    const raf = requestAnimationFrame(() => {
+      if (cancelled) return
+      goTo(reduce ? 'auto' : 'smooth')
+    })
+
+    // Corrections, only if something moved us off the mark since.
+    const correct = () => {
+      if (cancelled) return
+      const top = targetTop()
+      if (top === null) return
+      if (Math.abs(window.scrollY - top) < 40) return
+      window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' })
+    }
+    const t1 = setTimeout(correct, 800)
+    const t2 = setTimeout(correct, 1600)
+
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(raf)
+      clearTimeout(t1)
+      clearTimeout(t2)
+      window.removeEventListener('wheel', stop)
+      window.removeEventListener('touchstart', stop)
+    }
+  }, [booking])
 
   const bookedTime = booking ? formatBookedTime(booking.startTime, booking.timezone) : ''
 
@@ -85,7 +156,9 @@ export function FinalScreen({ onBooked, booking }) {
             : (finalScreenContent.bookingHeading || 'Book Your Call')}
         </h3>
         {booking && (
-          <p className="final-booked-note">
+          /* The bottom of what the scroll-into-view above has to keep on
+             screen — everything from the mark down to this line. */
+          <p className="final-booked-note" ref={confirmedRef}>
             {bookedTime && <strong>{bookedTime}</strong>}
             {bookedTime && ' — '}
             {finalScreenContent.bookedSub || 'Check your email for the confirmation and calendar invite.'}
