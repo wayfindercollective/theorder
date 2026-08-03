@@ -60,6 +60,7 @@ export const PRES_PAINTINGS = [
 export const PRES_PHOTOS = [
   { src: '/images/pres-library/true-gentleman.jpg', label: 'The True Gentleman' },
   { src: '/images/pres-library/regiment-afghanistan-oil.jpg', label: 'The Regiment — Afghanistan' },
+  { src: '/images/pres-library/operator-dog-oil.jpg', label: 'Operator & working dog' },
   { src: '/images/pres-library/brotherhood-oil.jpg', label: 'Brotherhood' },
   { src: '/images/pres-library/black-triumph-oil.jpg', label: 'The Black Triumph' },
   { src: '/images/pres-library/mountain-valley-oil.jpg', label: 'Mountain valley' },
