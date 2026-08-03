@@ -1712,10 +1712,15 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .booking-escape a:hover { color: var(--parchment); }
 
 /* Shown once the calendar reports a confirmed booking. */
+/* pre-line because the CMS copy for this paragraph carries real line breaks —
+   the sign-off ("God Wills It, / Nico") is written on its own lines and was
+   otherwise collapsing into the end of the paragraph as one run-on. */
 .final-booked-note {
   margin: 0 0 1.4rem;
   text-align: center;
   color: var(--parchment-mute);
+  white-space: pre-line;
+  line-height: 1.65;
 }
 .final-booked-note strong { color: var(--brass-light); font-weight: 600; }
 

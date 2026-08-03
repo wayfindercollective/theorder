@@ -38,12 +38,19 @@ export function FinalScreen({ onBooked, booking }) {
   }, [])
 
   // Once the call is booked, the calendar's own "booking confirmed" panel is
-  // NOT the message that matters — the ceremony above it is ("God Wills It",
-  // the interview line, the booked time). The applicant is left looking at the
-  // frame, which is mid-page and, on a phone, a screen or two below that copy.
-  // So on confirmation we bring the block from the mark down to the booked-time
-  // line into view: centred when it fits the viewport, top-aligned when it does
-  // not, which is what makes this work on both a phone and a desktop.
+  // NOT the message that matters — the ceremony above it is: THE ORDER, "God
+  // Wills It", "Confirmation", "Your Enquiry Interview Is Scheduled", and Nico's
+  // paragraph beneath it. The applicant is otherwise left looking at the frame,
+  // which is mid-page and, on a phone, a screen or two below that copy.
+  //
+  // So on confirmation we bring the block spanning exactly those elements — the
+  // mark (rootRef) down to the end of the paragraph (confirmedRef) — into view:
+  // centred when it fits, otherwise pinned directly under the fixed header so it
+  // reads from the first line down. That header is the reason we cannot just use
+  // a small constant offset: `.site-header` is position:fixed and would sit on
+  // top of "THE ORDER". The paragraph is long enough that on a phone the block
+  // is taller than the viewport, so the pinned branch is the normal outcome —
+  // which is the right one, since they read downward from the top of it.
   //
   // The calendar re-focuses a control on its confirmation screen and the frame
   // also changes height (`.booking-frame-wrap--confirmed`), either of which can
@@ -67,9 +74,14 @@ export function FinalScreen({ onBooked, booking }) {
       const top = window.scrollY + rootRect.top
       const height = Math.max(0, window.scrollY + endRect.bottom - top)
       const vh = window.innerHeight || 0
-      // Centre the whole block when there is room; otherwise pin its top just
-      // under the viewport edge so the copy reads from the first line down.
-      const pad = height && height + 48 <= vh ? (vh - height) / 2 : 16
+      // Measured, not assumed: the header is a different height on a phone and
+      // it is the one thing that can cover the top of the block.
+      const header = document.querySelector('.site-header')
+      const gap = (header ? header.offsetHeight : 0) + 12
+      const room = vh - gap - 8
+      // Centre inside the space below the header when the whole block fits;
+      // otherwise pin its top just under the header.
+      const pad = height && height <= room ? gap + (room - height) / 2 : gap
       return Math.max(0, top - pad)
     }
 
