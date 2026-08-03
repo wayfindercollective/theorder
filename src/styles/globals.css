@@ -1649,30 +1649,48 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 
 .booking-widget { width: 100%; }
 /* Cross-origin frame with no resize postMessage → a fixed height per
-   breakpoint, and the PAGE does the scrolling.
-   ⚠ These numbers are the whole mobile experience. If the frame is shorter
-   than the calendar, the calendar gets its own inner scroll area and the two
-   surfaces fight: dragging moves the calendar, not the page, and reaching the
-   dates feels glitchy. Too tall only costs some empty space, so err generous.
-   The calendar stacks vertically on a phone, so it needs roughly twice the
-   desktop height. Tune HERE — nothing else needs to change. */
+   breakpoint, and the PAGE does the scrolling. The frame must never be
+   SHORTER than the tallest state the applicant can reach, or the calendar
+   gets its own inner scrollbar and the two surfaces fight: dragging moves
+   the calendar instead of the page, and the lower fields and the confirm
+   button sit below an edge nobody expects to scroll.
+
+   The numbers below are MEASURED, not guessed — Playwright against the live
+   booking page (wayfindercollective.io/book/nico-seedsman-the-order), driven
+   to each step, reading document scrollHeight. Frame width, not viewport
+   width, is what drives content height, and the funnel gives the frame
+   `viewport - 48px (shell) - 2 x card padding`:
+
+     frame  974/908px (>=900 vp)  calendar  976   times 1300   details 1500
+     frame  514px      (600 vp)   calendar  978   times 1302   details 1504
+     frame  344px      (430 vp)   calendar 1062   times 1406   details 1676
+     frame  274px      (360 vp)   calendar 1235   times 1659   details 1890
+     frame  234px      (320 vp)   calendar 1338   times 1782   details 2091
+
+   "details" is the worst case: the form with the optional "add guest" and
+   "add phone" rows expanded. Each height below is that number plus ~3%
+   headroom for copy that wraps differently (a longer host name, a slot-lock
+   warning banner). The steps differ by ~500px, so sizing for the tallest
+   necessarily leaves dead space under the shorter ones — that is the trade
+   this breakpoint approach cannot avoid. The REAL fix is the OS posting its
+   content height; the listener for it already exists in BookingWidget.jsx
+   and overrides everything here the moment such a message arrives. */
 .booking-frame-wrap {
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(166, 136, 74, 0.35);
   border-radius: 6px;
   background: rgba(8, 7, 6, 0.5);
-  height: 1120px;
+  height: 1560px;
 }
-@media (max-width: 900px) { .booking-frame-wrap { height: 1500px; } }
-/* PHONES. There is no correct number here — the calendar is a different
-   height in every state, so this trades "dates cut off" (bad: looks broken)
-   against "dead space below the calendar" (annoying but harmless). 2000px
-   fitted the expanded date+time view but left a screenful of nothing in the
-   collapsed one; 1500 is the middle, still well above the 1120 that cut the
-   dates off. Overridden entirely, and exactly, the moment the OS posts a
-   height — see BookingWidget.jsx. */
-@media (max-width: 600px) { .booking-frame-wrap { height: 1500px; } }
+@media (max-width: 900px) { .booking-frame-wrap { height: 1580px; } }
+/* PHONES. The narrower the frame the taller the form gets — every field
+   stacks and every label wraps — so one phone number does not fit all: a
+   320px handset needs ~440px more than a 430px one. Hence the extra steps,
+   which keep the dead space on a large phone from being half a screen. */
+@media (max-width: 600px) { .booking-frame-wrap { height: 1700px; } }
+@media (max-width: 480px) { .booking-frame-wrap { height: 1900px; } }
+@media (max-width: 380px) { .booking-frame-wrap { height: 2160px; } }
 
 /* After booking the frame holds the short confirmation screen, not the month
    grid — without this the mobile height leaves a screen of dead space. */
