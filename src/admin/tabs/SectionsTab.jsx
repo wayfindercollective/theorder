@@ -103,14 +103,18 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'commitmentGate', nav: 'Commitment gate',
-    title: 'Commitment gate — shown after the last question',
-    note: 'The screen between the final question and the booking calendar. Applicants read this and press the button to reveal the calendar — nothing is collected here. Anyone who picked a declining answer never sees it.',
+    key: 'qualifiedScreen', nav: 'Qualified handoff',
+    title: 'Qualified applicant — Instagram handoff',
+    note: 'Shown only to applicants who pass the filter. There is deliberately no booking link here: Nico sends the private /booking URL after they contact him on Instagram.',
     fields: [
-      { path: ['commitmentGate', 'line1'], label: 'Line 1 — the seal', textarea: true, hint: 'The biggest line, gold and uppercase. Keep it short — it wraps around 18 characters per line. e.g. We are inundated with applications' },
-      { path: ['commitmentGate', 'line2'], label: 'Line 2 — the terms', textarea: true, rows: 4, hint: 'The rule of the call, under the seal line. White, slightly smaller than the gold lines either side of it.' },
-      { path: ['commitmentGate', 'line3'], label: 'Line 3 — the challenge', textarea: true, rows: 3, hint: 'The question they answer by pressing the button. Renders italic, below a divider.' },
-      { path: ['commitmentGate', 'button'], label: 'Button text', hint: 'Reveals the booking calendar. e.g. Book Your Call' },
+      { path: ['qualifiedScreen', 'heading'], label: 'Heading', hint: 'Confirms that the application has been submitted.' },
+      { path: ['qualifiedScreen', 'sub'], label: 'Sub line', hint: 'Short line confirming they passed the first stage.' },
+      { path: ['qualifiedScreen', 'video'], label: 'Nico video URL', hint: 'Full video URL supplied by Nico. Leave blank to show the development placeholder.' },
+      { path: ['qualifiedScreen', 'poster'], label: 'Video poster URL', hint: 'Optional still image shown before the video plays.' },
+      { path: ['qualifiedScreen', 'message'], label: 'Video DM instruction', textarea: true, rows: 4, hint: 'Tell the applicant what to send Nico in their Instagram video DM.' },
+      { path: ['qualifiedScreen', 'note'], label: 'Private booking explanation', textarea: true, rows: 3, hint: 'Explain that Nico will send the booking link if they are the right fit.' },
+      { path: ['qualifiedScreen', 'instagramHandle'], label: 'Instagram username', hint: 'Shown on the button. e.g. @theorder.global' },
+      { path: ['qualifiedScreen', 'instagramUrl'], label: 'Instagram URL', hint: 'Full clickable https:// Instagram profile URL.' },
     ],
   },
   {
@@ -206,8 +210,8 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'finalScreen', nav: 'Final screen',
-    title: 'Final screen (after submitting application)',
+    key: 'finalScreen', nav: 'Booking page',
+    title: 'Private /booking page',
     fields: [
       { path: ['finalScreen', 'heading'], label: 'Heading', hint: 'Display font, large.' },
       { path: ['finalScreen', 'sub'],     label: 'Sub line', textarea: true, hint: 'Standard body paragraph.' },

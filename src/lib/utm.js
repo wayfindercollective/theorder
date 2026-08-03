@@ -1,6 +1,6 @@
 // Traffic-source attribution: capture UTM + click IDs + referrer + vanity path
-// from the landing URL, persist FIRST-touch (write-once) in localStorage, and
-// expose a webhook-ready object to merge into the Wayfinder POST.
+// from the landing URL and persist FIRST-touch (write-once) in localStorage for
+// anonymous site analytics.
 //
 // Vanity links: a clean single-segment path (theorder.global/some-video) is read
 // as utm_campaign with source/medium defaulting to youtube/video. Explicit
@@ -13,13 +13,11 @@ const VANITY_SOURCE = 'youtube'
 const VANITY_MEDIUM = 'video'
 // Every real non-root path of this site — never read these as a campaign slug.
 const RESERVED_PATHS = new Set([
-  '', 'admin', 'presentations', 'api', 'images', 'testimonials', 'assets',
+  '', 'admin', 'presentations', 'booking', 'api', 'images', 'testimonials', 'assets',
   'favicon', 'robots', 'sitemap', 'index', 'index.html', '2',
 ])
 
-// Path segment → normalized campaign slug. MUST match the Wayfinder VU store's
-// transform exactly so both halves of the content→revenue ledger join on an
-// identical utm_campaign: slug.toLowerCase().replace(/[^a-z0-9._-]/g, '')
+// Path segment -> normalized campaign slug.
 function readVanityCampaign() {
   if (typeof window === 'undefined') return null
   const seg = (window.location.pathname || '/').replace(/^\/+|\/+$/g, '')
@@ -78,15 +76,6 @@ export function captureAttribution() {
     Object.keys(last).forEach((k) => { if (!first[k]) { first[k] = last[k]; changed = true } })
     if (changed) writeStore(first)
     return buildAttribution(last, first)
-  } catch {
-    return {}
-  }
-}
-
-// Call at submit time. Merged, webhook-ready subset; empty keys omitted.
-export function getAttribution() {
-  try {
-    return buildAttribution(readLastTouch(), readStore())
   } catch {
     return {}
   }

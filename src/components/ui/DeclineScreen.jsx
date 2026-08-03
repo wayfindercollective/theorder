@@ -3,9 +3,8 @@ import { brandContent, declineScreenContent } from '../../config/sectionContent.
 
 /**
  * The negation screen — shown instead of FinalScreen when the applicant chose
- * a disqualifying answer. Same staged reveal as FinalScreen, no booking
- * calendar. Their lead is NOT sent to Wayfinder and nothing is kept, which the
- * notice line states outright. All copy lives in sections.json → declineScreen.
+ * a disqualifying answer. Their answers are discarded and the return-later
+ * message stays editable in sections.json -> declineScreen.
  */
 export function DeclineScreen() {
   const [stage, setStage] = useState(0)

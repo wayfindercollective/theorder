@@ -2,21 +2,16 @@
  * ApplicationTab — full editor for the application questions.
  *
  * Everything is editable: question text, subtitles, answer labels, and the
- * question/option set itself (add, remove, reorder). The `value` field on
- * options and the question `id` are the Wayfinder scoring contract (the
- * strings the CRM scores on / the field names it reads) — those stay locked
- * behind an explicit unlock toggle so they can't be changed by accident.
+ * question/option set itself (add, remove, reorder). Option values and question
+ * IDs remain stable internal keys, so they stay behind an unlock toggle.
  *
- * Each answer option also carries a "Declines the application" flag — a
- * business rule, NOT part of the CRM contract, so it is never locked. An
- * applicant who picks a flagged answer finishes the form, sees the negation
- * screen (edited here too), and no lead is sent to the CRM.
+ * Each answer option also carries a "Declines the application" flag. An
+ * applicant who picks a flagged answer sees the return-later screen; everyone
+ * else sees the Nico video and Instagram handoff.
  *
- * There is no contact step any more: the form is multiple-choice only, and
- * applicants type their name, email and phone into the booking calendar that
- * follows the last question. A lead only exists once they book. If an old
- * saved copy still carries a contact step it is shown here so it can be
- * removed — the public site ignores it.
+ * The public form is a local filter only: there is no contact step, no booking
+ * widget and no Wayfinder submission. A leftover contact step remains visible
+ * here solely so it can be removed; the public site always ignores it.
  */
 
 import { useState } from 'react'
@@ -109,21 +104,20 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
   return (
     <div className="admin-tab-pane">
       <p className="restraint admin-tab-intro">
-        Edit the questions and answer options applicants see. The scoring values and
-        field IDs are the contract with the CRM — they stay locked unless you unlock
-        them below, and changing them changes how leads are scored. Tick
+        Edit the questions and answer options applicants see. Field IDs and option
+        values are stable internal identifiers, so they stay locked unless you unlock
+        them below. Nothing on this screen is sent to Wayfinder OS. Tick
         “Declines the application” on an answer to turn away anyone who picks it:
-        they finish the form, see the negation screen below, and are NOT sent to the
-        CRM. Everyone else goes straight to the booking calendar — and only a booked
-        call creates a lead, so someone who answers every question but never books
-        never reaches the CRM at all.
+        they finish the form and see the negation screen below. Everyone else sees
+        Nico's video and the Instagram handoff. The private booking URL is shared by
+        Nico later, in DM.
       </p>
 
       <section className="admin-section-block">
         <h2 className="admin-section-title display">Negation screen</h2>
         <p className="restraint admin-tab-intro">
-          Shown instead of the booking screen when an applicant picks a declining
-          answer. Their details are not stored and no lead is created.
+          Shown when an applicant picks a declining answer. They receive the
+          return-later message and no application data is submitted.
         </p>
         <div className="admin-fields">
           <label className="admin-field">
@@ -211,14 +205,14 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
 
             {q.type === 'choice' && unlocked && (
               <label className="admin-field">
-                <span className="admin-field-label">Field ID (CRM contract)</span>
+                <span className="admin-field-label">Field ID (internal)</span>
                 <input
                   className="input-field admin-option-value admin-value-unlocked"
                   type="text"
                   value={getAt(questions, ['questions', qi, 'id']) ?? ''}
                   onChange={(e) => update(['questions', qi, 'id'], e.target.value)}
                 />
-                <span className="admin-field-hint">The field name this answer is sent under. Must match the Wayfinder funnel.</span>
+                <span className="admin-field-hint">Stable key used by the local filter. It is not sent to Wayfinder.</span>
               </label>
             )}
           </div>
@@ -228,7 +222,7 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
               <div className="admin-options-header">
                 <span className="admin-field-label">Answer options</span>
                 <span className="admin-options-hint">
-                  left: label shown · right: scoring value {unlocked ? '(unlocked)' : '(locked)'}
+                  left: label shown · right: internal value {unlocked ? '(unlocked)' : '(locked)'}
                 </span>
               </div>
               {(q.options || []).map((opt, oi) => (
@@ -244,11 +238,11 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
                     <input
                       className={'input-field admin-option-value' + (unlocked ? ' admin-value-unlocked' : '')}
                       type="text"
-                      placeholder={unlocked ? 'Scoring value sent to the CRM' : 'Scoring value (locked)'}
+                      placeholder={unlocked ? 'Internal option value' : 'Internal value (locked)'}
                       value={getAt(questions, ['questions', qi, 'options', oi, 'value']) ?? ''}
                       readOnly={!unlocked}
                       tabIndex={unlocked ? 0 : -1}
-                      title={unlocked ? 'Scoring value sent to the CRM' : 'Scoring value — unlock below to edit'}
+                      title={unlocked ? 'Internal option value' : 'Internal value — unlock below to edit'}
                       onChange={(e) => update(['questions', qi, 'options', oi, 'value'], e.target.value)}
                     />
                     <div className="admin-q-toolbar">
@@ -266,7 +260,7 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
                       >✕</button>
                     </div>
                   </div>
-                  {/* Business rule, not CRM contract — never locked. */}
+                  {/* Business rule, separate from the internal option key. */}
                   <label
                     className="admin-unlock admin-option-disqualify"
                     style={{ margin: '0.15rem 0 0.6rem', fontSize: '0.8rem' }}
@@ -294,7 +288,7 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
                 </button>
                 {unlocked
                   ? null
-                  : <span className="admin-field-hint admin-add-hint">New options need a scoring value — unlock below to set it.</span>}
+                  : <span className="admin-field-hint admin-add-hint">New options need an internal value — unlock below to set it.</span>}
               </div>
             </div>
           )}
@@ -302,8 +296,7 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
           {q.type === 'contact' && (
             <p className="restraint admin-tab-intro" style={{ color: '#c86' }}>
               ⚠ Left over from the old form. The application no longer asks for name,
-              email or phone — applicants enter those in the booking calendar. This step
-              is not shown to anyone; remove it with the ✕ above.
+              email or phone. This step is not shown to anyone; remove it with the ✕ above.
             </p>
           )}
         </section>
@@ -320,8 +313,8 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
             onChange={(e) => setUnlocked(e.target.checked)}
           />
           <span>
-            Unlock scoring values &amp; field IDs — <strong>changes how leads are scored.</strong>{' '}
-            Only edit these in step with the Wayfinder funnel.
+            Unlock internal values &amp; field IDs — <strong>can invalidate saved in-progress answers.</strong>{' '}
+            The public form uses these values only for local filtering.
           </span>
         </label>
       </div>

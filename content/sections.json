@@ -72,11 +72,15 @@
     "stepLabel": "Step",
     "backButton": "← Back"
   },
-  "commitmentGate": {
-    "line1": "We are inundated with applications",
-    "line2": "This will be your only call, failure to attend will result in no further consideration to your application.",
-    "line3": "You answered the questionnaire, are you a man of your word indeed?",
-    "button": "Book Your Enquiry Interview"
+  "qualifiedScreen": {
+    "heading": "Your Application Has Been Submitted",
+    "sub": "You have passed the first stage.",
+    "video": "",
+    "poster": "",
+    "message": "Watch Nico's message, then send him a video DM introducing yourself and explaining why you are ready to go all in.",
+    "note": "If you are the right fit, Nico will reply with the private link to book your enquiry interview.",
+    "instagramHandle": "@theorder.global",
+    "instagramUrl": "https://www.instagram.com/theorder.global"
   },
   "founder": {
     "eyebrow": "V",

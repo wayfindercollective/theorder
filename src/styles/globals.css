@@ -1545,6 +1545,87 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   max-width: none;
 }
 
+/* Qualified application handoff. The booking URL is intentionally absent:
+   applicants must send Nico a video DM before he shares it privately. */
+.qualified-next {
+  width: min(100%, 680px);
+  margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
+}
+.qualified-next.in { opacity: 1; transform: translateY(0); }
+.qualified-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(166, 136, 74, 0.45);
+  border-radius: 6px;
+  background: #080706;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+}
+.qualified-video--placeholder {
+  display: grid;
+  place-content: center;
+  gap: 0.8rem;
+  color: var(--parchment-mute);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.qualified-video-mark {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  margin: 0 auto;
+  padding-left: 0.2rem;
+  border: 1px solid var(--brass);
+  border-radius: 50%;
+  color: var(--brass-light);
+  font-size: 1.15rem;
+}
+.qualified-message {
+  max-width: 48ch;
+  margin: 1.8rem auto 0;
+  color: var(--parchment);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  line-height: 1.55;
+  white-space: pre-line;
+}
+.qualified-note {
+  max-width: 54ch;
+  margin: 0.9rem auto 0;
+  color: var(--parchment-mute);
+  line-height: 1.65;
+  white-space: pre-line;
+}
+.qualified-instagram { margin-top: 1.7rem; }
+
+/* The calendar now lives exclusively at /booking. */
+.booking-page {
+  min-height: 100vh;
+  padding-top: clamp(2rem, 5vw, 4rem);
+  padding-bottom: clamp(3rem, 7vw, 6rem);
+  background: linear-gradient(180deg, var(--bg-deep) 0%, #0d0b0a 50%, var(--bg-deep) 100%);
+}
+.booking-page-shell { position: relative; z-index: 1; }
+.booking-page-card {
+  width: min(1020px, 96vw);
+  margin: 0 auto;
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+
+@media (max-width: 600px) {
+  .qualified-next { margin-top: 1.4rem; }
+  .qualified-message { margin-top: 1.3rem; }
+  .qualified-instagram { width: 100%; }
+  .booking-page { padding-top: 0.75rem; }
+  .booking-page-card { width: 100%; }
+}
+
 /* ---- Commitment gate (between the last question and the calendar) ---- */
 /* The moment the applicant commits to the call. The seal line carries the same
    brass gradient as "God Wills It" and the challenge is the italic gold

@@ -1,10 +1,9 @@
 /**
  * One question in the application — multiple choice only.
  *
- * There is deliberately no contact step and no submit button. This funnel is
- * booking-gated: the applicant's name, email and phone are typed on the
- * Wayfinder booking page embedded after the last question, and the lead is
- * only created once a booking is confirmed. See BOOKING_GATED_LEADS.md.
+ * There is deliberately no contact step and no submit button. Answers are
+ * evaluated locally to choose a result screen, then discarded without being
+ * sent to Wayfinder OS.
  */
 
 import { useEffect, useState } from 'react'

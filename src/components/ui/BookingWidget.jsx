@@ -1,9 +1,7 @@
 /**
- * The Wayfinder OS booking calendar, embedded after the last application
- * question. In this funnel it is not a nicety — it is the gate: the applicant
- * types their name, email and phone HERE, and the booking it produces is the
- * only thing that releases a lead to the CRM (see BOOKING_GATED_LEADS.md).
- * Nothing is prefilled, because we no longer collect contact details.
+ * The Wayfinder OS booking calendar, embedded only on the private /booking
+ * route. Nothing is prefilled and no questionnaire state is available here;
+ * applicants type their contact details directly into the booking page.
  *
  * Realities of this embed (learned on clearmind-clearlife, re-verified
  * against the Wayfinder OS source for this build):
@@ -26,8 +24,8 @@
  *  - A CSP frame-ancestors block fails SILENTLY — the load event still
  *    fires on an empty document, so no timeout can catch it. The "open in
  *    a new tab" link below the frame is therefore always visible. NOTE: a
- *    booking made in that new tab cannot post back to this page, so it
- *    produces a booking with no questionnaire enrichment. The allowlist
+ *    booking made in that new tab cannot post back to this page, so our local
+ *    confirmation treatment and analytics cannot run. The allowlist
  *    (BOOKING_FRAME_ANCESTORS on the OS) must include this site's origins.
  *  - On a successful booking it posts `wf-booking-confirmed` to the parent,
  *    ONCE, and does not re-emit it if the iframe reloads onto its
@@ -92,9 +90,8 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
   }, [])
 
   // The booking confirmation. All three checks — origin, source frame, message
-  // type — before anything is trusted: this handler releases a real lead and
-  // fires a billed conversion, so any window on the page must not be able to
-  // spoof it.
+  // type — before anything is trusted: this handler fires a billed conversion,
+  // so any window on the page must not be able to spoof it.
   useEffect(() => {
     const onMessage = (event) => {
       if (!BOOKING_ORIGIN || event.origin !== BOOKING_ORIGIN) return
@@ -189,8 +186,8 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
 
       {/* The real confirmation can only come from inside a cross-origin frame,
           so it cannot be exercised on localhost. This fires the same handler
-          with a fake payload — enough to test the relay, the CRM record and
-          the confirmed state end to end. `import.meta.env.DEV` is replaced at
+          with a fake payload to test the confirmed state and analytics.
+          `import.meta.env.DEV` is replaced at
           build time, so none of this reaches production. */}
       {import.meta.env.DEV && (
         <button

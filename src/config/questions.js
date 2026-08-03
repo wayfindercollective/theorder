@@ -1,12 +1,9 @@
 /**
  * Application questions — loaded from /content/questions.json.
  *
- * IMPORTANT — Wayfinder contract:
- *   - The `value` strings on scored questions MUST match the funnel's scoring
- *     rules EXACTLY. The CMS marks them read-only.
- *   - The `label` shown to the user can differ from `value`.
- *   - Field IDs (mainChallenge, commitment, readiness, income, contact) must
- *     match the Wayfinder funnel field names — do not rename.
+ * Labels are applicant-facing. Question IDs and option values are stable
+ * internal keys used only by the local qualification filter; none of this
+ * data is sent to Wayfinder OS.
  */
 
 import data from '../../content/questions.json'

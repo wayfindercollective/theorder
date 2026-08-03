@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { brandContent, finalScreenContent, submitConsent } from '../../config/sectionContent.js'
 import { BookingWidget } from './BookingWidget.jsx'
+import { track } from '../../lib/analytics.js'
 
 // Renders the booked time in the timezone the booking page reported, so the
 // line always agrees with the confirmation email. Falls back to the browser's
@@ -22,14 +23,14 @@ function formatBookedTime(startTime, timezone) {
   }
 }
 
-// The end of the application: the ceremony, then the Wayfinder booking
-// calendar. `onBooked` receives the validated `wf-booking-confirmed` payload —
-// it is what releases the lead. `booking` is that same payload once it has
-// arrived, and only switches this screen into its confirmed state.
-export function FinalScreen({ onBooked, booking }) {
+// The standalone private booking page. It receives no questionnaire state and
+// does not call a funnel-lead relay; contact details are entered directly into
+// the Wayfinder booking widget.
+export function FinalScreen() {
   const rootRef = useRef(null)
   const confirmedRef = useRef(null)
   const [stage, setStage] = useState(0)
+  const [booking, setBooking] = useState(null)
   useEffect(() => {
     const t1 = setTimeout(() => setStage(1), 350)
     const t2 = setTimeout(() => setStage(2), 1100)
@@ -176,7 +177,14 @@ export function FinalScreen({ onBooked, booking }) {
             {finalScreenContent.bookedSub || 'Check your email for the confirmation and calendar invite.'}
           </p>
         )}
-        <BookingWidget onBooked={onBooked} booked={!!booking} scrollAnchorRef={rootRef} />
+        <BookingWidget
+          onBooked={(message) => {
+            setBooking(message)
+            track('form_submitted', { source: 'private_booking_page' })
+          }}
+          booked={!!booking}
+          scrollAnchorRef={rootRef}
+        />
 
         {/* Contact details are typed inside the frame, so the disclosures
             belong here — this is the point of collection. */}

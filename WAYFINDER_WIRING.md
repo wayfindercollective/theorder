@@ -1,6 +1,12 @@
 # Wayfinder OS Wiring — The Order
 
-> **Partly superseded by [BOOKING_GATED_LEADS.md](BOOKING_GATED_LEADS.md).**
+> **Superseded.** The public application no longer submits any lead or answers
+> to Wayfinder OS. It filters locally, sends qualified applicants to an
+> Instagram handoff, and exposes the booking widget only on the standalone
+> `/booking` route that Nico shares privately. The material below is retained
+> only as implementation history.
+>
+> **Previously partly superseded by [BOOKING_GATED_LEADS.md](BOOKING_GATED_LEADS.md).**
 > The payload contract below is still current (dual-shape answers, phone as a
 > string, attribution, the local retry queue). What changed: the funnel is
 > booking-gated, so there is no contact step, the lead is created only when a

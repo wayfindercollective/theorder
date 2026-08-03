@@ -1,6 +1,15 @@
 # Booking-gated leads — The Order
 
-**Status:** built on branch `booking-gated-leads`, reviewed by the OS side,
+**Status: superseded.** The application is now a local qualification filter:
+it collects no contact details and sends no applicant data to Wayfinder OS.
+Declined applicants see the return-later screen; qualified applicants see
+Nico's video/Instagram handoff. The calendar is isolated at `/booking` and
+Nico shares that URL privately after the Instagram conversation.
+
+The material below documents the retired implementation and is retained only
+for history.
+
+**Previous status:** built on branch `booking-gated-leads`, reviewed by the OS side,
 **merge held**. The trigger to merge is the OS deploy being live on production
 with our origins baked into the frame allowlist and the booking page's toggles
 verified — steps 1 and 2 of "Before this can go live". The OS work rides
