@@ -111,6 +111,7 @@ const SECTION_DEFS = [
       { path: ['qualifiedScreen', 'sub'], label: 'Sub line', hint: 'Short line confirming they passed the first stage.' },
       { path: ['qualifiedScreen', 'video'], label: 'Nico video URL', hint: 'Full video URL supplied by Nico. Leave blank to show the development placeholder.' },
       { path: ['qualifiedScreen', 'poster'], label: 'Video poster URL', hint: 'Optional still image shown before the video plays.' },
+      { path: ['qualifiedScreen', 'videoLabel'], label: 'Video play button', hint: 'Text shown beneath the play icon. e.g. Watch Nico\'s Message' },
       { path: ['qualifiedScreen', 'message'], label: 'Next-step instruction', textarea: true, rows: 3, hint: 'Short encouragement to watch the video and continue.' },
       { path: ['qualifiedScreen', 'note'], label: 'Optional extra line', textarea: true, rows: 2, hint: 'Leave blank to keep the page concise.' },
       { path: ['qualifiedScreen', 'button'], label: 'Instagram button text', hint: 'e.g. Message @theorder.global' },

@@ -28,6 +28,7 @@ export const qualifiedScreenContent = data.qualifiedScreen || {
   sub: 'You have passed the first stage.',
   video: '',
   poster: '',
+  videoLabel: "Watch Nico's Message",
   message: "Watch Nico's video, then take the next step.",
   note: '',
   button: 'Message @theorder.global',

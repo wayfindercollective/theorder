@@ -5,6 +5,7 @@ import {
   qualifiedScreenContent,
 } from '../../config/sectionContent.js'
 import { track } from '../../lib/analytics.js'
+import { bgImage } from '../../lib/img.js'
 
 function instagramDetails() {
   const url = qualifiedScreenContent.instagramUrl || footerContent.instagram || ''
@@ -21,7 +22,9 @@ function instagramDetails() {
  */
 export function QualifiedScreen() {
   const [stage, setStage] = useState(0)
+  const [videoPlaying, setVideoPlaying] = useState(false)
   const { url, handle } = instagramDetails()
+  const videoLabel = qualifiedScreenContent.videoLabel || "Watch Nico's Message"
   const message = qualifiedScreenContent.message ??
     "Watch Nico's video, then take the next step."
   const note = qualifiedScreenContent.note ?? ''
@@ -56,16 +59,41 @@ export function QualifiedScreen() {
 
       <div className={'qualified-next' + (stage >= 3 ? ' in' : '')}>
         {qualifiedScreenContent.video ? (
-          <video
-            className="qualified-video"
-            src={qualifiedScreenContent.video}
-            poster={qualifiedScreenContent.poster || undefined}
-            controls
-            playsInline
-            preload="metadata"
+          <div
+            className="qualified-video qualified-video-frame"
+            style={qualifiedScreenContent.poster
+              ? { backgroundImage: bgImage(qualifiedScreenContent.poster) }
+              : undefined}
           >
-            Your browser does not support embedded video.
-          </video>
+            {videoPlaying ? (
+              <video
+                className="qualified-video-player"
+                src={qualifiedScreenContent.video}
+                poster={qualifiedScreenContent.poster || undefined}
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+                onEnded={() => setVideoPlaying(false)}
+                onError={() => setVideoPlaying(false)}
+              >
+                Your browser does not support embedded video.
+              </video>
+            ) : (
+              <button
+                type="button"
+                className="founder-video-trigger qualified-video-trigger"
+                aria-label={videoLabel}
+                onClick={() => {
+                  setVideoPlaying(true)
+                  track('qualified_video_started')
+                }}
+              >
+                <span className="founder-video-play" aria-hidden="true">▶</span>
+                <span className="founder-video-label display">{videoLabel}</span>
+              </button>
+            )}
+          </div>
         ) : (
           <div className="qualified-video qualified-video--placeholder" role="img" aria-label="Video from Nico coming soon">
             <span className="qualified-video-mark" aria-hidden="true">▶</span>
