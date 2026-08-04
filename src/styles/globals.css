@@ -1633,6 +1633,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   padding-bottom: clamp(3rem, 7vw, 6rem);
   background: linear-gradient(180deg, var(--bg-deep) 0%, #0d0b0a 50%, var(--bg-deep) 100%);
 }
+.booking-page .final-screen { padding-top: 0.35rem; }
 .booking-page-shell { position: relative; z-index: 1; }
 .booking-page-card {
   width: min(1020px, 96vw);
