@@ -24,14 +24,15 @@ export const footerContent = data.footer
 export const finalScreenContent = data.finalScreen
 
 export const qualifiedScreenContent = data.qualifiedScreen || {
-  heading: 'Your Application Has Been Submitted',
+  heading: 'Congratulations',
   sub: 'You have passed the first stage.',
   video: '',
   poster: '',
-  message: "Watch Nico's message, then send him a video DM introducing yourself and explaining why you are ready to go all in.",
-  note: 'If you are the right fit, Nico will reply with the private link to book your enquiry interview.',
+  message: "Watch Nico's video, then take the next step.",
+  note: '',
+  button: 'Message @theorder.global',
   instagramHandle: '@theorder.global',
-  instagramUrl: 'https://www.instagram.com/theorder.global',
+  instagramUrl: 'https://ig.me/m/theorder.global',
 }
 
 export const declineScreenContent = data.declineScreen || {

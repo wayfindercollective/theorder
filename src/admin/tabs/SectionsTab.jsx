@@ -105,16 +105,17 @@ const SECTION_DEFS = [
   {
     key: 'qualifiedScreen', nav: 'Qualified handoff',
     title: 'Qualified applicant — Instagram handoff',
-    note: 'Shown only to applicants who pass the filter. There is deliberately no booking link here: Nico sends the private /booking URL after they contact him on Instagram.',
+    note: 'Shown only to applicants who pass the filter. The Instagram button opens a DM; Nico sends the private /application URL after they contact him.',
     fields: [
       { path: ['qualifiedScreen', 'heading'], label: 'Heading', hint: 'Confirms that the application has been submitted.' },
       { path: ['qualifiedScreen', 'sub'], label: 'Sub line', hint: 'Short line confirming they passed the first stage.' },
       { path: ['qualifiedScreen', 'video'], label: 'Nico video URL', hint: 'Full video URL supplied by Nico. Leave blank to show the development placeholder.' },
       { path: ['qualifiedScreen', 'poster'], label: 'Video poster URL', hint: 'Optional still image shown before the video plays.' },
-      { path: ['qualifiedScreen', 'message'], label: 'Video DM instruction', textarea: true, rows: 4, hint: 'Tell the applicant what to send Nico in their Instagram video DM.' },
-      { path: ['qualifiedScreen', 'note'], label: 'Private booking explanation', textarea: true, rows: 3, hint: 'Explain that Nico will send the booking link if they are the right fit.' },
+      { path: ['qualifiedScreen', 'message'], label: 'Next-step instruction', textarea: true, rows: 3, hint: 'Short encouragement to watch the video and continue.' },
+      { path: ['qualifiedScreen', 'note'], label: 'Optional extra line', textarea: true, rows: 2, hint: 'Leave blank to keep the page concise.' },
+      { path: ['qualifiedScreen', 'button'], label: 'Instagram button text', hint: 'e.g. Message @theorder.global' },
       { path: ['qualifiedScreen', 'instagramHandle'], label: 'Instagram username', hint: 'Shown on the button. e.g. @theorder.global' },
-      { path: ['qualifiedScreen', 'instagramUrl'], label: 'Instagram URL', hint: 'Full clickable https:// Instagram profile URL.' },
+      { path: ['qualifiedScreen', 'instagramUrl'], label: 'Instagram DM URL', hint: 'Direct-message link. For this account: https://ig.me/m/theorder.global' },
     ],
   },
   {
@@ -147,6 +148,8 @@ const SECTION_DEFS = [
       { path: ['founder', 'heading'],         label: 'Heading', hint: 'Display font, centered.' },
       { path: ['founder', 'placeholderMark'], label: 'Portrait label', hint: 'Caption in the portrait frame until a photo is uploaded. e.g. Nico Seedsman — Afghanistan' },
       { path: ['founder', 'templatedLabel'],  label: 'Placeholder badge', hint: 'Small corner badge on the portrait frame while no photo is uploaded. Internal marker — e.g. TEMPLATED.' },
+      { path: ['founder', 'video'],            label: 'Founder video URL', hint: 'When set, the portrait becomes a click-to-play video. Leave blank to keep the portrait unchanged.' },
+      { path: ['founder', 'videoLabel'],       label: 'Founder video button', hint: 'Text shown over the portrait. e.g. Watch Nico\'s Story' },
       { path: ['founder', 'paragraphs', 0],   label: 'Paragraph 1', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
       { path: ['founder', 'paragraphs', 1],   label: 'Paragraph 2', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
       { path: ['founder', 'paragraphs', 2],   label: 'Paragraph 3', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
@@ -211,7 +214,7 @@ const SECTION_DEFS = [
   },
   {
     key: 'finalScreen', nav: 'Booking page',
-    title: 'Private /booking page',
+    title: 'Private /application page',
     fields: [
       { path: ['finalScreen', 'heading'], label: 'Heading', hint: 'Display font, large.' },
       { path: ['finalScreen', 'sub'],     label: 'Sub line', textarea: true, hint: 'Standard body paragraph.' },

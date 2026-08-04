@@ -13,7 +13,7 @@ const VANITY_SOURCE = 'youtube'
 const VANITY_MEDIUM = 'video'
 // Every real non-root path of this site — never read these as a campaign slug.
 const RESERVED_PATHS = new Set([
-  '', 'admin', 'presentations', 'booking', 'api', 'images', 'testimonials', 'assets',
+  '', 'admin', 'presentations', 'application', 'booking', 'api', 'images', 'testimonials', 'assets',
   'favicon', 'robots', 'sitemap', 'index', 'index.html', '2',
 ])
 

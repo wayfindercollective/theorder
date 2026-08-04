@@ -1,5 +1,5 @@
 /**
- * The Wayfinder OS booking calendar, embedded only on the private /booking
+ * The Wayfinder OS booking calendar, embedded only on the private /application
  * route. Nothing is prefilled and no questionnaire state is available here;
  * applicants type their contact details directly into the booking page.
  *

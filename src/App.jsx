@@ -31,7 +31,8 @@ function isPresentationsRoute() {
 
 function isBookingRoute() {
   if (typeof window === 'undefined') return false
-  return window.location.pathname.replace(/\/+$/, '') === '/booking'
+  const path = window.location.pathname.replace(/\/+$/, '')
+  return path === '/application' || path === '/booking'
 }
 
 function AdminRoot() {
@@ -56,7 +57,10 @@ function PublicSite() {
     // Retire the old split-design preview URL. /2 and ?v=2 now collapse to /.
     const path = window.location.pathname.replace(/\/+$/, '')
     const params = new URLSearchParams(window.location.search)
-    if (path === '/2' || params.get('v') === '2') {
+    if (path === '/booking') {
+      const query = params.toString()
+      window.history.replaceState({}, '', '/application' + (query ? '?' + query : ''))
+    } else if (path === '/2' || params.get('v') === '2') {
       params.delete('v')
       const query = params.toString()
       window.history.replaceState({}, '', '/' + (query ? '?' + query : ''))

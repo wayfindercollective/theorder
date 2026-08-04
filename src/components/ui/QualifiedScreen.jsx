@@ -16,12 +16,15 @@ function instagramDetails() {
 /**
  * The successful result of the local questionnaire filter. There is
  * deliberately no booking link here. The applicant must first contact Nico on
- * Instagram; Nico sends the private /booking URL himself if they should move
+ * Instagram; Nico sends the private /application URL himself if they should move
  * forward.
  */
 export function QualifiedScreen() {
   const [stage, setStage] = useState(0)
   const { url, handle } = instagramDetails()
+  const message = qualifiedScreenContent.message ??
+    "Watch Nico's video, then take the next step."
+  const note = qualifiedScreenContent.note ?? ''
 
   useEffect(() => {
     const first = setTimeout(() => setStage(1), 350)
@@ -45,7 +48,7 @@ export function QualifiedScreen() {
       </div>
 
       <h2 className={'final-heading display' + (stage >= 2 ? ' in' : '')}>
-        {qualifiedScreenContent.heading || 'Your Application Has Been Submitted'}
+        {qualifiedScreenContent.heading || 'Congratulations'}
       </h2>
       <p className={'final-sub final-sub--gilded' + (stage >= 2 ? ' in' : '')}>
         {qualifiedScreenContent.sub || 'You have passed the first stage.'}
@@ -70,14 +73,8 @@ export function QualifiedScreen() {
           </div>
         )}
 
-        <p className="qualified-message">
-          {qualifiedScreenContent.message ||
-            'Watch Nico\'s message, then send him a video DM introducing yourself and explaining why you are ready to go all in.'}
-        </p>
-        <p className="qualified-note">
-          {qualifiedScreenContent.note ||
-            'If you are the right fit, Nico will reply with the private link to book your enquiry interview.'}
-        </p>
+        {message && <p className="qualified-message">{message}</p>}
+        {note && <p className="qualified-note">{note}</p>}
 
         {url && (
           <a
@@ -87,7 +84,7 @@ export function QualifiedScreen() {
             rel="noopener noreferrer"
             onClick={() => track('instagram_handoff_clicked', { handle })}
           >
-            Message {handle} on Instagram
+            {qualifiedScreenContent.button || `Message ${handle}`}
           </a>
         )}
       </div>

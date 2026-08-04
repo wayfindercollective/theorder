@@ -5,7 +5,7 @@ import { FinalScreen } from '../ui/FinalScreen.jsx'
 
 /**
  * Standalone private booking destination. This route is intentionally absent
- * from the public questionnaire: Nico shares /booking in Instagram DMs after
+ * from the public questionnaire: Nico shares /application in Instagram DMs after
  * speaking with a qualified applicant.
  */
 export function BookingPage() {
