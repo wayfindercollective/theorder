@@ -18,9 +18,9 @@
  *    already post `wf-booking-confirmed` from the same page). Support for
  *    that is implemented below — the moment such a message arrives the frame
  *    sizes itself exactly and every fixed height stops mattering.
- *  - It autofocuses a control on load, which can scroll-jack the parent page.
- *    The frame stays hidden and inert for a brief settling period after load,
- *    so that autofocus finishes before the calendar becomes interactive.
+ *  - A restored date makes the calendar call scrollIntoView on its time pane.
+ *    In an embed that can scroll the parent document too. The parent viewport
+ *    is briefly locked at the top while that initial calendar effect settles.
  *  - A CSP frame-ancestors block fails SILENTLY — the load event still
  *    fires on an empty document, so no timeout can catch it. The "open in
  *    a new tab" link below the frame is therefore always visible. NOTE: a
@@ -31,7 +31,7 @@
  *    ONCE, and does not re-emit it if the iframe reloads onto its
  *    confirmation screen. Act on first receipt.
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { BOOKING_URL } from '../../config/booking.js'
 import { finalScreenContent } from '../../config/sectionContent.js'
 import { track } from '../../lib/analytics.js'
@@ -71,11 +71,12 @@ function resizeHeight(data) {
 }
 
 export function BookingWidget({ onBooked, booked }) {
-  const [ready, setReady] = useState(false)
+  const [loaded, setLoaded] = useState(false)
   const [autoHeight, setAutoHeight] = useState(0)
   const [timedOut, setTimedOut] = useState(false)
   const resetOnce = useRef(false)
-  const revealTimerRef = useRef(null)
+  const settleTimerRef = useRef(null)
+  const releaseScrollLockRef = useRef(() => {})
   const frameRef = useRef(null)
   const bookedRef = useRef(false)
   // Kept in a ref so a re-created callback never re-subscribes the listener
@@ -85,12 +86,65 @@ export function BookingWidget({ onBooked, booked }) {
 
   const url = BOOKING_URL
 
+  // CalendarView restores the visitor's last selected date from localStorage,
+  // then calls scrollIntoView for the corresponding time pane. Because the
+  // iframe is part of the outer page's scroll chain, Chrome may satisfy that
+  // request by moving this entire page. Locking the root before first paint
+  // makes that cross-frame scroll a no-op. We release after the iframe's
+  // smooth scroll has finished, or after a fail-safe if the frame never loads.
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    const body = document.body
+    const previous = {
+      rootOverflow: root.style.overflow,
+      rootScrollBehavior: root.style.scrollBehavior,
+      bodyOverflow: body.style.overflow,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyLeft: body.style.left,
+      bodyRight: body.style.right,
+      bodyWidth: body.style.width,
+    }
+    let locked = true
+
+    root.style.scrollBehavior = 'auto'
+    window.scrollTo(0, 0)
+    root.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.top = '0'
+    body.style.left = '0'
+    body.style.right = '0'
+    body.style.width = '100%'
+
+    const release = () => {
+      if (!locked) return
+      locked = false
+      frameRef.current?.blur()
+      window.scrollTo(0, 0)
+      root.style.overflow = previous.rootOverflow
+      body.style.overflow = previous.bodyOverflow
+      body.style.position = previous.bodyPosition
+      body.style.top = previous.bodyTop
+      body.style.left = previous.bodyLeft
+      body.style.right = previous.bodyRight
+      body.style.width = previous.bodyWidth
+      window.scrollTo(0, 0)
+      root.style.scrollBehavior = previous.rootScrollBehavior
+    }
+
+    releaseScrollLockRef.current = release
+    const failSafe = setTimeout(release, 5000)
+    return () => {
+      clearTimeout(failSafe)
+      clearTimeout(settleTimerRef.current)
+      release()
+    }
+  }, [])
+
   useEffect(() => {
     const t = setTimeout(() => setTimedOut(true), 10000)
-    return () => {
-      clearTimeout(t)
-      clearTimeout(revealTimerRef.current)
-    }
+    return () => clearTimeout(t)
   }, [])
 
   // The booking confirmation. All three checks — origin, source frame, message
@@ -115,14 +169,14 @@ export function BookingWidget({ onBooked, booked }) {
   }, [])
 
   const onLoad = () => {
+    setLoaded(true)
     if (resetOnce.current) return
     resetOnce.current = true
     track('booking_widget_loaded')
-    // The embedded page autofocuses during/just after its load event. Keeping
-    // the frame hidden and inert until that work settles prevents the browser
-    // from scrolling the focused control into view. Unlike a corrective
-    // scroll, this never moves the visitor away and then pulls them back.
-    revealTimerRef.current = setTimeout(() => setReady(true), 600)
+    // CalendarView uses a smooth scroll, so keep the parent locked until that
+    // animation has fully settled. This is a release, not a corrective scroll:
+    // the outer page never visibly leaves the top position.
+    settleTimerRef.current = setTimeout(() => releaseScrollLockRef.current(), 900)
   }
 
   return (
@@ -134,7 +188,7 @@ export function BookingWidget({ onBooked, booked }) {
         className={'booking-frame-wrap' + (booked ? ' booking-frame-wrap--confirmed' : '')}
         style={autoHeight ? { height: autoHeight } : undefined}
       >
-        {!ready && !timedOut && (
+        {!loaded && !timedOut && (
           <div className="booking-frame-status" aria-hidden="true">
             <span className="booking-spinner" />
           </div>
@@ -148,11 +202,9 @@ export function BookingWidget({ onBooked, booked }) {
           title="Book your call"
           onLoad={onLoad}
           allow="camera; microphone; payment"
-          className={'booking-frame' + (ready ? ' booking-frame--ready' : '')}
-          tabIndex={ready ? 0 : -1}
-          inert={ready ? undefined : ''}
+          className="booking-frame"
         />
-        {timedOut && !ready && (
+        {timedOut && !loaded && (
           <div className="booking-frame-status booking-frame-status--solid">
             <div>
               <p className="booking-slow">
