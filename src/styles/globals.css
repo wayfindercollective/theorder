@@ -1557,12 +1557,14 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .qualified-next.in { opacity: 1; transform: translateY(0); }
 .qualified-video {
   display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
+  width: min(100%, 420px);
+  aspect-ratio: 3 / 4;
+  margin: 0 auto;
   border: 1px solid rgba(166, 136, 74, 0.45);
   border-radius: 6px;
   background: #080706;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+  object-fit: cover;
 }
 .qualified-video--placeholder {
   display: grid;
