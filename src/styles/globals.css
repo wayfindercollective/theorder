@@ -1548,6 +1548,10 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 /* Qualified application handoff. The booking URL is intentionally absent:
    applicants must send Nico a video DM before he shares it privately. */
 .final-screen.qualified-screen { padding-top: 0.35rem; }
+.qualified-screen .final-logo,
+.booking-page .final-logo {
+  height: clamp(90px, 12vw, 132px);
+}
 .qualified-next {
   width: min(100%, 680px);
   margin-top: 2rem;
