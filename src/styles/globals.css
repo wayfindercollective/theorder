@@ -1808,7 +1808,14 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 /* The confirmation screen is far shorter than the month grid, so the frame
    shrinks once booked rather than leaving a screen of dead space. */
 @media (max-width: 600px) { .booking-frame-wrap--confirmed { height: 1350px; } }
-.booking-frame { display: block; width: 100%; height: 100%; border: 0; }
+.booking-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  visibility: hidden;
+}
+.booking-frame--ready { visibility: visible; }
 
 .booking-frame-status {
   position: absolute;

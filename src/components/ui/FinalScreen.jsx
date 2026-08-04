@@ -183,7 +183,6 @@ export function FinalScreen() {
             track('form_submitted', { source: 'private_booking_page' })
           }}
           booked={!!booking}
-          scrollAnchorRef={rootRef}
         />
 
         {/* Contact details are typed inside the frame, so the disclosures

@@ -18,9 +18,9 @@
  *    already post `wf-booking-confirmed` from the same page). Support for
  *    that is implemented below — the moment such a message arrives the frame
  *    sizes itself exactly and every fixed height stops mattering.
- *  - It autofocuses a control on load, which scroll-jacks the page past the
- *    confirmation heading. We restore the final screen into view once on
- *    load (immediately + again at 250ms; the calendar focuses late).
+ *  - It autofocuses a control on load, which can scroll-jack the parent page.
+ *    The frame stays hidden and inert for a brief settling period after load,
+ *    so that autofocus finishes before the calendar becomes interactive.
  *  - A CSP frame-ancestors block fails SILENTLY — the load event still
  *    fires on an empty document, so no timeout can catch it. The "open in
  *    a new tab" link below the frame is therefore always visible. NOTE: a
@@ -31,7 +31,7 @@
  *    ONCE, and does not re-emit it if the iframe reloads onto its
  *    confirmation screen. Act on first receipt.
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BOOKING_URL } from '../../config/booking.js'
 import { finalScreenContent } from '../../config/sectionContent.js'
 import { track } from '../../lib/analytics.js'
@@ -70,11 +70,12 @@ function resizeHeight(data) {
   return Math.min(n + 8, MAX_AUTO_HEIGHT)
 }
 
-export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
-  const [loaded, setLoaded] = useState(false)
+export function BookingWidget({ onBooked, booked }) {
+  const [ready, setReady] = useState(false)
   const [autoHeight, setAutoHeight] = useState(0)
   const [timedOut, setTimedOut] = useState(false)
   const resetOnce = useRef(false)
+  const revealTimerRef = useRef(null)
   const frameRef = useRef(null)
   const bookedRef = useRef(false)
   // Kept in a ref so a re-created callback never re-subscribes the listener
@@ -86,7 +87,10 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
 
   useEffect(() => {
     const t = setTimeout(() => setTimedOut(true), 10000)
-    return () => clearTimeout(t)
+    return () => {
+      clearTimeout(t)
+      clearTimeout(revealTimerRef.current)
+    }
   }, [])
 
   // The booking confirmation. All three checks — origin, source frame, message
@@ -111,32 +115,14 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
   }, [])
 
   const onLoad = () => {
-    setLoaded(true)
-    track('booking_widget_loaded')
     if (resetOnce.current) return
     resetOnce.current = true
-    // The calendar autofocuses a control → the browser scrolls it into view,
-    // hiding the confirmation heading. Bring the final screen back.
-    //
-    // ONE correction, after the autofocus has happened — not the two instant
-    // jumps this used to fire. Back to back they read as the page glitching
-    // or reloading, especially on a phone where the browser is also moving
-    // the view for the focused control. Skipped entirely if the applicant has
-    // already started scrolling themselves: yanking the page out from under a
-    // deliberate scroll is worse than a slightly off starting position.
-    let cancelled = false
-    const stop = () => { cancelled = true }
-    window.addEventListener('wheel', stop, { passive: true, once: true })
-    window.addEventListener('touchstart', stop, { passive: true, once: true })
-    setTimeout(() => {
-      window.removeEventListener('wheel', stop)
-      window.removeEventListener('touchstart', stop)
-      if (cancelled) return
-      const el = scrollAnchorRef?.current
-      if (!el) return
-      const top = window.scrollY + el.getBoundingClientRect().top - 90
-      window.scrollTo({ top, behavior: 'smooth' })
-    }, 320)
+    track('booking_widget_loaded')
+    // The embedded page autofocuses during/just after its load event. Keeping
+    // the frame hidden and inert until that work settles prevents the browser
+    // from scrolling the focused control into view. Unlike a corrective
+    // scroll, this never moves the visitor away and then pulls them back.
+    revealTimerRef.current = setTimeout(() => setReady(true), 600)
   }
 
   return (
@@ -148,7 +134,7 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
         className={'booking-frame-wrap' + (booked ? ' booking-frame-wrap--confirmed' : '')}
         style={autoHeight ? { height: autoHeight } : undefined}
       >
-        {!loaded && !timedOut && (
+        {!ready && !timedOut && (
           <div className="booking-frame-status" aria-hidden="true">
             <span className="booking-spinner" />
           </div>
@@ -162,9 +148,11 @@ export function BookingWidget({ onBooked, booked, scrollAnchorRef }) {
           title="Book your call"
           onLoad={onLoad}
           allow="camera; microphone; payment"
-          className="booking-frame"
+          className={'booking-frame' + (ready ? ' booking-frame--ready' : '')}
+          tabIndex={ready ? 0 : -1}
+          inert={ready ? undefined : ''}
         />
-        {timedOut && !loaded && (
+        {timedOut && !ready && (
           <div className="booking-frame-status booking-frame-status--solid">
             <div>
               <p className="booking-slow">
