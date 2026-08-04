@@ -109,8 +109,8 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
         them below. Nothing on this screen is sent to Wayfinder OS. Tick
         “Declines the application” on an answer to turn away anyone who picks it:
         they finish the form and see the negation screen below. Everyone else sees
-        Nico's video and the Instagram handoff. The private booking URL is shared by
-        Nico later, in DM.
+        Nico's video and the Instagram handoff. The private /application URL is
+        shared by Nico later, in DM; its commitment button leads to the calendar.
       </p>
 
       <section className="admin-section-block">

@@ -1631,7 +1631,8 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 .qualified-instagram { margin-top: 1.7rem; }
 
-/* The calendar now lives exclusively at /application. */
+/* The acceptance gate and calendar live at /application and
+   /application/booking respectively. */
 .booking-page {
   min-height: 100vh;
   padding-top: clamp(2rem, 5vw, 4rem);
@@ -1644,6 +1645,14 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   width: min(1020px, 96vw);
   margin: 0 auto;
   padding: clamp(1.2rem, 3vw, 2rem);
+}
+.application-gate-page {
+  display: grid;
+  align-items: center;
+}
+.application-gate-card {
+  width: min(760px, 92vw);
+  padding: clamp(1.8rem, 5vw, 3.4rem);
 }
 
 @media (max-width: 600px) {
@@ -1679,6 +1688,16 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
 }
 .gate-line.in { opacity: 1; transform: translateY(0); }
+
+.gate-line--acceptance {
+  max-width: 38ch;
+  margin-bottom: clamp(1.2rem, 3vh, 2rem);
+  color: var(--parchment);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, min(2.6vw, 3vh), 1.75rem);
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+}
 
 .gate-line--seal {
   font-family: var(--font-display);

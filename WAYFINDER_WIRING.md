@@ -2,8 +2,8 @@
 
 > **Superseded.** The public application no longer submits any lead or answers
 > to Wayfinder OS. It filters locally, sends qualified applicants to an
-> Instagram handoff, and exposes the booking widget only on the standalone
-> `/application` route that Nico shares privately. The material below is retained
+> Instagram handoff. Nico shares the standalone `/application` acceptance page,
+> whose button opens the booking widget at `/application/booking`. The material below is retained
 > only as implementation history.
 >
 > **Previously partly superseded by [BOOKING_GATED_LEADS.md](BOOKING_GATED_LEADS.md).**

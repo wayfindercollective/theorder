@@ -36,6 +36,14 @@ export const qualifiedScreenContent = data.qualifiedScreen || {
   instagramUrl: 'https://ig.me/m/theorder.global',
 }
 
+export const commitmentGateContent = data.commitmentGate || {
+  acceptance: 'Well done on getting accepted for an inquiry. Only 3% of people make it this far.',
+  line1: 'We are inundated with applications',
+  line2: 'This will be your only call, failure to attend will result in no further consideration to your application.',
+  line3: 'You answered the questionnaire, are you a man of your word indeed?',
+  button: 'Book Your Enquiry Interview',
+}
+
 export const declineScreenContent = data.declineScreen || {
   heading: 'Thank you for your enquiry.',
   body: 'Please return when you have made progress and are willing to go all in.',

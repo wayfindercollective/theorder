@@ -6,6 +6,7 @@ import { TheCodeSection } from './components/sections/TheCodeSection.jsx'
 import { PrinciplesSection } from './components/sections/PrinciplesSection.jsx'
 import { WhatYouBecomeSection } from './components/sections/WhatYouBecomeSection.jsx'
 import { ApplicationSection } from './components/sections/ApplicationSection.jsx'
+import { ApplicationGatePage } from './components/sections/ApplicationGatePage.jsx'
 import { BookingPage } from './components/sections/BookingPage.jsx'
 import { FounderSection } from './components/sections/FounderSection.jsx'
 import { EvidenceSection } from './components/sections/EvidenceSection.jsx'
@@ -29,10 +30,12 @@ function isPresentationsRoute() {
   return typeof window !== 'undefined' && window.location.pathname.startsWith('/presentations')
 }
 
-function isBookingRoute() {
+function privateApplicationRoute() {
   if (typeof window === 'undefined') return false
   const path = window.location.pathname.replace(/\/+$/, '')
-  return path === '/application' || path === '/booking'
+  if (path === '/application' || path === '/booking') return 'gate'
+  if (path === '/application/booking') return 'booking'
+  return false
 }
 
 function AdminRoot() {
@@ -88,13 +91,15 @@ function PublicSite() {
     }
   }, [])
 
-  const bookingRoute = isBookingRoute()
+  const applicationRoute = privateApplicationRoute()
 
   return (
     <>
       <Header />
       <main className={DESIGN_V2 ? 'design-v2' : undefined}>
-        {bookingRoute ? (
+        {applicationRoute === 'gate' ? (
+          <ApplicationGatePage />
+        ) : applicationRoute === 'booking' ? (
           <BookingPage />
         ) : (
           <>

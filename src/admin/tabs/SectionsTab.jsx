@@ -120,6 +120,18 @@ const SECTION_DEFS = [
     ],
   },
   {
+    key: 'commitmentGate', nav: 'Application gate',
+    title: 'Private /application acceptance page',
+    note: 'Shown before the calendar. The button continues to /application/booking; nothing is collected on this page.',
+    fields: [
+      { path: ['commitmentGate', 'acceptance'], label: 'Acceptance message', textarea: true, rows: 3, hint: 'The opening congratulations and acceptance-rate message.' },
+      { path: ['commitmentGate', 'line1'], label: 'Applications line', textarea: true, hint: 'The large gold scarcity line. e.g. We are inundated with applications' },
+      { path: ['commitmentGate', 'line2'], label: 'Call terms', textarea: true, rows: 4, hint: 'Explains that this is their only call and the consequence of failing to attend.' },
+      { path: ['commitmentGate', 'line3'], label: 'Commitment challenge', textarea: true, rows: 3, hint: 'The question immediately above the booking button.' },
+      { path: ['commitmentGate', 'button'], label: 'Button text', hint: 'Continues to /application/booking.' },
+    ],
+  },
+  {
     key: 'consent', nav: 'Legal lines',
     title: 'Legal lines under the booking calendar',
     note: 'The application no longer asks for name, email or phone — applicants type those into the booking calendar itself, so these disclosures sit directly under it.',
@@ -215,7 +227,7 @@ const SECTION_DEFS = [
   },
   {
     key: 'finalScreen', nav: 'Booking page',
-    title: 'Private /application page',
+    title: 'Private /application/booking page',
     fields: [
       { path: ['finalScreen', 'heading'], label: 'Heading', hint: 'Display font, large.' },
       { path: ['finalScreen', 'sub'],     label: 'Sub line', textarea: true, hint: 'Standard body paragraph.' },

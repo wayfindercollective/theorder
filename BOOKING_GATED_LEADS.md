@@ -3,8 +3,9 @@
 **Status: superseded.** The application is now a local qualification filter:
 it collects no contact details and sends no applicant data to Wayfinder OS.
 Declined applicants see the return-later screen; qualified applicants see
-Nico's video/Instagram handoff. The calendar is isolated at `/application` and
-Nico shares that URL privately after the Instagram conversation.
+Nico's video/Instagram handoff. Nico privately shares `/application` after the
+Instagram conversation; its commitment button continues to the isolated
+calendar at `/application/booking`.
 
 The material below documents the retired implementation and is retained only
 for history.
