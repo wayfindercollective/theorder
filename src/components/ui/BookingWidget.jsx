@@ -31,8 +31,8 @@
  *    ONCE, and does not re-emit it if the iframe reloads onto its
  *    confirmation screen. Act on first receipt.
  */
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { BOOKING_URL } from '../../config/booking.js'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { BOOKING_URL, bookingUrlWithAttribution } from '../../config/booking.js'
 import { finalScreenContent } from '../../config/sectionContent.js'
 import { track } from '../../lib/analytics.js'
 
@@ -84,7 +84,10 @@ export function BookingWidget({ onBooked, booked }) {
   const onBookedRef = useRef(onBooked)
   onBookedRef.current = onBooked
 
-  const url = BOOKING_URL
+  // Computed once: the src must not change after first paint or the iframe
+  // reloads and the visitor loses their place in the calendar. BOOKING_ORIGIN
+  // above is derived from the bare URL, so the confirmation check is unaffected.
+  const url = useMemo(() => bookingUrlWithAttribution(BOOKING_URL), [])
 
   // CalendarView restores the visitor's last selected date from localStorage,
   // then calls scrollIntoView for the corresponding time pane. Because the

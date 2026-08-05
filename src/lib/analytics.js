@@ -15,7 +15,7 @@
  * All three ride the SAME track() calls already wired through the funnel
  * (session_start, form_started, form_submitted, …), so switching one on
  * instantly backfills it with the full existing event stream — including the
- * key conversion, which is mapped to Meta's standard `Lead` event below.
+ * funnel milestones mapped to Meta standard events below.
  */
 
 const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY
@@ -69,10 +69,34 @@ function bootGA4() {
 let _metaReady = false
 
 // Internal event name → Meta *standard* event. Fired IN ADDITION to the custom
-// event, so the ad account gets the optimizable standard conversion (Lead)
-// while still receiving every granular custom event for audience-building.
+// event, so the ad account gets optimizable standard conversions while still
+// receiving every granular custom event for audience-building.
+//
+// `Lead` is deliberately ABSENT here. Wayfinder OS owns it: it creates the deal
+// from the booking, and reports `Lead` to Meta server-side once Nico scores the
+// applicant past the threshold. That makes `Lead` mean "approved by Nico", with
+// exactly one sender — a browser-side `Lead` on booking would double-count it
+// (nothing here emits an `event_id` for Meta to deduplicate on) and would
+// dilute the one event that carries real quality signal.
+//
+// `Schedule` is absent for the same reason: the OS fires it server-side on the
+// booking (`bookingEventName`, defaulting to `Schedule`). A browser `Schedule`
+// here would need to share an `event_id` with that server event or Meta counts
+// both — and it would be the weaker of the two anyway. It cannot fire at all
+// for a booking made through the calendar's "open in a new tab" escape hatch,
+// which can't post back to this page, whereas the server event always fires and
+// carries fbc/fbp/IP/UA. Nothing is lost by leaving it to them: the booking
+// happens a day or two later in a different session, so the "same-session
+// signal" a browser event would add is mostly theoretical in this funnel.
+//
+// Which leaves the browser reporting reach, not quality. `SubmitApplication` is
+// the optimization target: it fires in the same session as the ad click, so it
+// is always attributable and has the volume to exit the learning phase.
+// `form_submitted` still emits as a custom event — usable for audiences and
+// reporting, just not as a standard conversion.
 const META_STANDARD_EVENTS = {
-  form_submitted: 'Lead',
+  questionnaire_completed: 'SubmitApplication',
+  instagram_handoff_clicked: 'Contact',
 }
 
 // Meta's Business Tools Terms prohibit sending data that reveals financial

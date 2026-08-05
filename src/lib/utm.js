@@ -74,8 +74,52 @@ export function captureAttribution() {
     const first = readStore()
     let changed = false
     Object.keys(last).forEach((k) => { if (!first[k]) { first[k] = last[k]; changed = true } })
+    // When the click id lands for the first time, stamp WHEN — `_fbc` encodes
+    // the click time and cannot be rebuilt later without it. Not in OUTPUT_KEYS,
+    // so it stays internal to readMetaIds() below.
+    if (first.fbclid && !first.fbclid_at) { first.fbclid_at = Date.now(); changed = true }
     if (changed) writeStore(first)
     return buildAttribution(last, first)
+  } catch {
+    return {}
+  }
+}
+
+// ---- Meta click / browser IDs ----------------------------------------------
+// The pixel writes `_fbc` (the ad click) and `_fbp` (the browser) as first-party
+// cookies on this domain. They are the strongest identifiers we hold: a
+// conversion reported later — by the CRM, server-side, from a different device
+// — matches back to the ad click near-perfectly with `fbc`, versus roughly half
+// the time on hashed email/phone alone. Nothing carries them off this page
+// unless we pass them explicitly.
+function readCookie(name) {
+  const all = typeof document === 'undefined' ? '' : document.cookie || ''
+  const hit = all.split('; ').find((c) => c.startsWith(name + '='))
+  if (!hit) return ''
+  try { return decodeURIComponent(hit.slice(name.length + 1)) } catch { return '' }
+}
+
+export function readMetaIds() {
+  try {
+    const out = {}
+    const fbp = readCookie('_fbp')
+    if (fbp) out.fbp = fbp
+    const fbc = readCookie('_fbc')
+    if (fbc) {
+      out.fbc = fbc
+      return out
+    }
+    // The pixel only writes `_fbc` when it sees an `fbclid` in the URL, and
+    // Safari's ITP expires script-written cookies after 7 days — but we kept the
+    // click id first-touch. Rebuild the value Meta expects:
+    // fb.<subdomainIndex>.<clickTimeMs>.<fbclid>, where index 1 is the
+    // registrable domain (theorder.global) the pixel writes to. Only with a real
+    // timestamp — a fabricated one would be worse than sending nothing.
+    const first = readStore()
+    if (first.fbclid && first.fbclid_at) {
+      out.fbc = `fb.1.${first.fbclid_at}.${first.fbclid}`
+    }
+    return out
   } catch {
     return {}
   }
