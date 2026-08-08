@@ -59,6 +59,11 @@ export function ApplicationSection() {
   const [declined, setDeclined] = useState(() => !!saved?.declined)
   const [formStarted, setFormStarted] = useState(false)
   const [questionViewedFor, setQuestionViewedFor] = useState(0)
+  // Choice transitions are delayed for the fade animation, so two very fast
+  // clicks on the last answer can otherwise queue finish() twice. Seed the
+  // lock from restored state as well: returning to an already-confirmed result
+  // must never emit SubmitApplication again.
+  const finishLockRef = useRef(!!saved?.finished)
 
   const total = questions.length
   const question = questions[step - 1]
@@ -92,6 +97,8 @@ export function ApplicationSection() {
   // `finalData` includes the last answer; React state may not have committed it
   // yet when the delayed question transition calls this function.
   const finish = useCallback((finalData) => {
+    if (finishLockRef.current) return
+    finishLockRef.current = true
     const shouldDecline = isDisqualified(finalData)
     track(shouldDecline ? 'application_declined' : 'questionnaire_completed', {
       result: shouldDecline ? 'declined' : 'qualified',
