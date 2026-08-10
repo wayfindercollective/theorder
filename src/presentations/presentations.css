@@ -47,6 +47,51 @@
 .pres-toolbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
 .pres-toolbar-error { color: var(--cordovan-light); font-family: var(--font-mono); font-size: 0.72rem; }
 
+/* ---- Portable downloads ---- */
+.pres-download { position: relative; }
+.pres-download > summary { list-style: none; cursor: pointer; }
+.pres-download > summary::-webkit-details-marker { display: none; }
+.pres-download > summary[aria-disabled="true"] { opacity: 0.5; cursor: default; }
+.pres-download-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: 290px;
+  padding: 6px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(166, 136, 74, 0.4);
+  border-radius: 4px;
+  box-shadow: 0 18px 50px -16px rgba(0, 0, 0, 0.95);
+}
+.pres-download-menu button {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  color: var(--parchment);
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+}
+.pres-download-menu button:hover { border-color: rgba(166, 136, 74, 0.35); background: rgba(166, 136, 74, 0.08); }
+.pres-download-menu strong { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; }
+.pres-download-menu span { color: var(--ash); font-size: 0.72rem; }
+
+/* A fixed reference-size present-mode deck used only while a .pptx is being
+   captured. Keeping it far off-screen avoids any editor flicker while leaving
+   it fully laid out and paintable by the browser. */
+.pres-export-render {
+  position: fixed;
+  left: -100000px;
+  top: 0;
+  width: 1280px;
+  pointer-events: none;
+}
+.pres-export-render .pres-stage { width: 1280px; height: 720px; }
+
 /* ---- Buttons ---- */
 .pres-btn {
   font-family: var(--font-mono);

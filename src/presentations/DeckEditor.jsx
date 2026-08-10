@@ -10,6 +10,7 @@ import { blankCustomSlide, blankSlideForIndex } from './siteImages.js'
 import { PresHero } from './PresHero.jsx'
 import { Slide } from './Slide.jsx'
 import { ImagePicker } from './ImagePicker.jsx'
+import { downloadDeckBackup, exportDeckToPowerPoint } from './exportPresentation.js'
 
 const newId = () => crypto.randomUUID()
 // v2: rich-text drafts. The version suffix invalidates any stale pre-rich draft
@@ -33,9 +34,13 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
   const [saving, setSaving] = useState(false)
   const [savedTick, setSavedTick] = useState(false)
   const [present, setPresent] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [exportProgress, setExportProgress] = useState(null)
   const [scrollToId, setScrollToId] = useState(null)
   const [addPicker, setAddPicker] = useState(false)
   const deckRef = useRef(null)
+  const exportRef = useRef(null)
+  const downloadRef = useRef(null)
   const dragIndex = useRef(null)
   // Bumped on every edit; lets save() detect edits that landed mid-request.
   const revRef = useRef(0)
@@ -262,6 +267,37 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
     try { if (document.fullscreenElement) document.exitFullscreen?.() } catch { /* noop */ }
   }
 
+  const downloadBackup = () => {
+    downloadRef.current?.removeAttribute('open')
+    try {
+      downloadDeckBackup(deck)
+    } catch (e) {
+      setError(`Backup download failed: ${humanizeError(e)}`)
+    }
+  }
+
+  const downloadPowerPoint = async () => {
+    if (exporting) return
+    downloadRef.current?.removeAttribute('open')
+    setExporting(true)
+    setExportProgress(null)
+    setError('')
+
+    // The hidden present-mode stages mount when exporting becomes true. Two
+    // frames ensure React and the browser have both finished laying them out.
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+
+    try {
+      const stages = [...(exportRef.current?.querySelectorAll('.pres-stage') || [])]
+      await exportDeckToPowerPoint({ deck, stages, onProgress: setExportProgress })
+    } catch (e) {
+      setError(`PowerPoint export failed: ${humanizeError(e)}`)
+    } finally {
+      setExporting(false)
+      setExportProgress(null)
+    }
+  }
+
   // Present-mode keyboard: scroll between stages (←/→ included for clickers),
   // Escape to exit.
   useEffect(() => {
@@ -301,6 +337,11 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
   }
 
   const saveLabel = saving ? 'Saving…' : dirty ? 'Save' : savedTick ? 'Saved ✓' : 'Saved'
+  const downloadLabel = exporting
+    ? exportProgress
+      ? `Exporting ${exportProgress.current}/${exportProgress.total}`
+      : 'Preparing…'
+    : 'Download'
 
   return (
     <div className={`pres-editor${present ? ' is-present' : ''}`}>
@@ -317,6 +358,25 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
           {error && <span className="pres-toolbar-error">{error}</span>}
           <div className="pres-toolbar-right">
             <button type="button" className="pres-btn" onClick={save} disabled={saving || !dirty}>{saveLabel}</button>
+            <details className="pres-download" ref={downloadRef}>
+              <summary
+                className="pres-btn"
+                aria-disabled={exporting}
+                onClick={exporting ? (e) => e.preventDefault() : undefined}
+              >
+                {downloadLabel}
+              </summary>
+              <div className="pres-download-menu">
+                <button type="button" onClick={downloadPowerPoint}>
+                  <strong>PowerPoint (.pptx)</strong>
+                  <span>Opens in PowerPoint or Google Slides</span>
+                </button>
+                <button type="button" onClick={downloadBackup}>
+                  <strong>Source backup (.json)</strong>
+                  <span>Keeps the editable presentation data</span>
+                </button>
+              </div>
+            </details>
             <button type="button" className="pres-btn pres-btn-primary" onClick={enterPresent}>Present</button>
             <button type="button" className="pres-btn pres-btn-ghost" onClick={onSignOut} title="Sign out">⎋</button>
           </div>
@@ -379,6 +439,15 @@ export function DeckEditor({ deckId, newDeck, onClose, onSignOut }) {
           </div>
         )}
       </div>
+
+      {exporting && (
+        <div className="pres-export-render" ref={exportRef} aria-hidden="true">
+          <PresHero />
+          {deck.slides.map((slide, i) => (
+            <Slide key={slide.id} slide={slide} index={i} total={deck.slides.length} present />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
