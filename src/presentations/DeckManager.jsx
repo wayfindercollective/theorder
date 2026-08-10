@@ -7,6 +7,7 @@
 import { useEffect, useState } from 'react'
 import { listDecks, deleteDeck, getDeck, renameDeck, saveDeck, humanizeError } from './presentationsApi.js'
 import { buildDefaultDeck } from './siteImages.js'
+import { PresentationDownload } from './PresentationDownload.jsx'
 
 const newId = () => crypto.randomUUID()
 
@@ -100,6 +101,13 @@ export function DeckManager({ onOpen, onNew, onSignOut }) {
                   </span>
                 </button>
                 <div className="pres-deck-actions">
+                  <PresentationDownload
+                    deck={deck}
+                    onError={setError}
+                    onBusyChange={setBusy}
+                    disabled={busy}
+                    buttonClassName="pres-btn pres-btn-ghost"
+                  />
                   <button type="button" className="pres-btn pres-btn-ghost" disabled={busy} onClick={() => rename(deck)}>Rename</button>
                   <button type="button" className="pres-btn pres-btn-ghost" disabled={busy} onClick={() => duplicate(deck)} title="Make a copy of this presentation">Duplicate</button>
                   <button type="button" className="pres-btn pres-btn-ghost pres-danger" disabled={busy} onClick={() => remove(deck)}>Delete</button>
