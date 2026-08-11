@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   brandContent,
   footerContent,
@@ -6,6 +6,7 @@ import {
 } from '../../config/sectionContent.js'
 import { track } from '../../lib/analytics.js'
 import { bgImage } from '../../lib/img.js'
+import { maxPreload, pickVideoSource } from '../../lib/video.js'
 
 function instagramDetails() {
   const url = qualifiedScreenContent.instagramUrl || footerContent.instagram || ''
@@ -14,15 +15,32 @@ function instagramDetails() {
   return { url, handle: rawHandle.startsWith('@') ? rawHandle : `@${rawHandle}` }
 }
 
+// This screen exists to get Nico's message watched — there is nothing else to
+// do on it — so the video is mounted with the rest of the page and buffers
+// during the reveal animation rather than waiting for the press.
+//
+// `inView` comes from the section around it. In the normal flow it is already
+// true (they just answered the last question here), so buffering starts at
+// once. It matters on a reload: the questionnaire result is restored from
+// sessionStorage, so this screen remounts at the very bottom of a homepage
+// that opens at the top, and without the gate it would pull the whole clip
+// down before the applicant had scrolled anywhere near it.
+
 /**
  * The successful result of the local questionnaire filter. There is
  * deliberately no booking link here. The applicant must first contact Nico on
  * Instagram; Nico sends the private /application URL himself if they should move
  * forward.
  */
-export function QualifiedScreen() {
+export function QualifiedScreen({ inView = true }) {
   const [stage, setStage] = useState(0)
-  const [videoPlaying, setVideoPlaying] = useState(false)
+  const [videoStarted, setVideoStarted] = useState(false)
+  const videoRef = useRef(null)
+  const [videoSrc] = useState(() => pickVideoSource(
+    qualifiedScreenContent.video,
+    qualifiedScreenContent.videoMobile,
+  ))
+  const [preload] = useState(maxPreload)
   const { url, handle } = instagramDetails()
   const videoLabel = qualifiedScreenContent.videoLabel || "Watch Nico's Message"
   const message = qualifiedScreenContent.message ??
@@ -39,6 +57,17 @@ export function QualifiedScreen() {
       clearTimeout(third)
     }
   }, [])
+
+  const startVideo = () => {
+    const el = videoRef.current
+    if (!el) return
+    setVideoStarted(true)
+    track('qualified_video_started')
+    // Rejects if the applicant navigates away or interrupts the start. Not
+    // worth surfacing: the native controls are showing by then, so the video
+    // sits there paused and one tap resumes it.
+    el.play()?.catch(() => {})
+  }
 
   return (
     <div className="final-screen qualified-screen">
@@ -65,29 +94,34 @@ export function QualifiedScreen() {
               ? { backgroundImage: bgImage(qualifiedScreenContent.poster) }
               : undefined}
           >
-            {videoPlaying ? (
-              <video
-                className="qualified-video-player"
-                src={qualifiedScreenContent.video}
-                poster={qualifiedScreenContent.poster || undefined}
-                controls
-                autoPlay
-                playsInline
-                preload="metadata"
-                onEnded={() => setVideoPlaying(false)}
-                onError={() => setVideoPlaying(false)}
-              >
-                Your browser does not support embedded video.
-              </video>
-            ) : (
+            <video
+              ref={videoRef}
+              className="qualified-video-player"
+              src={videoSrc}
+              poster={qualifiedScreenContent.poster || undefined}
+              controls={videoStarted}
+              playsInline
+              preload={inView ? preload : 'none'}
+              /* Covers the case where the browser starts it some other way —
+                 a native control, or a resumed session — so the button never
+                 sits on top of a playing video. */
+              onPlay={() => setVideoStarted(true)}
+              /* Rewind so a replay opens on the first frame rather than the
+                 last one, and bring the branded trigger back over it. */
+              onEnded={() => {
+                if (videoRef.current) videoRef.current.currentTime = 0
+                setVideoStarted(false)
+              }}
+              onError={() => setVideoStarted(false)}
+            >
+              Your browser does not support embedded video.
+            </video>
+            {!videoStarted && (
               <button
                 type="button"
                 className="founder-video-trigger qualified-video-trigger"
                 aria-label={videoLabel}
-                onClick={() => {
-                  setVideoPlaying(true)
-                  track('qualified_video_started')
-                }}
+                onClick={startVideo}
               >
                 <span className="founder-video-play" aria-hidden="true">▶</span>
                 <span className="founder-video-label display">{videoLabel}</span>

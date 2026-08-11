@@ -192,7 +192,7 @@ export function ApplicationSection() {
           <div className="application-card card card-stitched nailed" ref={formRef}>
             <span className="nail-tl" />
             <span className="nail-br" />
-            {declined ? <DeclineScreen /> : <QualifiedScreen />}
+            {declined ? <DeclineScreen /> : <QualifiedScreen inView={inView} />}
           </div>
         )}
       </div>

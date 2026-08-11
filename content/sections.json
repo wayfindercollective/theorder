@@ -75,14 +75,15 @@
   "qualifiedScreen": {
     "heading": "Congratulations",
     "sub": "You have passed the first stage.",
-    "video": "/videos/post-questionnaire-cta.mp4",
+    "video": "/videos/post-questionnaire-cta-720.mp4",
     "poster": "/videos/post-questionnaire-cta-poster.jpg",
     "videoLabel": "Watch Nico's Message",
     "message": "Watch Nico's video, then take the next step.",
     "note": "",
     "button": "Message @theorder.global",
     "instagramHandle": "@theorder.global",
-    "instagramUrl": "https://ig.me/m/theorder.global"
+    "instagramUrl": "https://ig.me/m/theorder.global",
+    "videoMobile": "/videos/post-questionnaire-cta-540.mp4"
   },
   "commitmentGate": {
     "acceptance": "WELL DONE",
@@ -96,7 +97,7 @@
     "heading": "Who Am I",
     "placeholderMark": "Nico Seedsman - Afghanistan",
     "portrait": "/images/founder-portrait.jpg",
-    "video": "/videos/who-am-i.mp4",
+    "video": "/videos/who-am-i-720.mp4",
     "videoLabel": "Watch Nico's Story",
     "paragraphs": [
       "I am a former SAS tier-1 (Special Operations) Operator with three kill/capture combat deployments and thirteen years in the military; I have overcome and thrived through PTSD and autoimmunity post war; I am a Master Freemason and a Knight of the Order of Saint Martino, Rome; I am a Founder, an artist, a lover, a gentleman, a savage, and a man of God.",
@@ -108,7 +109,8 @@
     "templated": true,
     "templatedLabel": "TEMPLATED",
     "image": "/images/oil-founder.jpg",
-    "imageAlign": "full"
+    "imageAlign": "full",
+    "videoMobile": "/videos/who-am-i-540.mp4"
   },
   "evidence": {
     "eyebrow": "IV",

@@ -1,14 +1,27 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useInView } from '../../hooks/useInView.js'
 import { founderContent } from '../../config/sectionContent.js'
 import { renderRich } from '../../lib/richtext.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
 import { bgImage } from '../../lib/img.js'
+import { maxPreload, pickVideoSource } from '../../lib/video.js'
 
 export function FounderSection() {
   const { ref, inView } = useInView()
-  const [videoPlaying, setVideoPlaying] = useState(false)
+  const [videoStarted, setVideoStarted] = useState(false)
+  const videoRef = useRef(null)
+  const [videoSrc] = useState(() => pickVideoSource(founderContent.video, founderContent.videoMobile))
+  const [preload] = useState(maxPreload)
   const videoLabel = founderContent.videoLabel || "Watch Nico's Story"
+
+  const startVideo = () => {
+    const el = videoRef.current
+    if (!el) return
+    setVideoStarted(true)
+    // Rejects if the visitor navigates away or interrupts the start. The native
+    // controls are showing by then, so it just sits paused and one tap resumes.
+    el.play()?.catch(() => {})
+  }
   return (
     <section className="section section-founder" ref={ref}>
       {founderContent.image && (
@@ -38,31 +51,41 @@ export function FounderSection() {
           >
             <span className="nail-tl" />
             <span className="nail-br" />
-            {founderContent.video && videoPlaying ? (
+            {founderContent.video && (
               <video
+                ref={videoRef}
                 className="founder-video"
-                src={founderContent.video}
+                src={videoSrc}
                 poster={founderContent.portrait || undefined}
-                controls
-                autoPlay
+                controls={videoStarted}
                 playsInline
-                preload="metadata"
-                onEnded={() => setVideoPlaying(false)}
-                onError={() => setVideoPlaying(false)}
+                /* Unlike the qualified screen, this player is one section of a
+                   long page most visitors scroll past — buffering it on load
+                   would spend megabytes on a clip they never open. Hold at
+                   `none` until the section comes into view (`once: true`, so it
+                   latches), then buffer ahead of the press. */
+                preload={inView ? preload : 'none'}
+                onPlay={() => setVideoStarted(true)}
+                onEnded={() => {
+                  if (videoRef.current) videoRef.current.currentTime = 0
+                  setVideoStarted(false)
+                }}
+                onError={() => setVideoStarted(false)}
               >
                 Your browser does not support embedded video.
               </video>
-            ) : founderContent.video ? (
+            )}
+            {founderContent.video && !videoStarted && (
               <button
                 type="button"
                 className="founder-video-trigger"
-                onClick={() => setVideoPlaying(true)}
+                onClick={startVideo}
                 aria-label={videoLabel}
               >
                 <span className="founder-video-play" aria-hidden="true">▶</span>
                 <span className="founder-video-label display">{videoLabel}</span>
               </button>
-            ) : null}
+            )}
             {!founderContent.portrait && (
               <div className="founder-portrait-inner">
                 <span className="restraint founder-portrait-mark">
