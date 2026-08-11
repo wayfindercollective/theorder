@@ -1583,7 +1583,11 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .qualified-video-player {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  /* Both players now stay mounted so they can buffer before the press, which
+     leaves them underneath their play button instead of swapped out for it.
+     The layering is the same in both cards: player 2, trigger 3, and the
+     founder card's frame and nails 4 on top of everything. */
+  z-index: 2;
   display: block;
   width: 100%;
   height: 100%;
@@ -1952,7 +1956,8 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .founder-video-trigger {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  /* Above the player it covers (z-index 2), below the frame and nails (4). */
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1994,7 +1999,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .founder-video {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 2;
   display: block;
   width: 100%;
   height: 100%;
@@ -2633,6 +2638,69 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   color: var(--parchment);
   line-height: 1.2;
 }
+/* "become" is a split section (design.js), so this list lives in a ~600px well.
+   A single long word — "connectivity", "Prosperity" — was wider than its grid
+   column at the sizes above and punched out past the section edge, where it was
+   clipped rather than wrapped. Grid columns do not shrink below their longest
+   word unless told to, so this is a correctness rule, not a nicety. */
+.offering { overflow-wrap: break-word; min-width: 0; }
+
+/* ---- Term + description form ------------------------------------------------
+   Used when the offerings carry explanations. Two type sizes are set as custom
+   properties so the whole block scales from one CMS choice, and the tiers stay
+   fluid within themselves rather than jumping at a breakpoint. */
+.offerings-grid--defined {
+  grid-template-columns: 1fr;
+  gap: 1.55rem;
+  text-align: left;
+  max-width: 40rem;
+  --offering-term: clamp(1.12rem, 2vw, 1.4rem);
+  --offering-desc: clamp(0.95rem, 1.45vw, 1.04rem);
+}
+.offerings-grid--defined[data-size="small"] {
+  --offering-term: clamp(1rem, 1.7vw, 1.18rem);
+  --offering-desc: clamp(0.86rem, 1.25vw, 0.94rem);
+}
+.offerings-grid--defined[data-size="large"] {
+  --offering-term: clamp(1.3rem, 2.5vw, 1.75rem);
+  --offering-desc: clamp(1.04rem, 1.7vw, 1.18rem);
+}
+/* Two columns only where there is genuinely room. The split well is too narrow
+   for it below this width, so the choice is ignored rather than honoured into
+   an unreadable layout. */
+@media (min-width: 1250px) {
+  .offerings-grid--defined[data-columns="2"] {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2.4rem;
+    max-width: 100%;
+  }
+}
+.offerings-grid--defined .offering {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  /* Cancel the label-list clamp; the two spans carry their own sizes. */
+  font-size: inherit;
+  letter-spacing: normal;
+  line-height: 1.3;
+}
+.offerings-grid--defined .offering-term {
+  font-size: var(--offering-term);
+  letter-spacing: 0.06em;
+  color: var(--brass-light);
+  line-height: 1.25;
+}
+.offerings-grid--defined .offering-desc {
+  font-family: var(--font-body);
+  font-size: var(--offering-desc);
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  color: var(--parchment);
+  /* The description is support, not a second heading — hold it back from the
+     brass term without dropping it below comfortable reading contrast. */
+  opacity: 0.88;
+  text-transform: none;
+}
 .offering-closing {
   margin-top: 3rem;
   text-align: center;
@@ -2773,6 +2841,16 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
    the lightest pairing on the page, so give it the most help. */
 .section-become .offering-closing {
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.88);
+}
+
+/* The offerings list has the same problem, and worse below 901px where the
+   split collapses and the painting runs full-bleed behind the text: the
+   brightest part of the picture — the gold dress — lands under the middle of
+   the list, washing the brass terms out. Same remedy as the closing line, so
+   the painting stays visible instead of being covered by a plate. */
+.section-become .offering-term,
+.section-become .offering-desc {
+  text-shadow: 0 1px 10px rgba(8, 7, 6, 0.9), 0 1px 3px rgba(8, 7, 6, 0.85);
 }
 
 /* Founder — the letter is laid over the brightest region of the window
@@ -3177,6 +3255,26 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   font-family: var(--font-body);
   resize: vertical;
   min-height: 80px;
+}
+
+.admin-select {
+  /* `appearance: none` drops the platform arrow along with the platform
+     styling, so draw one back in — without it the control reads as a plain
+     text box and nobody discovers it opens. */
+  appearance: none;
+  padding-right: 2.6rem;
+  background-image: linear-gradient(45deg, transparent 50%, var(--brass) 50%),
+                    linear-gradient(135deg, var(--brass) 50%, transparent 50%);
+  background-position: calc(100% - 1.25rem) 55%, calc(100% - 0.85rem) 55%;
+  background-size: 0.4rem 0.4rem, 0.4rem 0.4rem;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+/* The dropdown list itself is drawn by the OS and does not inherit the dark
+   field, so state its colours explicitly or Windows renders black on black. */
+.admin-select option {
+  background: var(--bg-surface);
+  color: var(--parchment);
 }
 
 /* Options */

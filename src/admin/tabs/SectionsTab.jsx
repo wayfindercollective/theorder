@@ -7,6 +7,9 @@
  * Field flags:
  *   textarea   — multiline plain text (rows defaults to 3, override with `rows`)
  *   markdown   — multiline markdown (with toolbar + preview)
+ *   options    — [{ value, label }] renders a dropdown instead of a text input.
+ *                Use for presentation choices (sizes, column counts) so the
+ *                site only ever receives a value it has styling for.
  *   hint       — small grey caption under the field
  *
  * A `{ divider: 'Label' }` entry in a fields list renders a small labelled rule
@@ -79,7 +82,16 @@ const SECTION_DEFS = [
     fields: [
       { path: ['become', 'eyebrow'],   label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VI' },
       { path: ['become', 'heading'],   label: 'Heading' },
-      { path: ['become', 'offerings'], label: 'Offerings', textarea: true, rows: 10, hint: 'One offering per line.' },
+      { path: ['become', 'offerings'], label: 'Offerings', textarea: true, rows: 14, hint: 'One offering per line. To add an explanation, put two dashes after the name: “Brotherhood -- community of like minded, integrous gentlemen”. The name is shown in gold with its explanation beneath. Lines with no dashes stay as plain names.' },
+      { path: ['become', 'offeringsSize'], label: 'Offerings text size', options: [
+        { value: 'medium', label: 'Medium (default)' },
+        { value: 'small', label: 'Small — best for long explanations or a long list' },
+        { value: 'large', label: 'Large — best for short names only' },
+      ], hint: 'Only affects offerings that have explanations. Use Small if the list is running too long down the page.' },
+      { path: ['become', 'offeringsColumns'], label: 'Offerings columns', options: [
+        { value: '1', label: 'One column (default)' },
+        { value: '2', label: 'Two columns — shortens the page on wide screens' },
+      ], hint: 'Two columns only apply on large desktop screens; phones and the narrower layout always use one so the text stays readable.' },
       { path: ['become', 'closing'],   label: 'Closing line', hint: 'One line under the list. e.g. I hope that you join us.' },
     ],
   },
@@ -110,6 +122,7 @@ const SECTION_DEFS = [
       { path: ['qualifiedScreen', 'heading'], label: 'Heading', hint: 'Confirms that the application has been submitted.' },
       { path: ['qualifiedScreen', 'sub'], label: 'Sub line', hint: 'Short line confirming they passed the first stage.' },
       { path: ['qualifiedScreen', 'video'], label: 'Nico video URL', hint: 'Full video URL supplied by Nico. Leave blank to show the development placeholder.' },
+      { path: ['qualifiedScreen', 'videoMobile'], label: 'Nico video URL (mobile)', hint: 'Optional smaller copy of the same video, used on phones so it starts faster. Leave blank to use the one above everywhere.' },
       { path: ['qualifiedScreen', 'poster'], label: 'Video poster URL', hint: 'Optional still image shown before the video plays.' },
       { path: ['qualifiedScreen', 'videoLabel'], label: 'Video play button', hint: 'Text shown beneath the play icon. e.g. Watch Nico\'s Message' },
       { path: ['qualifiedScreen', 'message'], label: 'Next-step instruction', textarea: true, rows: 3, hint: 'Short encouragement to watch the video and continue.' },
@@ -162,6 +175,7 @@ const SECTION_DEFS = [
       { path: ['founder', 'placeholderMark'], label: 'Portrait label', hint: 'Caption in the portrait frame until a photo is uploaded. e.g. Nico Seedsman — Afghanistan' },
       { path: ['founder', 'templatedLabel'],  label: 'Placeholder badge', hint: 'Small corner badge on the portrait frame while no photo is uploaded. Internal marker — e.g. TEMPLATED.' },
       { path: ['founder', 'video'],            label: 'Founder video URL', hint: 'When set, the portrait becomes a click-to-play video. Leave blank to keep the portrait unchanged.' },
+      { path: ['founder', 'videoMobile'],      label: 'Founder video URL (mobile)', hint: 'Optional smaller copy of the same video, used on phones so it starts faster. Leave blank to use the one above everywhere.' },
       { path: ['founder', 'videoLabel'],       label: 'Founder video button', hint: 'Text shown over the portrait. e.g. Watch Nico\'s Story' },
       { path: ['founder', 'paragraphs', 0],   label: 'Paragraph 1', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
       { path: ['founder', 'paragraphs', 1],   label: 'Paragraph 2', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
@@ -339,7 +353,20 @@ export function SectionsTab({ sections, onChange }) {
               return (
                 <label key={id} className="admin-field" htmlFor={id}>
                   <span className="admin-field-label">{f.label}</span>
-                  {f.textarea ? (
+                  {f.options ? (
+                    <select
+                      id={id}
+                      className="input-field admin-select"
+                      /* Fall back to the first option rather than showing a
+                         blank row when the key is absent from sections.json. */
+                      value={value || f.options[0].value}
+                      onChange={(e) => update(f.path, e.target.value)}
+                    >
+                      {f.options.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  ) : f.textarea ? (
                     <textarea
                       id={id}
                       className={'input-field admin-textarea' + italicClass}
