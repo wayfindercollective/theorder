@@ -114,10 +114,13 @@ export async function fetchContent() {
   return await jsonFetch('/api/admin/content', { method: 'GET' })
 }
 
-export async function saveContent({ sections, questions }) {
+// `payload` holds only the pieces that changed — any of { sections, questions,
+// variants: { slug: data } }. One file per save is the common case; each file
+// sent is one commit and one deploy, so sending clean files wastes deploys.
+export async function saveContent(payload) {
   return await jsonFetch('/api/admin/content', {
     method: 'POST',
-    body: JSON.stringify({ sections, questions }),
+    body: JSON.stringify(payload),
   })
 }
 

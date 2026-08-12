@@ -65,16 +65,24 @@ export default function AdminApp() {
     }
   }, [])
 
+  // `next` holds only the changed pieces (AdminEditor diffs per file). Merge
+  // the server's stored copies over the previous content so untouched pieces
+  // keep their baseline.
   const onSave = useCallback(async (next) => {
     setError('')
     setLoading(true)
     try {
       const saved = await saveContent(next)
       // Reflect exactly what the server stored (rich fields come back sanitised).
-      setContent({
-        sections: saved?.sections ?? next.sections,
-        questions: saved?.questions ?? next.questions,
-      })
+      setContent((prev) => ({
+        sections: saved?.sections ?? next.sections ?? prev?.sections,
+        questions: saved?.questions ?? next.questions ?? prev?.questions,
+        variants: {
+          ...(prev?.variants || {}),
+          ...(next.variants || {}),
+          ...(saved?.variants || {}),
+        },
+      }))
       return { ok: true }
     } catch (err) {
       const human = humanizeError(err)

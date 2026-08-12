@@ -3149,6 +3149,30 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   border-color: var(--brass-deep);
 }
 
+/* Page selector — Main Site vs each variant landing page (Sections tab) */
+.admin-page-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--iron);
+}
+.admin-page-selector-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ash);
+  margin-right: 0.35rem;
+}
+.admin-page-chip.active {
+  color: var(--parchment, var(--brass-light));
+  border-color: var(--brass-deep);
+  background: rgba(255, 255, 255, 0.04);
+}
+
 /* Labelled rule sub-grouping fields inside a long block (testimonial cards) */
 .admin-fields-divider {
   margin: 0.8rem 0 0;

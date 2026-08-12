@@ -12,7 +12,8 @@
     "make:signature-lockup": "node scripts/make-signature-lockup.mjs",
     "optimize:paintings": "node scripts/optimize-paintings.mjs",
     "optimize:videos": "node scripts/optimize-videos.mjs",
-    "optimize:hero-videos": "node scripts/optimize-hero-videos.mjs"
+    "optimize:hero-videos": "node scripts/optimize-hero-videos.mjs",
+    "seed:variant": "node scripts/seed-variant.mjs"
   },
   "dependencies": {
     "@octokit/rest": "^21.0.2",

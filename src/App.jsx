@@ -15,6 +15,7 @@ import { HowWeOperateSection } from './components/sections/HowWeOperateSection.j
 import { ClosingSection } from './components/sections/ClosingSection.jsx'
 import { FooterSection } from './components/sections/FooterSection.jsx'
 import { captureAttribution } from './lib/utm.js'
+import { variantSlugFromPath } from './config/variantFields.js'
 import { bootAnalytics, track } from './lib/analytics.js'
 import { DESIGN_V2 } from './config/design.js'
 
@@ -81,6 +82,10 @@ function PublicSite() {
         referrer: document.referrer,
         viewport_w: window.innerWidth,
         viewport_h: window.innerHeight,
+        // Derived fresh from the CURRENT pathname, never the first-touch
+        // store — a visitor who saw /physical last week and /financial today
+        // is labelled financial today. Blocked from Meta in analytics.js.
+        landing_variant: variantSlugFromPath(window.location.pathname) || 'main',
       })
     }
     const requestIdle = window.requestIdleCallback

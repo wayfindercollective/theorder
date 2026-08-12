@@ -101,8 +101,10 @@ const META_STANDARD_EVENTS = {
 
 // Meta's Business Tools Terms prohibit sending data that reveals financial
 // status or health/personal-hardship categories. These props still flow to
-// PostHog and GA4 above — they must never reach the pixel.
-const META_BLOCKED_PROPS = ['income_bracket', 'life_area']
+// PostHog and GA4 above — they must never reach the pixel. `landing_variant`
+// names a health/wealth focus area; Meta already sees the URL via PageView,
+// but our own event props stay clean of it.
+const META_BLOCKED_PROPS = ['income_bracket', 'life_area', 'landing_variant']
 
 function metaSafe(props) {
   if (!META_BLOCKED_PROPS.some((k) => k in props)) return props

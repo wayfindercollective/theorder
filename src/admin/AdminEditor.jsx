@@ -7,6 +7,7 @@ import { LogoTab } from './tabs/LogoTab.jsx'
 import { LibraryTab } from './tabs/LibraryTab.jsx'
 import { EmailSignatureTab } from './tabs/EmailSignatureTab.jsx'
 import { getDeployStatus, humanizeError } from './adminApi.js'
+import { VARIANT_PAGES, pickVariantFields } from '../config/variantFields.js'
 
 const TABS = [
   { id: 'sections',    label: 'Sections' },
@@ -29,9 +30,44 @@ const DRAFT_KEY = 'order_admin_draft_v1'
 // no longer matches (someone else saved on top), we drop the draft so
 // we don't surface stale edits as if they were against fresh content.
 
+// djb2 over the full serialisation — length + first-64-chars collided too
+// easily once variant edits pushed real differences past char 64.
 function fingerprint(obj) {
-  try { return JSON.stringify(obj).length + ':' + JSON.stringify(obj).slice(0, 64) }
-  catch { return '' }
+  try {
+    const s = JSON.stringify(obj)
+    let h = 5381
+    for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0
+    return s.length + ':' + h.toString(36)
+  } catch { return '' }
+}
+
+// The editable draft for the variant pages. A page whose file does not exist
+// yet (GET returned null) seeds from the live base copy, filtered through the
+// whitelist — it reads as clean and its file is created on first save.
+function seedVariants(content) {
+  const out = {}
+  for (const { slug } of VARIANT_PAGES) {
+    out[slug] = content.variants?.[slug] || pickVariantFields(content.sections)
+  }
+  return out
+}
+
+// Only the pieces of the draft that differ from the loaded baseline. This IS
+// the save payload: each file sent is one commit and one deploy, so a
+// one-word edit to the Physical page must not re-commit sections.json,
+// questions.json or the other variant.
+function diffPayload(content, draft) {
+  const payload = {}
+  if (JSON.stringify(draft.sections) !== JSON.stringify(content.sections)) payload.sections = draft.sections
+  if (JSON.stringify(draft.questions) !== JSON.stringify(content.questions)) payload.questions = draft.questions
+  const baseline = seedVariants(content)
+  const dv = draft.variants || baseline
+  const variants = {}
+  for (const { slug } of VARIANT_PAGES) {
+    if (JSON.stringify(dv[slug]) !== JSON.stringify(baseline[slug])) variants[slug] = dv[slug]
+  }
+  if (Object.keys(variants).length) payload.variants = variants
+  return payload
 }
 
 function readDraft() {
@@ -105,6 +141,8 @@ function useDeployStatus(saveTrigger) {
 
 export function AdminEditor({ content, loading, error, onSave, onLogout }) {
   const [tab, setTab] = useState('sections')
+  // Which page the Sections tab is editing: 'main' or a variant slug.
+  const [page, setPage] = useState('main')
   const [draft, setDraft] = useState(null)
   const [saveStatus, setSaveStatus] = useState({ state: 'idle', message: '' })
   const [restorePrompt, setRestorePrompt] = useState(null) // { draft, savedAt } | null
@@ -132,11 +170,14 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
       return
     }
     baselineFpRef.current = fp
+    const seeded = {
+      sections: content.sections,
+      questions: content.questions,
+      variants: seedVariants(content),
+    }
     const stored = readDraft()
     if (stored && stored.baselineFp === fp) {
-      const matches = JSON.stringify(stored.draft) === JSON.stringify({
-        sections: content.sections, questions: content.questions,
-      })
+      const matches = JSON.stringify(stored.draft) === JSON.stringify(seeded)
       if (!matches) {
         setRestorePrompt({ draft: stored.draft, savedAt: stored.savedAt })
       } else {
@@ -146,13 +187,12 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
       // baseline drifted (someone else saved). Drop stale draft.
       clearDraft()
     }
-    setDraft({ sections: content.sections, questions: content.questions })
+    setDraft(seeded)
   }, [content])
 
   const dirty = useMemo(() => {
     if (!content || !draft) return false
-    return JSON.stringify(content.sections) !== JSON.stringify(draft.sections)
-        || JSON.stringify(content.questions) !== JSON.stringify(draft.questions)
+    return Object.keys(diffPayload(content, draft)).length > 0
   }, [content, draft])
 
   // Persist draft to localStorage whenever it changes and is actually dirty.
@@ -181,7 +221,8 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
     if (!dirty || saveStatus.state === 'saving') return
     setSaveStatus({ state: 'saving', message: 'Saving…' })
     const revAtSave = revRef.current
-    const r = await onSave(draft)
+    // Send only the changed files — each one is a commit and a deploy.
+    const r = await onSave(diffPayload(content, draft))
     if (r.ok) {
       if (revRef.current === revAtSave) {
         clearDraft()
@@ -219,6 +260,16 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
   const updateQuestions = useCallback((patch) => {
     revRef.current += 1
     setDraft((d) => ({ ...d, questions: typeof patch === 'function' ? patch(d.questions) : patch }))
+  }, [])
+  const updateVariant = useCallback((slug, patch) => {
+    revRef.current += 1
+    setDraft((d) => ({
+      ...d,
+      variants: {
+        ...d.variants,
+        [slug]: typeof patch === 'function' ? patch(d.variants[slug]) : patch,
+      },
+    }))
   }, [])
 
   const acceptRestore = useCallback(() => {
@@ -293,7 +344,14 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
       </nav>
 
       <main className="admin-tab-body">
-        {tab === 'sections'    && <SectionsTab    sections={draft.sections} onChange={updateSections} />}
+        {tab === 'sections'    && (
+          <SectionsTab
+            sections={page === 'main' ? draft.sections : draft.variants[page]}
+            onChange={page === 'main' ? updateSections : (patch) => updateVariant(page, patch)}
+            page={page}
+            onPageChange={setPage}
+          />
+        )}
         {tab === 'application' && (
           <ApplicationTab
             questions={draft.questions}

@@ -5,6 +5,8 @@
 // Vanity links: a clean single-segment path (theorder.global/some-video) is read
 // as utm_campaign with source/medium defaulting to youtube/video. Explicit
 // ?utm_* query params always win over those defaults.
+import { RESERVED_VARIANT_SLUGS } from '../config/variantFields.js'
+
 const URL_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid']
 const OUTPUT_KEYS = [...URL_KEYS, 'referrer']
 const FIRST_TOUCH_STORE = 'wf_attribution_first'
@@ -12,9 +14,14 @@ const FIRST_TOUCH_STORE = 'wf_attribution_first'
 const VANITY_SOURCE = 'youtube'
 const VANITY_MEDIUM = 'video'
 // Every real non-root path of this site — never read these as a campaign slug.
+// Includes ALL seven focus-area variant slugs (built or not): they are our own
+// page names, and letting them attribute as vanity "campaigns" in the interim
+// would contaminate campaign reporting and then flip meaning when the page
+// ships. Links to variant pages carry explicit ?utm_* params instead.
 const RESERVED_PATHS = new Set([
   '', 'admin', 'presentations', 'application', 'booking', 'api', 'images', 'testimonials', 'assets',
   'favicon', 'robots', 'sitemap', 'index', 'index.html', '2',
+  ...RESERVED_VARIANT_SLUGS,
 ])
 
 // Path segment -> normalized campaign slug.

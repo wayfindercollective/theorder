@@ -26,6 +26,7 @@ import { MarkdownField } from '../MarkdownField.jsx'
 import { SectionVideoField } from '../SectionVideoField.jsx'
 import { RichText } from '../../components/ui/RichText.jsx'
 import { richModeForPath } from '../../lib/richtext.js'
+import { VARIANT_PAGES, VARIANT_FIELDS } from '../../config/variantFields.js'
 
 const SECTION_DEFS = [
   {
@@ -262,6 +263,39 @@ const SECTION_DEFS = [
   },
 ]
 
+// ── Variant pages ────────────────────────────────────────────────────────
+//
+// The same tab edits the main site and each variant landing page (/physical,
+// /financial), switched by the Page chips at the top. On a variant page,
+// SECTION_DEFS is filtered through the VARIANT_FIELDS whitelist: only
+// variant-owned sections appear, and within them only text fields — videos,
+// posters and the Instagram details stay shared with the main site.
+
+// Extra guidance shown under a section title on variant pages, where shared
+// fields have been filtered out.
+const VARIANT_NOTES = {
+  founder: 'The founder video is shared with the main site — edit it on the Main Site page.',
+  qualifiedScreen: 'The video, poster and Instagram details are shared with the main site — edit them on the Main Site page.',
+}
+
+function variantField(f) {
+  if (f.divider) return false
+  if (f.video) return false
+  const allowed = VARIANT_FIELDS[f.path[0]]
+  return !!allowed && allowed.includes(f.path[1])
+}
+
+function defsForPage(page) {
+  if (page === 'main') return SECTION_DEFS
+  return SECTION_DEFS
+    .filter((sec) => VARIANT_FIELDS[sec.key])
+    .map((sec) => ({
+      ...sec,
+      note: VARIANT_NOTES[sec.key] || sec.note,
+      fields: sec.fields.filter(variantField),
+    }))
+}
+
 function getAt(obj, path) {
   let cur = obj
   for (const k of path) {
@@ -280,13 +314,35 @@ function setAt(obj, path, value) {
   return next
 }
 
-export function SectionsTab({ sections, onChange }) {
+export function SectionsTab({ sections, onChange, page = 'main', onPageChange }) {
   const update = (path, value) => onChange((cur) => setAt(cur, path, value))
+  const defs = defsForPage(page)
 
   return (
     <div className="admin-tab-pane">
+      {onPageChange && (
+        <nav className="admin-page-selector" aria-label="Page">
+          <span className="admin-page-selector-label">Page</span>
+          {[{ slug: 'main', label: 'Main Site' }, ...VARIANT_PAGES].map((p) => (
+            <button
+              key={p.slug}
+              type="button"
+              className={'admin-jump-chip admin-page-chip' + (p.slug === page ? ' active' : '')}
+              onClick={() => onPageChange(p.slug)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </nav>
+      )}
+      {page !== 'main' && (
+        <p className="restraint admin-tab-intro">
+          You are editing the words of theorder.global/{page} only. Images, videos,
+          testimonials, the application questions and the main site are untouched.
+        </p>
+      )}
       <nav className="admin-jump" aria-label="Jump to section">
-        {SECTION_DEFS.map((sec) => (
+        {defs.map((sec) => (
           <button
             key={sec.key}
             type="button"
@@ -300,8 +356,8 @@ export function SectionsTab({ sections, onChange }) {
         ))}
       </nav>
 
-      {SECTION_DEFS.map((sec) => (
-        <section key={sec.key} id={'admin-sec-' + sec.key} className="admin-section-block">
+      {defs.map((sec) => (
+        <section key={page + '-' + sec.key} id={'admin-sec-' + sec.key} className="admin-section-block">
           <h2 className="admin-section-title display">{sec.title}</h2>
           {sec.note && <p className="restraint admin-tab-intro">{sec.note}</p>}
           <div className="admin-fields">
