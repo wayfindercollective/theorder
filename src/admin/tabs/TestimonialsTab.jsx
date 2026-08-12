@@ -32,12 +32,24 @@ import {
 } from '../adminApi.js'
 import { ImagePickerModal } from '../ImagePickerModal.jsx'
 import { posterFromFile, posterFromUrl } from '../videoPoster.js'
+import { canTranscode, transcodeVideo } from '../videoTranscode.js'
 import { videoLibraryFrom, freshVideoUploads, videoUploadLabel } from '../../lib/videoLibrary.js'
 import { RichText } from '../../components/ui/RichText.jsx'
 
-// Past this a clip is the slowest thing on the page — the bundled ones are
-// 6–17 MB AFTER compression, so this is a nudge, not a wall.
+// Past this a clip is the slowest thing on the page. Clips are compressed on
+// upload now, so reaching this after a transcode means the clip is simply long.
 const BIG_CLIP_BYTES = 25 * 1024 * 1024
+
+// Above this, uploading without compressing is not an option worth offering —
+// a clip this size is what made the rail crawl in the first place. Below it,
+// a failed transcode falls back to uploading the original.
+const HARD_LIMIT_BYTES = 20 * 1024 * 1024
+
+// Worth a transcode pass. Under this a clip is already light enough that
+// re-encoding would cost quality and the admin's time for no real gain
+// (videoTranscode applies the same floor, on dimensions too).
+const COMPRESS_ABOVE_BYTES = 10 * 1024 * 1024
+const needsCompression = (file) => file.size > COMPRESS_ABOVE_BYTES
 
 const VIDEO_ACCEPT = 'video/mp4,video/quicktime,video/webm,video/x-m4v'
 
@@ -219,20 +231,57 @@ function TestimonialCard({ card, index, total, sections, savedSections, onPatch,
     setNote('')
     setProgress(0)
     try {
-      // Grab the poster BEFORE the upload: reading the local file is instant
+      // Grab the poster BEFORE anything else: reading the local file is instant
       // and can't fail on CORS the way reading it back from Blob might.
       let posterUrl = null
       try { posterUrl = await capturePoster(file, { fromFile: true }) } catch { posterUrl = null }
 
-      const { url } = await uploadVideo(file, setProgress)
+      // Compress before upload. This is the only step that sees every clip
+      // however it arrives, so it is where the size problem has to be solved —
+      // a clip uploaded here used to reach the site at whatever size it came
+      // off the phone, and one 76 MB testimonial was enough to make the rail
+      // crawl. Failing to compress must not cost the admin their upload, so a
+      // transcode error falls through to the size gate below rather than
+      // aborting.
+      let upload = file
+      let savedFrom = 0
+      if (needsCompression(file)) {
+        if (!canTranscode()) {
+          throw new Error(
+            `This clip is ${bytes(file.size)} and this browser can’t compress video. ` +
+            'Open /admin in Chrome, Edge or Safari and try again, or send the clip to Nathan to compress.'
+          )
+        }
+        setBusy('compressing')
+        try {
+          const result = await transcodeVideo(file, { onProgress: setProgress })
+          if (!result.skipped && result.outputs[0]) {
+            upload = result.outputs[0].file
+            savedFrom = file.size
+          }
+        } catch (err) {
+          if (file.size > HARD_LIMIT_BYTES) throw err
+          setNote(`Couldn’t compress this clip (${humanizeError(err)}) — uploading it as it is.`)
+        }
+        setProgress(0)
+      }
+
+      setBusy('video')
+      const { url } = await uploadVideo(upload, setProgress)
       onPatch({ video: url, type: 'video', ...(posterUrl ? { poster: posterUrl } : {}) })
 
+      const parts = []
+      if (savedFrom) parts.push(`compressed ${bytes(savedFrom)} → ${bytes(upload.size)}`)
+      if (posterUrl) parts.push('poster frame captured')
       const warnings = []
       if (!posterUrl) warnings.push('a still couldn’t be captured from this clip — add a poster image below')
-      if (file.size > BIG_CLIP_BYTES) {
-        warnings.push(`this clip is ${bytes(file.size)} — large clips slow the page down, so ask Nathan to compress it`)
+      if (upload.size > BIG_CLIP_BYTES) {
+        warnings.push(`it is still ${bytes(upload.size)}, which is large — a shorter clip would load faster`)
       }
-      setNote(warnings.length ? `Uploaded, but ${warnings.join('; ')}.` : 'Uploaded — poster frame captured automatically.')
+      setNote(
+        'Uploaded' + (parts.length ? ` — ${parts.join(', ')}` : '') +
+        (warnings.length ? `. Note: ${warnings.join('; ')}.` : '.')
+      )
     } catch (err) {
       setError(humanizeError(err))
     } finally {
@@ -346,9 +395,11 @@ function TestimonialCard({ card, index, total, sections, savedSections, onPatch,
                   type="button" className="btn btn-ghost"
                   onClick={() => fileRef.current?.click()} disabled={locked}
                 >
-                  {busy === 'video'
-                    ? `Uploading ${progress}%…`
-                    : card.video ? 'Replace clip' : 'Upload a clip'}
+                  {busy === 'compressing'
+                    ? `Compressing ${progress}%…`
+                    : busy === 'video'
+                      ? `Uploading ${progress}%…`
+                      : card.video ? 'Replace clip' : 'Upload a clip'}
                 </button>
                 <button
                   type="button" className="btn btn-ghost"
@@ -357,8 +408,19 @@ function TestimonialCard({ card, index, total, sections, savedSections, onPatch,
                   Choose existing
                 </button>
               </div>
-              {busy === 'video' && (
-                <div className="tm-progress"><span style={{ width: `${progress}%` }} /></div>
+              {(busy === 'video' || busy === 'compressing') && (
+                <>
+                  <div className="tm-progress"><span style={{ width: `${progress}%` }} /></div>
+                  {busy === 'compressing' && (
+                    /* Compression plays the clip through to re-encode it, so it
+                       takes about as long as the clip runs. Say so — otherwise a
+                       three-minute testimonial looks like a hung page. */
+                    <p className="admin-field-hint">
+                      Shrinking this clip so the page loads fast. It takes about as long as
+                      the clip plays — keep this tab open and in front.
+                    </p>
+                  )}
+                </>
               )}
               <input
                 className="input-field admin-image-src-input"

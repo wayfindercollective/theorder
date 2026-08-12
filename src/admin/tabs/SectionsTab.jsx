@@ -10,6 +10,10 @@
  *   options    — [{ value, label }] renders a dropdown instead of a text input.
  *                Use for presentation choices (sizes, column counts) so the
  *                site only ever receives a value it has styling for.
+ *   video      — upload control that compresses the clip and writes BOTH the
+ *                desktop and phone URLs. `path` is the desktop key and
+ *                `mobilePath` the phone one; they are edited together because
+ *                writing one without the other leaves the pair inconsistent.
  *   hint       — small grey caption under the field
  *
  * A `{ divider: 'Label' }` entry in a fields list renders a small labelled rule
@@ -19,6 +23,7 @@
  */
 
 import { MarkdownField } from '../MarkdownField.jsx'
+import { SectionVideoField } from '../SectionVideoField.jsx'
 import { RichText } from '../../components/ui/RichText.jsx'
 import { richModeForPath } from '../../lib/richtext.js'
 
@@ -121,8 +126,7 @@ const SECTION_DEFS = [
     fields: [
       { path: ['qualifiedScreen', 'heading'], label: 'Heading', hint: 'Confirms that the application has been submitted.' },
       { path: ['qualifiedScreen', 'sub'], label: 'Sub line', hint: 'Short line confirming they passed the first stage.' },
-      { path: ['qualifiedScreen', 'video'], label: 'Nico video URL', hint: 'Full video URL supplied by Nico. Leave blank to show the development placeholder.' },
-      { path: ['qualifiedScreen', 'videoMobile'], label: 'Nico video URL (mobile)', hint: 'Optional smaller copy of the same video, used on phones so it starts faster. Leave blank to use the one above everywhere.' },
+      { path: ['qualifiedScreen', 'video'], mobilePath: ['qualifiedScreen', 'videoMobile'], video: true, label: 'Nico’s video', hint: 'Shown to applicants who pass the filter. Clear both boxes to show the development placeholder.' },
       { path: ['qualifiedScreen', 'poster'], label: 'Video poster URL', hint: 'Optional still image shown before the video plays.' },
       { path: ['qualifiedScreen', 'videoLabel'], label: 'Video play button', hint: 'Text shown beneath the play icon. e.g. Watch Nico\'s Message' },
       { path: ['qualifiedScreen', 'message'], label: 'Next-step instruction', textarea: true, rows: 3, hint: 'Short encouragement to watch the video and continue.' },
@@ -174,8 +178,7 @@ const SECTION_DEFS = [
       { path: ['founder', 'heading'],         label: 'Heading', hint: 'Display font, centered.' },
       { path: ['founder', 'placeholderMark'], label: 'Portrait label', hint: 'Caption in the portrait frame until a photo is uploaded. e.g. Nico Seedsman — Afghanistan' },
       { path: ['founder', 'templatedLabel'],  label: 'Placeholder badge', hint: 'Small corner badge on the portrait frame while no photo is uploaded. Internal marker — e.g. TEMPLATED.' },
-      { path: ['founder', 'video'],            label: 'Founder video URL', hint: 'When set, the portrait becomes a click-to-play video. Leave blank to keep the portrait unchanged.' },
-      { path: ['founder', 'videoMobile'],      label: 'Founder video URL (mobile)', hint: 'Optional smaller copy of the same video, used on phones so it starts faster. Leave blank to use the one above everywhere.' },
+      { path: ['founder', 'video'], mobilePath: ['founder', 'videoMobile'], video: true, label: 'Founder video', hint: 'When set, the portrait becomes a click-to-play video. Clear both boxes to go back to a plain portrait.' },
       { path: ['founder', 'videoLabel'],       label: 'Founder video button', hint: 'Text shown over the portrait. e.g. Watch Nico\'s Story' },
       { path: ['founder', 'paragraphs', 0],   label: 'Paragraph 1', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
       { path: ['founder', 'paragraphs', 1],   label: 'Paragraph 2', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
@@ -309,6 +312,24 @@ export function SectionsTab({ sections, onChange }) {
               }
               const value = getAt(sections, f.path) ?? ''
               const id = sec.key + '-' + f.path.join('-')
+
+              if (f.video) {
+                return (
+                  <SectionVideoField
+                    key={id}
+                    label={f.label}
+                    hint={f.hint}
+                    value={getAt(sections, f.path) ?? ''}
+                    mobileValue={getAt(sections, f.mobilePath) ?? ''}
+                    // One update for the pair: two sequential `update` calls
+                    // would each read a stale `sections` and the second would
+                    // discard the first.
+                    onChange={({ video, videoMobile }) =>
+                      onChange((cur) => setAt(setAt(cur, f.path, video), f.mobilePath, videoMobile))
+                    }
+                  />
+                )
+              }
 
               const richMode = richModeForPath(f.path)
               if (richMode) {
