@@ -2651,7 +2651,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
    fluid within themselves rather than jumping at a breakpoint. */
 .offerings-grid--defined {
   grid-template-columns: 1fr;
-  gap: 1.55rem;
+  gap: 0.95rem;
   text-align: left;
   max-width: 40rem;
   --offering-term: clamp(1.12rem, 2vw, 1.4rem);
@@ -2671,14 +2671,14 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 @media (min-width: 1250px) {
   .offerings-grid--defined[data-columns="2"] {
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem 2.4rem;
+    gap: 1rem 2.4rem;
     max-width: 100%;
   }
 }
 .offerings-grid--defined .offering {
   display: flex;
   flex-direction: column;
-  gap: 0.28rem;
+  gap: 0.18rem;
   /* Cancel the label-list clamp; the two spans carry their own sizes. */
   font-size: inherit;
   letter-spacing: normal;
@@ -2694,7 +2694,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   font-family: var(--font-body);
   font-size: var(--offering-desc);
   letter-spacing: 0.01em;
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--parchment);
   /* The description is support, not a second heading — hold it back from the
      brass term without dropping it below comfortable reading contrast. */
@@ -2702,7 +2702,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   text-transform: none;
 }
 .offering-closing {
-  margin-top: 3rem;
+  margin-top: 2rem;
   text-align: center;
   color: var(--brass-light);
   font-size: clamp(1.2rem, 2.2vw, 1.6rem);
@@ -2841,6 +2841,14 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
    the lightest pairing on the page, so give it the most help. */
 .section-become .offering-closing {
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.88);
+}
+
+/* The accolade painting: the queen stands at ~35% across the canvas, the
+   kneeling knight at ~55%. Centered cropping featured her; Nico wants the
+   knight as the subject with her at the edge of frame, so bias the window
+   toward his side of the canvas. */
+.section-become .section-side-image {
+  background-position: 64% 50%;
 }
 
 /* The offerings list has the same problem, and worse below 901px where the

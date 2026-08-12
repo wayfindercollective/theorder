@@ -37,7 +37,7 @@ export function WhatYouBecomeSection() {
             <span className="brass-rule" /> {becomeContent.eyebrow} <span className="brass-rule" />
           </div>
           <h2 className="display section-heading become-heading" dangerouslySetInnerHTML={renderRich(becomeContent.heading)} />
-          <div className="section-divider" style={{ margin: '2rem auto 3rem' }} />
+          <div className="section-divider" style={{ margin: '1.5rem auto 2rem' }} />
         </div>
 
         <ul
