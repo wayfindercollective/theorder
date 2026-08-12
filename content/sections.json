@@ -76,11 +76,11 @@
   },
   "qualifiedScreen": {
     "heading": "Legend, Well Done",
-    "sub": "Watch the video and take the next step.",
+    "sub": "Watch the video and take the next step",
     "video": "/videos/post-questionnaire-cta-720.mp4",
     "poster": "/videos/post-questionnaire-cta-poster.jpg",
     "videoLabel": "Watch Nico's Message",
-    "message": "If you’re not yet comfortable sending a video, then send us a long text or voice message. ",
+    "message": "If you’re not yet comfortable sending a video, then send us a long text or voice message",
     "note": "",
     "button": "Message @theorder.global",
     "instagramHandle": "@theorder.global",
