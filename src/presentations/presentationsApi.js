@@ -47,6 +47,14 @@ export async function login(password) {
   return data.token
 }
 
+// Sliding session: same refresh endpoint as admin, but reading and storing
+// THIS area's token so the two areas stay independently gated.
+export async function refreshSession() {
+  const data = await call('/api/admin/refresh', { method: 'POST' })
+  if (data?.token) setToken(data.token)
+  return data?.token
+}
+
 async function call(url, opts = {}) {
   const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) }
   const token = getToken()

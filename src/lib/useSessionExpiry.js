@@ -1,51 +1,67 @@
 /**
- * Shared session-expiry hook — extracted from AdminApp so both the admin editor
- * and the presentations builder warn before the JWT lapses and sign out when it
- * does. Returns a warning string ('' when none). `active` gates the timers;
- * `onExpire` is called once the token is past expiry.
+ * Sliding session hook — shared by the admin editor and the presentations
+ * builder. While the area is active it silently swaps the JWT for a fresh one
+ * every half hour, so an editor who is sitting there signed in NEVER gets the
+ * old "session expires in 5 minutes" warning or a forced sign-out mid-work.
+ *
+ * Sign-out now only happens when renewal is genuinely impossible: the token
+ * already lapsed (away for more than a day, laptop asleep past expiry). A
+ * network or server hiccup keeps the current token and simply retries on the
+ * next tick.
+ *
+ * Returns a warning string for backwards compatibility with its render sites;
+ * it is now always '' (there is nothing to warn about).
  */
-import { useEffect, useRef, useState } from 'react'
-import { getTokenExpiryMs as adminTokenExpiryMs } from '../admin/adminApi.js'
+import { useEffect } from 'react'
+import {
+  getTokenExpiryMs as adminTokenExpiryMs,
+  refreshSession as adminRefreshSession,
+} from '../admin/adminApi.js'
 
-const EXPIRY_WARN_MS = 5 * 60 * 1000
-const WARN_MSG = 'Your session expires in under 5 minutes — save now and sign in again to extend.'
+const REFRESH_INTERVAL_MS = 30 * 60 * 1000
 
-// `getExpiryMs` lets each area read its OWN token's expiry (admin vs presentations).
-export function useSessionExpiry(active, onExpire, getExpiryMs = adminTokenExpiryMs) {
-  const [warning, setWarning] = useState('')
-  const warnRef = useRef(null)
-  const expiryRef = useRef(null)
-
+// `getExpiryMs` / `refresh` let each area work its OWN token (admin vs
+// presentations — separate localStorage keys, same JWT format and endpoint).
+export function useSessionExpiry(
+  active,
+  onExpire,
+  getExpiryMs = adminTokenExpiryMs,
+  refresh = adminRefreshSession,
+) {
   useEffect(() => {
-    clearTimeout(warnRef.current)
-    clearTimeout(expiryRef.current)
-    setWarning('')
     if (!active) return
+    let cancelled = false
+    let timer = null
 
-    const expMs = getExpiryMs()
-    if (!expMs) return
-    const untilExp = expMs - Date.now()
-    if (untilExp <= 0) {
-      onExpire()
-      return
+    const tick = async () => {
+      if (cancelled) return
+      const expMs = getExpiryMs()
+      if (!expMs) return
+      if (expMs - Date.now() <= 0) {
+        // Already lapsed (e.g. machine slept past expiry) — a refresh would be
+        // rejected too, so sign out. Drafts survive in localStorage.
+        onExpire()
+        return
+      }
+      try {
+        await refresh()
+      } catch (err) {
+        if (err?.status === 401) {
+          onExpire()
+          return
+        }
+        // Offline or server hiccup: current token is still good for now,
+        // try again next tick.
+      }
+      if (!cancelled) timer = setTimeout(tick, REFRESH_INTERVAL_MS)
     }
 
-    const untilWarn = untilExp - EXPIRY_WARN_MS
-    if (untilWarn > 0) {
-      warnRef.current = setTimeout(() => setWarning(WARN_MSG), untilWarn)
-    } else {
-      setWarning(WARN_MSG)
-    }
-    expiryRef.current = setTimeout(() => {
-      setWarning('')
-      onExpire()
-    }, untilExp)
-
+    tick()
     return () => {
-      clearTimeout(warnRef.current)
-      clearTimeout(expiryRef.current)
+      cancelled = true
+      clearTimeout(timer)
     }
-  }, [active, onExpire, getExpiryMs])
+  }, [active, onExpire, getExpiryMs, refresh])
 
-  return warning
+  return ''
 }

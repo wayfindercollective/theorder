@@ -113,6 +113,14 @@ export async function login(password) {
   return r.token
 }
 
+// Sliding session: trade the current (still valid) token for a fresh 24h one.
+// Called on a timer by useSessionExpiry so an editor left open never lapses.
+export async function refreshSession() {
+  const r = await jsonFetch('/api/admin/refresh', { method: 'POST' })
+  if (r?.token) setToken(r.token)
+  return r?.token
+}
+
 export async function fetchContent() {
   return await jsonFetch('/api/admin/content', { method: 'GET' })
 }
