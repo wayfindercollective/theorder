@@ -1,22 +1,22 @@
 {
   "hero": {
-    "eyebrow": "",
+    "eyebrow": "Rebuild the body. Reforge the man.",
     "headline": "THE ORDER",
     "verseLine": "Mark 12:30 · Mark 12:31",
     "cta": "God wills it - Apply",
-    "restraint": "",
+    "restraint": "The body is the first battlefield.",
     "scrollLabel": "Scroll"
   },
   "truth": {
     "eyebrow": "I",
     "provocation": [
-      "Are you <strong>sick?</strong>",
-      "And <strong>tired?</strong>",
-      "And <strong>disgusted?</strong>",
-      "And <strong>disappointed?</strong>",
+      "Are you <strong>weaker</strong> than the man you were?",
+      "<strong>Softer?</strong>",
+      "<strong>Slower?</strong>",
+      "Winded on the stairs, <strong>heavy in the mirror?</strong>",
       "",
-      "Have you <strong>had enough yet?</strong>",
-      "Are you <strong>sufficiently unsatisfied, men?</strong>"
+      "Your body is not a burden. It is your <strong>first weapon.</strong>",
+      "Have you <strong>had enough yet, men?</strong>"
     ]
   },
   "code": {
@@ -31,22 +31,22 @@
   },
   "become": {
     "eyebrow": "VI",
-    "heading": "We're Offering You",
-    "offerings": "Transcendence -- find the truest and realest you, the \"youest you\"\nPurpose -- aligned purpose, a clear path to your destiny\nBrotherhood -- community of like minded, integrous, well-rounded savage gentlemen\nCourage -- the strength to answer your calls-to-action and conquer your fears\nWarrior Code -- to be noble, a man of principals, of virtues; to be chivalrous\nSpirituality -- connectivity to the divine and his benevolent wisdom and guidance \nAdventure -- feel the full expression of life as a man on a quest; you are the main character\nSavagery --  a call to your nature; to be wild, daring and primal; again\nPhysical Resilience -- the toughest, strongest, most athletic and healthiest version of you \nFinancial Prosperity -- the clear alignment of your truest mission, with passion \nMentoring -- you now have a community of wisdom to lean on\nMental Fortitude -- the calmest, centred, most focussed mind you've ever known\nLove -- the healthiest relationship with yourself, your girl, your family, and those you love",
+    "heading": "We're Offering You Your Body Back",
+    "offerings": "Physical Resilience -- the strongest, toughest, most athletic and healthiest version of you, built to last decades\nDiscipline -- train, eat and sleep like a man with a mission, held accountable daily\nSavagery -- a call to your nature; to be wild, physically capable and primal; again\nWarrior Code -- strength in service of something; a protector's body, not a vanity project\nMental Fortitude -- the calm, centred, focussed mind that only a hard-trained body carries\nBrotherhood -- train, suffer and celebrate beside like minded, integrous savage gentlemen\nAdventure -- survival, combatives and wild country retreats that demand the body you are building\nCourage -- the strength to answer your calls-to-action and conquer your fears\nPurpose -- a reason to be strong that outlasts motivation\nTranscendence -- find the truest and realest you; the body is the doorway\nLove -- the energy and presence to show up fully for your girl, your family, and those you love",
     "offeringsSize": "medium",
     "offeringsColumns": "1",
-    "closing": "I hope that you join us"
+    "closing": "I hope you join us at your strongest"
   },
   "considered": {
     "eyebrow": "IV",
-    "heading": "[ Heading - 2–4 words ]",
+    "heading": "[ Heading - 2-4 words ]",
     "for_": "[ Apply if… line ]",
     "not": "[ Do not apply if… line ]"
   },
   "faq": {
     "eyebrow": "VII",
     "heading": "Questions a Serious Man Asks",
-    "questions": "Do you wish not only to heal, but to transform and prosper?\nAre you tired of swimming upstream from your destiny and highest self?\nAre you capable, humble and courageous enough to pass an eight-week program?\nDo you want to stand in a global brotherhood of savage gentlemen who hold the same principles as you?\nDo you want to attend daring, fun, life-changing retreats and bond with those same high calibre brethren?\nDo you want to work daily -- be held accountable, and hold others accountable -- toward lasting transformation and reinvention?\nDo you want to be the truest, most authentic version of yourself, released from the shackles of fear and attachment?"
+    "questions": "Do you wish not only to get fit, but to transform and prosper in every arena?\nAre you tired of programs that train the body and abandon the man?\nAre you capable, humble and courageous enough to pass an eight-week program?\nDo you want to stand in a global brotherhood of strong, disciplined, savage gentlemen?\nDo you want to attend daring, physical, life-changing retreats and bond with high calibre brethren?\nDo you want to be held accountable daily, in training, eating, sleeping and recovering, toward lasting transformation?\nDo you want to inhabit the strongest, healthiest, most capable version of yourself, released from the shackles of comfort?"
   },
   "howWeOperate": {
     "eyebrow": "VIII",
