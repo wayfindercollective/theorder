@@ -2844,11 +2844,24 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 
 /* The accolade painting: the queen stands at ~35% across the canvas, the
-   kneeling knight at ~55%. Centered cropping featured her; Nico wants the
-   knight as the subject with her at the edge of frame, so bias the window
-   toward his side of the canvas. */
+   kneeling knight at ~55%. Two things buried him: centered cropping put the
+   queen mid-frame with dead space to her left, and the left-panel mask fades
+   exactly where he kneels. So (1) bias the crop window hard toward his side
+   of the canvas — the queen's sword arm stays at the edge of frame — and
+   (2) hold the mask solid further across so he is lit, not dissolved.
+   Desktop-only: the phone layout drops the horizontal fade on purpose. */
 .section-become .section-side-image {
-  background-position: 64% 50%;
+  background-position: 78% 50%;
+}
+@media (min-width: 901px) {
+  .section-become .section-side-image-left {
+    -webkit-mask-image:
+      linear-gradient(to right, black 48%, rgba(0, 0, 0, 0.4) 84%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+    mask-image:
+      linear-gradient(to right, black 48%, rgba(0, 0, 0, 0.4) 84%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+  }
 }
 
 /* The offerings list has the same problem, and worse below 901px where the
