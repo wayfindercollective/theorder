@@ -55,7 +55,7 @@
   "become": {
     "eyebrow": "VI",
     "heading": "We're Offering You",
-    "offerings": "Transcendence -- find the truest and realest you, the \"youest you\"\nPurpose -- aligned purpose, a clear path to your destiny\nBrotherhood -- community of like minded, integrous, well-rounded savage gentlemen\nCourage -- the strength to answer your calls-to-action and conquer your fears\nWarrior Code -- to be noble, a man of principals, of virtues; to be chivalrous\nSpirituality -- connectivity to the divine and his benevolent wisdom and guidance \nAdventure -- feel the full expression of life as a man on a quest; you are the main character\nSavagery --  a call to your nature; to be wild, daring and primal; again\nPhysical Resilience -- the toughest, strongest, most athletic and healthiest version of you \nFinancial Prosperity -- the clear alignment of your truest mission, with passion \nMentoring -- you now have a community of wisdom to lean on\nMental Fortitude -- the calmest, centred, most focussed mind you've ever known\nLove -- the healthiest relationship with yourself, your girl, your family, and those you love",
+    "offerings": "Transcendence -- Find the truest and realest you, the \"youest you\"\nPurpose -- Aligned purpose, a clear path to your destiny\nBrotherhood -- Community of like minded, integrous, well-rounded savage gentlemen\nCourage -- The strength to answer your calls-to-action and conquer your fears\nWarrior Code -- To be noble, a man of principals, of virtues; to be chivalrous\nSpiritual -- Connectivity to the divine and his benevolent wisdom and guidance \nAdventure -- Feel the full expression of life as a man on a quest; you are the main character\nSavagery --  A call to your nature; to be wild, daring and primal; again\nPhysical Resilience -- The toughest, strongest, most athletic and healthiest version of you \nFinancial Prosperity -- The clear alignment of your truest mission, with passion \nMentoring -- You now have a community of wisdom to lean on\nMental Fortitude -- The calmest, centred, most focussed mind you've ever known\nLove -- The healthiest relationship with yourself, your girl, your family, and those you love",
     "offeringsSize": "medium",
     "offeringsColumns": "1",
     "closing": "I hope that you join us",
@@ -75,12 +75,12 @@
     "backButton": "← Back"
   },
   "qualifiedScreen": {
-    "heading": "Legend, Well Done",
-    "sub": "Watch the video and take the next step",
-    "video": "/videos/post-questionnaire-cta-720.mp4",
+    "heading": "Congratulations",
+    "sub": "You have passed the first stage.",
+    "video": "/videos/post-questionnaire-cta.mp4",
     "poster": "/videos/post-questionnaire-cta-poster.jpg",
     "videoLabel": "Watch Nico's Message",
-    "message": "If you’re not yet comfortable sending a video, then send us a long text or voice message",
+    "message": "Watch Nico's video, then take the next step.",
     "note": "",
     "button": "Message @theorder.global",
     "instagramHandle": "@theorder.global",
@@ -88,8 +88,8 @@
     "videoMobile": "/videos/post-questionnaire-cta-540.mp4"
   },
   "commitmentGate": {
-    "acceptance": "AGAIN, WELL DONE",
-    "line1": "WeI cull 90% of applicants make thus far",
+    "acceptance": "WELL DONE",
+    "line1": "4% of applicants make it this far",
     "line2": "It is now time to book our call together",
     "line3": "Let's take the hill",
     "button": "Book Your Enquiry Interview"
@@ -99,7 +99,7 @@
     "heading": "Who Am I",
     "placeholderMark": "Nico Seedsman - Afghanistan",
     "portrait": "/images/founder-portrait.jpg",
-    "video": "/videos/who-am-i-720.mp4",
+    "video": "/videos/who-am-i.mp4",
     "videoLabel": "Watch Nico's Story",
     "paragraphs": [
       "I am a former SAS tier-1 (Special Operations) Operator with three kill/capture combat deployments and thirteen years in the military; I have overcome and thrived through PTSD and autoimmunity post war; I am a Master Freemason and a Knight of the Order of Saint Martino, Rome; I am a Founder, an artist, a lover, a gentleman, a savage, and a man of God.",
