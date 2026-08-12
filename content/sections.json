@@ -75,12 +75,12 @@
     "backButton": "← Back"
   },
   "qualifiedScreen": {
-    "heading": "Congratulations",
-    "sub": "You have passed the first stage.",
+    "heading": "Legend, Well Done",
+    "sub": "Watch the video, then take the next step.",
     "video": "/videos/post-questionnaire-cta-720.mp4",
     "poster": "/videos/post-questionnaire-cta-poster.jpg",
     "videoLabel": "Watch Nico's Message",
-    "message": "Watch Nico's video, then take the next step.",
+    "message": "If you’re not yet comfortable sending a video, then send us a long text or voice message. ",
     "note": "",
     "button": "Message @theorder.global",
     "instagramHandle": "@theorder.global",
@@ -88,8 +88,8 @@
     "videoMobile": "/videos/post-questionnaire-cta-540.mp4"
   },
   "commitmentGate": {
-    "acceptance": "WELL DONE",
-    "line1": "4% of applicants make it this far",
+    "acceptance": "AGAIN, WELL DONE",
+    "line1": "WeI cull 90% of applicants make thus far",
     "line2": "It is now time to book our call together",
     "line3": "Let's take the hill",
     "button": "Book Your Enquiry Interview"
