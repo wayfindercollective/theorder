@@ -12,15 +12,15 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { RESERVED_VARIANT_SLUGS, pickVariantFields } from '../src/config/variantFields.js'
+import { RESERVED_VARIANT_SLUGS, isValidVariantSlug, pickVariantFields } from '../src/config/variantFields.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const args = process.argv.slice(2).filter((a) => a !== '--')
 const force = args.includes('--force')
 const slug = args.find((a) => !a.startsWith('-'))
 
-if (!slug || !RESERVED_VARIANT_SLUGS.includes(slug)) {
-  console.error(`Usage: npm run seed:variant -- <slug> [--force]\nSlugs: ${RESERVED_VARIANT_SLUGS.join(', ')}`)
+if (!slug || !isValidVariantSlug(slug)) {
+  console.error(`Usage: npm run seed:variant -- <slug> [--force]\nAny lowercase letters/digits/hyphens slug works. Planned areas: ${RESERVED_VARIANT_SLUGS.join(', ')}`)
   process.exit(1)
 }
 

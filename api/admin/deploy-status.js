@@ -10,8 +10,15 @@
  *   VERCEL_PROJECT_ID — the project's id (Project → Settings → General)
  *   VERCEL_TEAM_ID    — optional, only if the project is under a team
  *
+ * Query:
+ *   sha — optional git commit sha to wait for. When given, the latest
+ *   deployment only counts if its meta.githubCommitSha matches; otherwise the
+ *   response is { state: "BUILDING", pending: true } so the poller keeps
+ *   waiting instead of trusting a PREVIOUS deploy's READY (a poll landing
+ *   before Vercel registers the new build used to turn the badge green early).
+ *
  * Response:
- *   { state, url, createdAt, name }
+ *   { state, url, createdAt, name, pending? }
  *   state ∈ "READY" | "BUILDING" | "QUEUED" | "ERROR" | "CANCELED" | "INITIALIZING"
  *
  * If env vars are missing, returns { state: "UNKNOWN" } so the client can
@@ -51,6 +58,15 @@ export default async function handler(req, res) {
     const data = await r.json()
     const dep = data.deployments?.[0]
     if (!dep) return res.status(200).json({ state: 'UNKNOWN', reason: 'no deployments returned' })
+
+    const wantSha = String(req.query?.sha || '')
+    const depSha = dep.meta?.githubCommitSha || ''
+    if (wantSha && depSha && depSha !== wantSha) {
+      // The commit we just made is not what Vercel lists as latest yet —
+      // either its build hasn't registered, or something newer superseded it.
+      // Report "still building"; the poller's timeout bounds the wait.
+      return res.status(200).json({ state: 'BUILDING', pending: true, url: null, createdAt: null, name: dep.name || null })
+    }
 
     return res.status(200).json({
       state: dep.state || dep.readyState || 'UNKNOWN',

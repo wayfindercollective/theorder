@@ -10,17 +10,16 @@
  */
 
 import base from '../../content/sections.json'
-import { mergeVariantSections, variantSlugFromPath } from './variantFields.js'
+import { mergeVariantSections } from './variantFields.js'
+import { getVariantContent, variantSlugFromPath } from './variantPages.js'
 
-// Eagerly bundled: text-only files, ~3 KB gzipped each. Keeps content
-// resolution synchronous so module-init order never matters.
-const variantModules = import.meta.glob('../../content/variants/*.json', { eager: true })
-
+// Variant files are eagerly bundled (variantPages.js): text-only, ~3 KB
+// gzipped each. Keeps content resolution synchronous so module-init order
+// never matters.
 function resolveContent() {
   const slug = typeof window === 'undefined' ? null : variantSlugFromPath(window.location.pathname)
   if (!slug) return base
-  const mod = variantModules[`../../content/variants/${slug}.json`]
-  const variant = mod?.default || mod
+  const variant = getVariantContent(slug)
   return variant ? mergeVariantSections(base, variant) : base
 }
 

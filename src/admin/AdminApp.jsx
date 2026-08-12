@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   clearToken,
+  deleteVariantPage,
   fetchContent,
   getToken,
   humanizeError,
@@ -80,10 +81,11 @@ export default function AdminApp() {
         variants: {
           ...(prev?.variants || {}),
           ...(next.variants || {}),
+          ...(next.createVariants || {}),
           ...(saved?.variants || {}),
         },
       }))
-      return { ok: true }
+      return { ok: true, commitSha: saved?.commitSha || null }
     } catch (err) {
       const human = humanizeError(err)
       setError(human)
@@ -91,6 +93,28 @@ export default function AdminApp() {
       return { ok: false, error: human }
     } finally {
       setLoading(false)
+    }
+  }, [signOut])
+
+  // Remove a saved variant page. The editor only calls this while the draft is
+  // clean and with its UI locked, so the content change below can safely
+  // re-seed the draft without clobbering anything.
+  const onDeleteVariant = useCallback(async (slug) => {
+    setError('')
+    try {
+      const r = await deleteVariantPage(slug)
+      setContent((prev) => {
+        if (!prev) return prev
+        const variants = { ...(prev.variants || {}) }
+        delete variants[slug]
+        return { ...prev, variants }
+      })
+      return { ok: true, commitSha: r?.commitSha || null }
+    } catch (err) {
+      const human = humanizeError(err)
+      setError(human)
+      if (err?.status === 401) signOut()
+      return { ok: false, error: human }
     }
   }, [signOut])
 
@@ -108,6 +132,7 @@ export default function AdminApp() {
         loading={loading}
         error={error}
         onSave={onSave}
+        onDeleteVariant={onDeleteVariant}
         onLogout={signOut}
       />
     </>

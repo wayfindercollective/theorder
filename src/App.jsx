@@ -15,7 +15,7 @@ import { HowWeOperateSection } from './components/sections/HowWeOperateSection.j
 import { ClosingSection } from './components/sections/ClosingSection.jsx'
 import { FooterSection } from './components/sections/FooterSection.jsx'
 import { captureAttribution } from './lib/utm.js'
-import { variantSlugFromPath } from './config/variantFields.js'
+import { variantSlugFromPath } from './config/variantPages.js'
 import { bootAnalytics, track } from './lib/analytics.js'
 import { DESIGN_V2 } from './config/design.js'
 
@@ -23,12 +23,20 @@ import { DESIGN_V2 } from './config/design.js'
 const AdminApp = lazy(() => import('./admin/AdminApp.jsx'))
 const PresentationsApp = lazy(() => import('./presentations/PresentationsApp.jsx'))
 
+// Segment-boundary match: /admin and /admin/foo are the admin app, but a
+// variant page like /admin-offer must NOT be (Nico names pages himself now).
+function pathIsUnder(prefix) {
+  if (typeof window === 'undefined') return false
+  const path = window.location.pathname
+  return path === prefix || path.startsWith(prefix + '/')
+}
+
 function isAdminRoute() {
-  return typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+  return pathIsUnder('/admin')
 }
 
 function isPresentationsRoute() {
-  return typeof window !== 'undefined' && window.location.pathname.startsWith('/presentations')
+  return pathIsUnder('/presentations')
 }
 
 function privateApplicationRoute() {

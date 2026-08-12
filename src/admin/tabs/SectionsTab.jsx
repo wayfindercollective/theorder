@@ -26,7 +26,7 @@ import { MarkdownField } from '../MarkdownField.jsx'
 import { SectionVideoField } from '../SectionVideoField.jsx'
 import { RichText } from '../../components/ui/RichText.jsx'
 import { richModeForPath } from '../../lib/richtext.js'
-import { VARIANT_PAGES, VARIANT_FIELDS } from '../../config/variantFields.js'
+import { VARIANT_FIELDS, labelForSlug } from '../../config/variantFields.js'
 
 const SECTION_DEFS = [
   {
@@ -314,16 +314,21 @@ function setAt(obj, path, value) {
   return next
 }
 
-export function SectionsTab({ sections, onChange, page = 'main', onPageChange }) {
+export function SectionsTab({
+  sections, onChange, page = 'main',
+  pages = [], savedPages = [],
+  onPageChange, onAddPage, onRemovePage,
+}) {
   const update = (path, value) => onChange((cur) => setAt(cur, path, value))
   const defs = defsForPage(page)
+  const unsaved = page !== 'main' && !savedPages.includes(page)
 
   return (
     <div className="admin-tab-pane">
       {onPageChange && (
         <nav className="admin-page-selector" aria-label="Page">
           <span className="admin-page-selector-label">Page</span>
-          {[{ slug: 'main', label: 'Main Site' }, ...VARIANT_PAGES].map((p) => (
+          {[{ slug: 'main', label: 'Main Site' }, ...pages.map((slug) => ({ slug, label: labelForSlug(slug) }))].map((p) => (
             <button
               key={p.slug}
               type="button"
@@ -331,14 +336,37 @@ export function SectionsTab({ sections, onChange, page = 'main', onPageChange })
               onClick={() => onPageChange(p.slug)}
             >
               {p.label}
+              {p.slug !== 'main' && !savedPages.includes(p.slug) ? ' *' : ''}
             </button>
           ))}
+          {onAddPage && (
+            <button
+              type="button"
+              className="admin-jump-chip admin-page-chip admin-page-add"
+              onClick={onAddPage}
+            >
+              + Add Page
+            </button>
+          )}
         </nav>
       )}
       {page !== 'main' && (
         <p className="restraint admin-tab-intro">
           You are editing the words of theorder.global/{page} only. Images, videos,
           testimonials, the application questions and the main site are untouched.
+          {unsaved && ' This page is not on the site yet: Save Changes publishes it.'}
+          {onRemovePage && (
+            <>
+              {' '}
+              <button
+                type="button"
+                className="admin-page-remove"
+                onClick={() => onRemovePage(page)}
+              >
+                Remove this page
+              </button>
+            </>
+          )}
         </p>
       )}
       <nav className="admin-jump" aria-label="Jump to section">

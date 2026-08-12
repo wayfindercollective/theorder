@@ -58,6 +58,9 @@ export function humanizeError(err) {
   if (/expected.*([0-9a-f]{40}|sha)/i.test(msg)) {
     return 'Someone else just saved. Reload the admin to pick up their changes, then save again.'
   }
+  if (/page (already exists|was removed)/i.test(msg)) {
+    return msg // already written for the admin
+  }
   if (/401|invalid token|missing.*token|expired/i.test(msg)) {
     return 'Your session expired. Sign in again.'
   }
@@ -115,12 +118,21 @@ export async function fetchContent() {
 }
 
 // `payload` holds only the pieces that changed — any of { sections, questions,
-// variants: { slug: data } }. One file per save is the common case; each file
-// sent is one commit and one deploy, so sending clean files wastes deploys.
+// variants: { slug: data }, createVariants: { slug: data } }. One file per
+// save is the common case; each file sent is one commit and one deploy, so
+// sending clean files wastes deploys.
 export async function saveContent(payload) {
   return await jsonFetch('/api/admin/content', {
     method: 'POST',
     body: JSON.stringify(payload),
+  })
+}
+
+// Remove a variant page. The server tombstones the slug first (it stays
+// reserved in attribution forever), then deletes the page file.
+export async function deleteVariantPage(slug) {
+  return await jsonFetch(`/api/admin/content?variant=${encodeURIComponent(slug)}`, {
+    method: 'DELETE',
   })
 }
 
@@ -197,8 +209,12 @@ export async function deleteImage(url) {
   })
 }
 
-export async function getDeployStatus() {
-  return await jsonFetch('/api/admin/deploy-status', { method: 'GET' })
+// `sha` (optional): the commit the save/delete produced. The endpoint then
+// reports Building until THAT commit's deployment is the live one, instead of
+// trusting whatever deploy happens to be latest.
+export async function getDeployStatus(sha) {
+  const q = sha ? `?sha=${encodeURIComponent(sha)}` : ''
+  return await jsonFetch(`/api/admin/deploy-status${q}`, { method: 'GET' })
 }
 
 /**

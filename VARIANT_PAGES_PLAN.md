@@ -158,3 +158,187 @@ Per our working split: variants ship seeded with the current approved copy verba
 2. Slug names locked as the table above? (`/financial` vs `/wealth` is the only real toss-up)
 3. Testimonials shared? (assumed yes, edited once in the Testimonials tab)
 4. Founder section: text per variant so Nico can angle his story per area, video shared. Right call, or fully shared?
+
+---
+
+# Phase 2: self-serve pages in /admin
+
+Status: BUILT (2026-08-12). Codex high-effort review: round 1 found 6 defects (all addressed in revision 2), round 2 found 1 (tombstone ordering, addressed), round 3 clean.
+Goal: Nico adds a page himself. He clicks Add Page, names it, the copy
+is a duplicate of the main site as it stands at that moment, and from then on he
+edits that page's words like any other. No developer step.
+
+## Core shift: pages are derived from files, not from a hardcoded list
+
+Today `VARIANT_PAGES` in `variantFields.js` hardcodes the two pages, and four
+places consult it (runtime slug match, admin selector, editor seeding/diffing,
+API validation). Phase 2 removes the list: **a page exists if and only if
+`content/variants/<slug>.json` exists.**
+
+- The public bundle already globs `content/variants/*.json`, so any file
+  committed by the CMS is picked up automatically at the next deploy — that
+  machinery needs no change, only the slug matching stops consulting a list.
+- The CMS already commits files and Vercel already redeploys per commit, so
+  "create file" IS "create page".
+
+## Module layout
+
+`src/config/variantFields.js` (shared client + API, no import.meta):
+- keeps `VARIANT_FIELDS`, `pickVariantFields`, `mergeVariantSections` unchanged
+- keeps `RESERVED_VARIANT_SLUGS` (the seven planned areas, always UTM-reserved)
+- drops `VARIANT_PAGES` and `variantSlugFromPath`
+- gains `SYSTEM_PATHS` (admin, presentations, application, booking, api,
+  images, videos, testimonials, assets, favicon, robots, sitemap, index,
+  index.html, 2) — single source shared with utm.js
+- gains `slugifyPageName(name)` (lowercase, spaces to hyphens, strip the rest)
+  and `isValidVariantSlug(slug)`: `/^[a-z0-9][a-z0-9-]{1,31}$/` and not in
+  SYSTEM_PATHS
+- gains `labelForSlug(slug)` (capitalise hyphen parts) for chips and headings
+
+`src/config/variantPages.js` (client only — owns the ONE `import.meta.glob`):
+- `VARIANT_PAGE_SLUGS`: sorted slugs derived from the glob keys
+- `getVariantContent(slug)`: the bundled JSON or null
+- `variantSlugFromPath(pathname)`: normalised segment that has a file
+- `sectionContent.js` imports these instead of globbing itself
+
+## UTM, and the tombstone for removed pages
+
+`RESERVED_PATHS` in utm.js = its current literals + `RESERVED_VARIANT_SLUGS` +
+`VARIANT_PAGE_SLUGS` + the retired list below (all spread at module init). Any
+page Nico creates is never read as a vanity campaign once its deploy is live.
+
+**Tombstone (Codex finding 6):** deleting a page must not turn its old links
+into fabricated `utm_campaign` attributions. DELETE therefore also appends the
+slug to `content/variants/_retired.json` (a plain string array, deduped, in the
+same request). The page-list glob and the admin GET both skip files whose name
+starts with `_`; utm.js reads the retired list and keeps those slugs reserved
+forever. A retired slug MAY be re-created later (Add Page allows it) — active
+and retired are both simply "reserved", so no cleanup pass is needed.
+
+Accepted timing note: between Save and deploy-complete (~2 min) the old bundle
+is still serving, so a brand-new slug is not yet reserved. Nobody has the link
+yet; accepted. And if Nico names a page with a slug already in use as a vanity
+campaign link, those old links start serving his page; the Add Page dialog
+carries a warning line, beyond validation this stays a human rule.
+
+## Routing fix that validation depends on (Codex finding 5)
+
+`App.jsx` routes `/admin*` and `/presentations*` by `startsWith`, so a page
+slug like `admin-offer` would pass an exact-match denylist yet land in the
+admin app. Fix the routing to segment boundaries (`path === '/admin' ||
+path.startsWith('/admin/')`), which is correct independently of this feature;
+then exact-match validation against `SYSTEM_PATHS` is sound. `videos` joins
+`SYSTEM_PATHS` (real `public/videos/` directory, missing from the current
+reserved set).
+
+## API (`/api/admin/content`)
+
+- **GET** stops reading two known files and instead lists the
+  `content/variants/` directory (new `readDir` helper in `_lib/github.js`,
+  `[]` on 404), then reads each `*.json` in parallel, skipping `_`-prefixed
+  files. Returns `variants: { slug: data }`. A file that fails to parse is
+  skipped (it would have failed the Vite build/deploy anyway — pathological,
+  not a state to model).
+- **POST** distinguishes create from update (Codex finding 2 — two tabs adding
+  the same slug must not silently overwrite each other):
+  - `variants: { slug: data }` — UPDATE. Slug must pass `isValidVariantSlug`;
+    the file must exist. Unchanged pipeline: merge over live, rebuild through
+    `VARIANT_FIELDS`, sanitise, commit. If the file is gone (page removed by
+    another tab), the save FAILS with "that page was removed — reload" rather
+    than silently resurrecting it.
+  - `createVariants: { slug: data }` — CREATE. Committed with NO sha and NO
+    conflict retry: GitHub's Contents API rejects a sha-less write to an
+    existing file, which is exactly the atomic "must not exist" precondition.
+    A concurrent creation therefore surfaces as "that page already exists —
+    reload" instead of overwriting.
+- **DELETE** `?variant=<slug>`: TOMBSTONE FIRST, then delete (Codex round 2:
+  delete-then-retire leaves a deploy window, or a permanent gap if the retire
+  write fails, where the old URL earns fabricated vanity attribution). Order:
+  (1) append the slug to `_retired.json` via the normal `writeJsonFile`
+  resolver (deduped; a failure here aborts the whole request, page untouched);
+  (2) delete the page file with the new `deleteJsonFile` helper mirroring
+  `writeJsonFile`'s conflict handling (Codex finding 3): read the file (a true
+  read-404 = already gone = success), delete with its sha, and on a stale-SHA
+  409/422 re-read and retry once — never treat a delete-call 404/permission
+  error as success. If (2) fails after (1), the slug is reserved but the page
+  still exists: harmless, retry-safe. Commit messages `cms: retire <slug>
+  slug` / `cms: remove <slug> page`. Deleting remotely edited content is
+  inherent to "remove this page" and is covered by the confirm dialog
+  (single-editor CMS in practice).
+
+## Deploy badge tied to the actual commit (Codex finding 4)
+
+The badge polls the LATEST production deployment and stops at the first READY,
+so a poll that lands before Vercel registers the new build reports the previous
+deploy as Live. Pre-existing flaw, but page creation makes it bite (Nico visits
+the new URL "when it's green" and gets the main site). Fix properly:
+
+- `writeJsonFile` / `deleteJsonFile` return the commit sha GitHub reports;
+  the content API returns the LAST commit sha of the request as `commitSha`.
+- The editor passes it to `/api/admin/deploy-status?sha=<sha>`; the endpoint
+  compares against the latest deployment's `meta.githubCommitSha`. Match →
+  report that deployment's real state. No match (Vercel has not registered the
+  commit's build yet, or the latest listed is still an older deploy) → report
+  BUILDING with `pending: true` so the badge keeps waiting. Edge case: another
+  commit lands right after ours and Vercel only lists ITS deployment — our sha
+  never matches and the poll times out quietly rather than lying green; a later
+  save restarts the poll with its own sha. `MAX_POLL_MS` still bounds the wait;
+  missing env vars still return UNKNOWN and hide the badge; a sha-less call
+  behaves exactly as today (backwards compatible).
+
+## Admin UX
+
+Page selector row in the Sections tab becomes: `Main Site | <one chip per
+existing page> | + Add Page`.
+
+- **Add Page**: prompt for a name; slugify + validate (reject SYSTEM_PATHS,
+  malformed slugs, duplicates against the loaded pages; hint lists the reserved
+  areas not yet built). On accept: `updateVariant(slug,
+  pickVariantFields(draft.sections))` — a DRAFT-ONLY page seeded from the main
+  copy as currently in the editor — and the selector switches to it. It is
+  dirty by construction; **Save** sends it under `createVariants` (baseline
+  absent → create) and the badge tracks the commit to Live.
+- **Remove This Page** button, shown only on a variant page:
+  - Draft-only page (never saved): removed from the draft directly, no API.
+  - Saved page (Codex finding 1 — deletion must not race the editor): blocked
+    while `dirty` OR while a restore banner is pending (the stored draft would
+    be orphaned by the baseline change), and while the DELETE request is in
+    flight the editor renders a full-screen busy overlay so no edit can land
+    before the content re-seed. Confirm dialog → DELETE → content state
+    updated → selector falls back to Main Site.
+- Editor plumbing: `seedVariants` is deleted; `draft.variants` starts as a copy
+  of `content.variants`, and `diffPayload` iterates `Object.keys(draft.variants)`:
+  baseline present and different → `variants` (update); baseline absent →
+  `createVariants` (new page). If the selected page stops existing, the
+  selector falls back to 'main'. Labels everywhere come from `labelForSlug`.
+
+## Also updated
+
+- `scripts/seed-variant.mjs` validates with `isValidVariantSlug` instead of the
+  reserved list (still handy for bulk seeding from the shell).
+- `adminApi.js` gains `deleteVariantPage(slug)`; `getDeployStatus` takes the
+  optional commit sha.
+- Every current `VARIANT_PAGES` import site is reworked; the export is deleted
+  so nothing can quietly keep consulting a stale list.
+
+## What deliberately does NOT change
+
+- `VARIANT_FIELDS` whitelist, the merge, the save-scrubbing, sanitisation.
+- `landing_variant` analytics (dynamic slugs are covered — the PROP is blocked
+  from Meta, whatever its value).
+- Images/videos/testimonials/questions stay shared; nothing about Phase 2
+  lets a page own an asset.
+
+## Smoke tests
+
+- Add a page "primal" in /admin: appears in selector seeded with main copy,
+  Save commits only `content/variants/primal.json`, deploy goes green,
+  `/primal` serves the page, `/primal` no longer writes a vanity campaign.
+- Add Page rejects: `admin`, `Application`, `foo bar!` (auto-slugified ok),
+  an existing slug, a 1-char slug.
+- Draft-only page can be removed without any commit.
+- Removing a saved page is blocked while dirty; when clean it commits the
+  deletion, the selector falls back to Main Site, and after deploy the URL
+  renders the main site.
+- Existing /physical and /financial behave exactly as before (files untouched).
+- Main-site edit still commits only sections.json.

@@ -7,7 +7,12 @@ import { LogoTab } from './tabs/LogoTab.jsx'
 import { LibraryTab } from './tabs/LibraryTab.jsx'
 import { EmailSignatureTab } from './tabs/EmailSignatureTab.jsx'
 import { getDeployStatus, humanizeError } from './adminApi.js'
-import { VARIANT_PAGES, pickVariantFields } from '../config/variantFields.js'
+import {
+  RESERVED_VARIANT_SLUGS,
+  isValidVariantSlug,
+  pickVariantFields,
+  slugifyPageName,
+} from '../config/variantFields.js'
 
 const TABS = [
   { id: 'sections',    label: 'Sections' },
@@ -41,32 +46,25 @@ function fingerprint(obj) {
   } catch { return '' }
 }
 
-// The editable draft for the variant pages. A page whose file does not exist
-// yet (GET returned null) seeds from the live base copy, filtered through the
-// whitelist — it reads as clean and its file is created on first save.
-function seedVariants(content) {
-  const out = {}
-  for (const { slug } of VARIANT_PAGES) {
-    out[slug] = content.variants?.[slug] || pickVariantFields(content.sections)
-  }
-  return out
-}
-
 // Only the pieces of the draft that differ from the loaded baseline. This IS
 // the save payload: each file sent is one commit and one deploy, so a
-// one-word edit to the Physical page must not re-commit sections.json,
-// questions.json or the other variant.
+// one-word edit to one page must not re-commit sections.json, questions.json
+// or any other page. A page with no baseline is a NEW page — it goes under
+// `createVariants` so the server can enforce must-not-exist (two tabs adding
+// the same slug cannot silently overwrite each other).
 function diffPayload(content, draft) {
   const payload = {}
   if (JSON.stringify(draft.sections) !== JSON.stringify(content.sections)) payload.sections = draft.sections
   if (JSON.stringify(draft.questions) !== JSON.stringify(content.questions)) payload.questions = draft.questions
-  const baseline = seedVariants(content)
-  const dv = draft.variants || baseline
-  const variants = {}
-  for (const { slug } of VARIANT_PAGES) {
-    if (JSON.stringify(dv[slug]) !== JSON.stringify(baseline[slug])) variants[slug] = dv[slug]
+  const baseline = content.variants || {}
+  const updates = {}
+  const creates = {}
+  for (const [slug, data] of Object.entries(draft.variants || {})) {
+    if (!(slug in baseline)) creates[slug] = data
+    else if (JSON.stringify(data) !== JSON.stringify(baseline[slug])) updates[slug] = data
   }
-  if (Object.keys(variants).length) payload.variants = variants
+  if (Object.keys(updates).length) payload.variants = updates
+  if (Object.keys(creates).length) payload.createVariants = creates
   return payload
 }
 
@@ -101,6 +99,9 @@ function clearDraft() {
 const POLL_INTERVAL_MS = 5000
 const MAX_POLL_MS = 3 * 60 * 1000
 
+// `saveTrigger` is { n, sha } — sha is the git commit the save/delete made.
+// Passing it means the badge waits for THAT commit's deployment instead of
+// trusting whatever deploy happens to be latest at the first poll.
 function useDeployStatus(saveTrigger) {
   const [status, setStatus] = useState(null) // { state, url, since }
   const timerRef = useRef(null)
@@ -115,7 +116,7 @@ function useDeployStatus(saveTrigger) {
     const tick = async () => {
       if (cancelled) return
       try {
-        const r = await getDeployStatus()
+        const r = await getDeployStatus(saveTrigger.sha || undefined)
         if (cancelled) return
         if (r.state === 'UNKNOWN') {
           setStatus(null)
@@ -139,14 +140,18 @@ function useDeployStatus(saveTrigger) {
   return status
 }
 
-export function AdminEditor({ content, loading, error, onSave, onLogout }) {
+export function AdminEditor({ content, loading, error, onSave, onDeleteVariant, onLogout }) {
   const [tab, setTab] = useState('sections')
   // Which page the Sections tab is editing: 'main' or a variant slug.
   const [page, setPage] = useState('main')
   const [draft, setDraft] = useState(null)
   const [saveStatus, setSaveStatus] = useState({ state: 'idle', message: '' })
   const [restorePrompt, setRestorePrompt] = useState(null) // { draft, savedAt } | null
-  const [saveTrigger, setSaveTrigger] = useState(0)
+  const [saveTrigger, setSaveTrigger] = useState(null) // { n, sha } after a save/delete
+  // True while a page DELETE is in flight — the whole editor is covered by a
+  // busy overlay so no edit can land before the content re-seed replaces the
+  // draft (the same clobber the dirty-check guards against, but mid-request).
+  const [removing, setRemoving] = useState(false)
   const baselineFpRef = useRef('')
   // Bumped on every draft edit; lets handleSave detect edits that landed while
   // the request was in flight (same guard DeckEditor uses).
@@ -173,7 +178,7 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
     const seeded = {
       sections: content.sections,
       questions: content.questions,
-      variants: seedVariants(content),
+      variants: { ...(content.variants || {}) },
     }
     const stored = readDraft()
     if (stored && stored.baselineFp === fp) {
@@ -232,7 +237,7 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
         keepDraftRef.current = true
       }
       setSaveStatus({ state: 'saved', message: 'Saved.' })
-      setSaveTrigger((n) => n + 1)
+      setSaveTrigger((t) => ({ n: (t?.n || 0) + 1, sha: r.commitSha || null }))
       setTimeout(() => setSaveStatus((s) => (s.state === 'saved' ? { state: 'idle', message: '' } : s)), 4000)
     } else {
       setSaveStatus({ state: 'error', message: humanizeError({ message: r.error }) })
@@ -272,6 +277,71 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
     }))
   }, [])
 
+  // Create a page: name it, seed it from the main copy as it stands in the
+  // editor right now, switch to it. Dirty by construction — Save commits it.
+  const addPage = useCallback(() => {
+    if (!draft) return
+    const existing = Object.keys(draft.variants || {})
+    const unused = RESERVED_VARIANT_SLUGS.filter((s) => !existing.includes(s))
+    const name = window.prompt(
+      'Name the new page. The name becomes the web address, e.g. "primal" makes theorder.global/primal.\n' +
+      (unused.length ? `Planned areas not yet built: ${unused.join(', ')}.\n` : '') +
+      'Avoid names already used for campaign links.'
+    )
+    if (!name) return
+    const slug = slugifyPageName(name)
+    if (!isValidVariantSlug(slug)) {
+      window.alert('That name cannot be used as a web address. Use 2 to 32 letters, numbers or hyphens.')
+      return
+    }
+    if (existing.includes(slug)) {
+      window.alert(`The page "${slug}" already exists.`)
+      return
+    }
+    revRef.current += 1
+    setDraft((d) => ({
+      ...d,
+      variants: { ...d.variants, [slug]: pickVariantFields(d.sections) },
+    }))
+    setPage(slug)
+  }, [draft])
+
+  const removePage = useCallback(async (slug) => {
+    const isDraftOnly = !(content?.variants && slug in content.variants)
+    if (isDraftOnly) {
+      // Never committed — dropping it from the draft is the whole removal.
+      if (!window.confirm(`Remove the unsaved page "${slug}"?`)) return
+      revRef.current += 1
+      setPage('main')
+      setDraft((d) => {
+        const variants = { ...d.variants }
+        delete variants[slug]
+        return { ...d, variants }
+      })
+      return
+    }
+    // A saved page. Deleting refreshes the baseline content, and the re-seed
+    // that follows would clobber a dirty draft or orphan a pending restore —
+    // so both must be settled first, and the busy overlay locks the editor
+    // while the request is in flight.
+    if (dirty || restorePrompt) {
+      window.alert('Save or discard your changes first, then remove the page.')
+      return
+    }
+    if (!window.confirm(
+      `Remove the page "${slug}" from the site?\n` +
+      `theorder.global/${slug} will show the main site instead. Old links keep working.`
+    )) return
+    try { document.activeElement?.blur() } catch { /* noop */ }
+    setRemoving(true)
+    const r = await onDeleteVariant(slug)
+    setRemoving(false)
+    if (r?.ok) {
+      setPage('main')
+      setSaveTrigger((t) => ({ n: (t?.n || 0) + 1, sha: r.commitSha || null }))
+    }
+  }, [content, dirty, restorePrompt, onDeleteVariant])
+
   const acceptRestore = useCallback(() => {
     // A restore mutates the draft like any edit — bump the rev so a save that
     // was in flight when it happened can't adopt the server copy over it.
@@ -295,6 +365,11 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
 
   return (
     <div className="admin-shell">
+      {removing && (
+        <div className="admin-busy-overlay" role="alert" aria-busy="true">
+          <p className="restraint">Removing page…</p>
+        </div>
+      )}
       <header className="admin-topbar">
         <div className="admin-topbar-left">
           <span className="display admin-brand">The Order · Admin</span>
@@ -344,14 +419,23 @@ export function AdminEditor({ content, loading, error, onSave, onLogout }) {
       </nav>
 
       <main className="admin-tab-body">
-        {tab === 'sections'    && (
-          <SectionsTab
-            sections={page === 'main' ? draft.sections : draft.variants[page]}
-            onChange={page === 'main' ? updateSections : (patch) => updateVariant(page, patch)}
-            page={page}
-            onPageChange={setPage}
-          />
-        )}
+        {tab === 'sections'    && (() => {
+          // If the selected page stopped existing (removed elsewhere), fall
+          // back to the main site rather than rendering an empty draft.
+          const effectivePage = page !== 'main' && draft.variants?.[page] ? page : 'main'
+          return (
+            <SectionsTab
+              sections={effectivePage === 'main' ? draft.sections : draft.variants[effectivePage]}
+              onChange={effectivePage === 'main' ? updateSections : (patch) => updateVariant(effectivePage, patch)}
+              page={effectivePage}
+              pages={Object.keys(draft.variants || {}).sort()}
+              savedPages={Object.keys(content.variants || {})}
+              onPageChange={setPage}
+              onAddPage={addPage}
+              onRemovePage={removePage}
+            />
+          )
+        })()}
         {tab === 'application' && (
           <ApplicationTab
             questions={draft.questions}

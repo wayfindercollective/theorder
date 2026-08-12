@@ -15,12 +15,10 @@
  * variant file can never carry an asset key no matter what a payload contains.
  */
 
-// The variant pages that exist. Adding a future area = add its entry here and
-// seed its file (npm run seed:variant -- <slug>); everything else follows.
-export const VARIANT_PAGES = [
-  { slug: 'physical', label: 'Physical' },
-  { slug: 'financial', label: 'Financial' },
-]
+// A page exists if and only if content/variants/<slug>.json exists — there is
+// NO hardcoded page list. The client derives pages from the bundled files
+// (src/config/variantPages.js); the API derives them from the repo directory.
+// Nico creates and removes pages himself in /admin.
 
 // All seven planned focus-area slugs, reserved in utm.js from day one so none
 // of them is ever misread as a vanity campaign — flipping a path's attribution
@@ -29,6 +27,41 @@ export const VARIANT_PAGES = [
 export const RESERVED_VARIANT_SLUGS = [
   'physical', 'financial', 'relationships', 'primal', 'mental', 'emotional', 'spiritual',
 ]
+
+// Every real system path of the site. Single source shared by utm.js (never
+// read these as a vanity campaign) and the page-slug validator (never let a
+// page shadow them). App.jsx routes /admin and /presentations on segment
+// boundaries, so an exact-match check here is sound.
+export const SYSTEM_PATHS = [
+  'admin', 'presentations', 'application', 'booking', 'api', 'images', 'videos',
+  'testimonials', 'assets', 'favicon', 'robots', 'sitemap', 'index', 'index.html', '2',
+]
+
+// "Primal & Adventure" -> "primal-adventure"
+export function slugifyPageName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+// Lowercase letters/digits/hyphens, 2-32 chars, starts alphanumeric, and not a
+// system path. Underscore is excluded on purpose: _-prefixed files in
+// content/variants/ are internal (the retired-slug tombstone), never pages.
+export function isValidVariantSlug(slug) {
+  return /^[a-z0-9][a-z0-9-]{1,31}$/.test(slug) && !SYSTEM_PATHS.includes(slug)
+}
+
+// "primal-adventure" -> "Primal Adventure" (chip and heading labels)
+export function labelForSlug(slug) {
+  return String(slug || '')
+    .split('-')
+    .filter(Boolean)
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join(' ')
+}
 
 // Section key → the keys a variant may own. Exactly the non-video fields the
 // Sections tab exposes for these sections. Array-valued keys (provocation,
@@ -114,13 +147,13 @@ export function mergeVariantSections(base, variant) {
 }
 
 /**
- * The variant slug for a pathname, or null. Only pages that actually exist
- * count — reserved-but-unbuilt slugs fall through to the main site.
- * Normalisation matches the vanity reader in utm.js (trim slashes, lowercase,
- * single segment only).
+ * Normalise a pathname to a candidate page slug, or null if it is not a clean
+ * single segment. Whether a page EXISTS for it is the caller's question
+ * (variantPages.js checks the bundled files). Normalisation matches the
+ * vanity reader in utm.js (trim slashes, lowercase, single segment only).
  */
-export function variantSlugFromPath(pathname) {
+export function pathToSlug(pathname) {
   const seg = String(pathname || '/').replace(/^\/+|\/+$/g, '').toLowerCase()
   if (!seg || seg.indexOf('/') !== -1) return null
-  return VARIANT_PAGES.some((p) => p.slug === seg) ? seg : null
+  return seg
 }

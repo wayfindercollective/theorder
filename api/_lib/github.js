@@ -29,6 +29,21 @@ export async function readJsonFile(path) {
   return { content, sha: res.data.sha }
 }
 
+// File names in a repo directory. A missing directory is an empty list, any
+// other failure propagates (so a token/permission problem can't read as
+// "no pages exist").
+export async function readDir(path) {
+  const { kit, owner, name, branch } = getCtx()
+  try {
+    const res = await kit.repos.getContent({ owner, repo: name, path, ref: branch })
+    if (!Array.isArray(res.data)) throw new Error(`expected dir, got file: ${path}`)
+    return res.data.filter((e) => e.type === 'file').map((e) => e.name)
+  } catch (err) {
+    if (err?.status === 404) return []
+    throw err
+  }
+}
+
 // `jsonOrFn` is either the object to write, or a resolver
 // `(liveJsonOrNull) => object` called with the live file content from the
 // SAME read that supplied the write SHA — so callers can merge against
@@ -69,8 +84,9 @@ export async function writeJsonFile(path, jsonOrFn, message) {
   // re-read (so a genuinely newer commit feeds the resolver) and retry once;
   // if the re-read still serves the stale blob, fall back to the SHA parsed
   // out of the error with the freshest content we have.
+  let result
   try {
-    await attempt(sha, live)
+    result = await attempt(sha, live)
   } catch (err) {
     const msg = err?.message || ''
     const status = err?.status
@@ -85,14 +101,83 @@ export async function writeJsonFile(path, jsonOrFn, message) {
       if (fresh.sha === sha) {
         // CDN served us the stale blob again — our read basis IS the latest
         // content; only the SHA was stale. Use the SHA from the error.
-        await attempt(match[1], live)
+        result = await attempt(match[1], live)
       } else {
         // A newer commit really exists — re-resolve against it.
-        await attempt(fresh.sha, JSON.parse(fresh.content))
+        result = await attempt(fresh.sha, JSON.parse(fresh.content))
       }
     } else {
       throw err
     }
   }
-  return { ok: true }
+  // The commit sha lets the deploy-status poller wait for THIS change's
+  // deployment instead of trusting whatever is currently "latest".
+  return { ok: true, commitSha: result?.data?.commit?.sha || null }
+}
+
+// Create a file that must NOT already exist. A sha-less write to an existing
+// file is rejected by the Contents API, which is exactly the atomic
+// "must not exist" precondition page creation needs — no read, no retry.
+// Callers map the conflict to "that page already exists".
+export async function createJsonFile(path, json, message) {
+  const { kit, owner, name, branch } = getCtx()
+  const content = JSON.stringify(json, null, 2) + '\n'
+  const res = await kit.repos.createOrUpdateFileContents({
+    owner,
+    repo: name,
+    path,
+    message: message || `cms: create ${path}`,
+    content: Buffer.from(content, 'utf-8').toString('base64'),
+    branch,
+  })
+  return { ok: true, commitSha: res?.data?.commit?.sha || null }
+}
+
+// Delete a file with the same stale-SHA handling as writeJsonFile. A true
+// read-404 means already gone (success, no commit); any failure of the delete
+// call itself propagates — a masked permission error must never read as
+// "deleted".
+export async function deleteJsonFile(path, message) {
+  const { kit, owner, name, branch } = getCtx()
+
+  let sha
+  try {
+    const existing = await readJsonFile(path)
+    sha = existing.sha
+  } catch (err) {
+    if (err?.status === 404) return { ok: true, existed: false, commitSha: null }
+    throw err
+  }
+
+  const attempt = (delSha) => kit.repos.deleteFile({
+    owner,
+    repo: name,
+    path,
+    message: message || `cms: delete ${path}`,
+    sha: delSha,
+    branch,
+  })
+
+  let result
+  try {
+    result = await attempt(sha)
+  } catch (err) {
+    const msg = err?.message || ''
+    const status = err?.status
+    const match = msg.match(/is at ([0-9a-f]{40})/i)
+    if ((status === 409 || status === 422) && match) {
+      // Stale SHA (a save just landed). Re-read for the freshest sha; if the
+      // re-read 404s the file is already gone.
+      try {
+        const fresh = await readJsonFile(path)
+        result = await attempt(fresh.sha)
+      } catch (err2) {
+        if (err2?.status === 404) return { ok: true, existed: false, commitSha: null }
+        throw err2
+      }
+    } else {
+      throw err
+    }
+  }
+  return { ok: true, existed: true, commitSha: result?.data?.commit?.sha || null }
 }
