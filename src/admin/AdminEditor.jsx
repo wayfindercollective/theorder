@@ -306,11 +306,12 @@ export function AdminEditor({ content, loading, error, onSave, onDeleteVariant, 
     setPage(slug)
   }, [draft])
 
+  // Called only from the Sections tab's own two-step confirm UI — the
+  // confirmation already happened there.
   const removePage = useCallback(async (slug) => {
     const isDraftOnly = !(content?.variants && slug in content.variants)
     if (isDraftOnly) {
       // Never committed — dropping it from the draft is the whole removal.
-      if (!window.confirm(`Remove the unsaved page "${slug}"?`)) return
       revRef.current += 1
       setPage('main')
       setDraft((d) => {
@@ -322,16 +323,8 @@ export function AdminEditor({ content, loading, error, onSave, onDeleteVariant, 
     }
     // A saved page. Deleting refreshes the baseline content, and the re-seed
     // that follows would clobber a dirty draft or orphan a pending restore —
-    // so both must be settled first, and the busy overlay locks the editor
-    // while the request is in flight.
-    if (dirty || restorePrompt) {
-      window.alert('Save or discard your changes first, then remove the page.')
-      return
-    }
-    if (!window.confirm(
-      `Remove the page "${slug}" from the site?\n` +
-      `theorder.global/${slug} will show the main site instead. Old links keep working.`
-    )) return
+    // the UI disables the button in those states; this guard is defensive.
+    if (dirty || restorePrompt) return
     try { document.activeElement?.blur() } catch { /* noop */ }
     setRemoving(true)
     const r = await onDeleteVariant(slug)
@@ -433,6 +426,13 @@ export function AdminEditor({ content, loading, error, onSave, onDeleteVariant, 
               onPageChange={setPage}
               onAddPage={addPage}
               onRemovePage={removePage}
+              removeBlockedReason={
+                effectivePage !== 'main' &&
+                content.variants && effectivePage in content.variants &&
+                (dirty || restorePrompt)
+                  ? 'Save your changes first, then delete the page.'
+                  : null
+              }
             />
           )
         })()}

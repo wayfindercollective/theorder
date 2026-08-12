@@ -3175,18 +3175,40 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .admin-page-add {
   border-style: dashed;
 }
-/* Inline "Remove this page" action in the variant intro line */
-.admin-page-remove {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-  color: var(--ash);
-  text-decoration: underline;
-  cursor: pointer;
+/* Delete-page control on a variant page: an outlined button that arms an
+   inline confirm strip (Yes, Delete Page / Cancel) instead of a browser popup */
+.admin-delete-zone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1.2rem;
 }
-.admin-page-remove:hover {
+.admin-delete-question {
+  font-size: 0.82rem;
+  color: var(--parchment, #e8e0d0);
+}
+.admin-btn-danger-outline {
   color: #c96a5a;
+  border: 1px solid rgba(201, 106, 90, 0.55);
+  background: transparent;
+}
+.admin-btn-danger-outline:hover:not(:disabled) {
+  border-color: #c96a5a;
+  background: rgba(201, 106, 90, 0.08);
+}
+.admin-btn-danger-outline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.admin-btn-danger {
+  color: #f2e6e2;
+  border: 1px solid #a84a3b;
+  background: #a84a3b;
+}
+.admin-btn-danger:hover {
+  background: #c05a49;
+  border-color: #c05a49;
 }
 /* Full-screen lock while a page deletion is in flight — nothing may be
    edited between the request and the content re-seed. */

@@ -22,6 +22,7 @@
  * Each section's `nav` is its short name in the "Jump to" chip row at the top.
  */
 
+import { useEffect, useState } from 'react'
 import { MarkdownField } from '../MarkdownField.jsx'
 import { SectionVideoField } from '../SectionVideoField.jsx'
 import { RichText } from '../../components/ui/RichText.jsx'
@@ -318,10 +319,14 @@ export function SectionsTab({
   sections, onChange, page = 'main',
   pages = [], savedPages = [],
   onPageChange, onAddPage, onRemovePage,
+  removeBlockedReason = null,
 }) {
   const update = (path, value) => onChange((cur) => setAt(cur, path, value))
   const defs = defsForPage(page)
   const unsaved = page !== 'main' && !savedPages.includes(page)
+  // Two-step delete: the button arms a confirm strip; switching page disarms.
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  useEffect(() => { setConfirmDelete(false) }, [page])
 
   return (
     <div className="admin-tab-pane">
@@ -351,23 +356,54 @@ export function SectionsTab({
         </nav>
       )}
       {page !== 'main' && (
-        <p className="restraint admin-tab-intro">
-          You are editing the words of theorder.global/{page} only. Images, videos,
-          testimonials, the application questions and the main site are untouched.
-          {unsaved && ' This page is not on the site yet: Save Changes publishes it.'}
+        <>
+          <p className="restraint admin-tab-intro">
+            You are editing the words of theorder.global/{page} only. Images, videos,
+            testimonials, the application questions and the main site are untouched.
+            {unsaved && ' This page is not on the site yet: Save Changes publishes it.'}
+          </p>
           {onRemovePage && (
-            <>
-              {' '}
-              <button
-                type="button"
-                className="admin-page-remove"
-                onClick={() => onRemovePage(page)}
-              >
-                Remove this page
-              </button>
-            </>
+            <div className="admin-delete-zone">
+              {confirmDelete ? (
+                <>
+                  <span className="admin-delete-question">
+                    {unsaved
+                      ? `Delete the unpublished page "${page}"? Its draft copy is discarded.`
+                      : `Delete theorder.global/${page}? That address will show the main site instead; old links keep working.`}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn admin-btn-danger"
+                    onClick={() => { setConfirmDelete(false); onRemovePage(page) }}
+                  >
+                    Yes, Delete Page
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    onClick={() => setConfirmDelete(false)}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="btn admin-btn-danger-outline"
+                    onClick={() => setConfirmDelete(true)}
+                    disabled={!!removeBlockedReason}
+                  >
+                    Delete This Page
+                  </button>
+                  {removeBlockedReason && (
+                    <span className="admin-field-hint">{removeBlockedReason}</span>
+                  )}
+                </>
+              )}
+            </div>
           )}
-        </p>
+        </>
       )}
       <nav className="admin-jump" aria-label="Jump to section">
         {defs.map((sec) => (
