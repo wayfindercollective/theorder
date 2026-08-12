@@ -35,8 +35,31 @@ export function pickVideoSource(desktop, mobile) {
  * many; a player the visitor may never scroll to should not preload at all.
  */
 export function maxPreload() {
+  return prefersReducedData() ? 'metadata' : 'auto'
+}
+
+/**
+ * Whether this visitor has asked us not to spend their data, or is on a
+ * connection too slow to spend it well. Data Saver is an explicit request;
+ * 2G is a practical one.
+ */
+export function prefersReducedData() {
   const conn = typeof navigator === 'undefined' ? null : navigator.connection
-  if (conn?.saveData) return 'metadata'
-  if (conn?.effectiveType && /2g$/.test(conn.effectiveType)) return 'metadata'
-  return 'auto'
+  if (conn?.saveData) return true
+  return !!(conn?.effectiveType && /2g$/.test(conn.effectiveType))
+}
+
+/**
+ * Whether to run the testimonial rail's silent looping previews.
+ *
+ * Each preview downloads its whole clip just to loop muted in a tile. On a
+ * phone only about one and a half tiles are even visible, the tile is small
+ * enough that the motion adds little, and the data is the visitor's — so
+ * phones get the poster frame and play on tap instead. Desktop, where several
+ * tiles are on screen at once and the drift is the point, keeps them.
+ */
+export function shouldAutoPreview() {
+  if (typeof window === 'undefined') return false
+  if (prefersReducedData()) return false
+  return !window.matchMedia?.('(max-width: 900px)')?.matches
 }

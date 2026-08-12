@@ -3,6 +3,7 @@ import { useInView } from '../../hooks/useInView.js'
 import { evidenceContent } from '../../config/sectionContent.js'
 import { SectionPainting } from '../ui/SectionPainting.jsx'
 import { renderRich, richText } from '../../lib/richtext.js'
+import { shouldAutoPreview } from '../../lib/video.js'
 
 /**
  * A video testimonial. It plays muted on a loop while on screen so it visibly
@@ -15,6 +16,37 @@ import { renderRich, richText } from '../../lib/richtext.js'
  * pauses again off-screen. This section used to eager-load every clip on page
  * load, which was most of the site's slow first load.
  */
+// The rail is a marquee, not a scroller: tiles are laid out in a translating
+// strip, so a tapped tile sits wherever the animation left it — on a phone that
+// is usually half off the edge of the screen, which is where a testimonial was
+// being watched from. Hand the clip to the phone's own fullscreen player
+// instead, so a portrait testimonial fills the screen.
+//
+// Desktop is deliberately untouched: there the tile is fully visible in the
+// rail and yanking the browser into fullscreen would be worse than the problem.
+// iOS Safari implements none of the standard Fullscreen API on other elements
+// but does expose `webkitEnterFullscreen` ON THE VIDEO, which is the only route
+// to fullscreen there. Everything here is best effort — a refusal (or a browser
+// with no fullscreen at all) just leaves the clip playing inline as before.
+function goFullscreenOnPhone(video) {
+  if (typeof window === 'undefined') return
+  if (!window.matchMedia?.('(max-width: 900px)')?.matches) return
+  try {
+    if (typeof video.webkitEnterFullscreen === 'function') {
+      // iOS refuses until the media has loaded enough to present a frame.
+      if (video.readyState >= 1) video.webkitEnterFullscreen()
+      else video.addEventListener('loadedmetadata', () => {
+        try { video.webkitEnterFullscreen() } catch { /* leave it inline */ }
+      }, { once: true })
+      return
+    }
+    const req = video.requestFullscreen || video.webkitRequestFullscreen
+    if (req) Promise.resolve(req.call(video)).catch(() => {})
+  } catch {
+    /* inline playback is a fine outcome */
+  }
+}
+
 function EvidenceVideo({ src, poster, title, onEngagedChange, ariaHidden }) {
   const videoRef = useRef(null)
   const engagedRef = useRef(false)
@@ -23,6 +55,9 @@ function EvidenceVideo({ src, poster, title, onEngagedChange, ariaHidden }) {
   // the play button shows (every card shows it except the one playing)
   const [playing, setPlaying] = useState(false)
   const [nearView, setNearView] = useState(false)
+  // Decided once: this depends on the device and the connection, not on state
+  // that changes as the visitor scrolls.
+  const [preview] = useState(shouldAutoPreview)
 
   useEffect(() => {
     const v = videoRef.current
@@ -41,9 +76,13 @@ function EvidenceVideo({ src, poster, title, onEngagedChange, ariaHidden }) {
   // Drive the muted preview from visibility. Once the visitor activates sound
   // the native controls own playback — stop steering it. (Set `muted` on the
   // element directly: some browsers ignore the attribute set via React.)
+  //
+  // `preview` is false on phones and under Data Saver, where the preview would
+  // download an entire clip per tile to loop silently in a thumbnail. There the
+  // poster stands in and the clip is fetched only if the visitor taps play.
   useEffect(() => {
     const v = videoRef.current
-    if (!v || activated) return
+    if (!v || activated || !preview) return
     if (nearView) {
       v.muted = true
       const p = v.play()
@@ -51,7 +90,7 @@ function EvidenceVideo({ src, poster, title, onEngagedChange, ariaHidden }) {
     } else {
       v.pause()
     }
-  }, [nearView, activated])
+  }, [nearView, activated, preview])
 
   // Once activated (playing with sound), report engagement so the marquee holds
   // still — but only while it's actually playing. Pausing or finishing the clip
@@ -91,6 +130,7 @@ function EvidenceVideo({ src, poster, title, onEngagedChange, ariaHidden }) {
     const p = v.play()
     if (p && p.catch) p.catch(() => {})
     setActivated(true)
+    goFullscreenOnPhone(v)
   }
 
   return (
