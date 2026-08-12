@@ -75,7 +75,11 @@ function PublicSite() {
     } else if (path === '/2' || params.get('v') === '2') {
       params.delete('v')
       const query = params.toString()
-      window.history.replaceState({}, '', '/' + (query ? '?' + query : ''))
+      // '/2' itself collapses to the root; a stray ?v=2 on any other path
+      // (e.g. a variant page like /physical) keeps its path and only loses
+      // the dead param.
+      const target = path === '/2' ? '/' : (window.location.pathname || '/')
+      window.history.replaceState({}, '', target + (query ? '?' + query : ''))
     } else if (window.location.hash) {
       window.history.replaceState({}, '', window.location.pathname + window.location.search)
     }
