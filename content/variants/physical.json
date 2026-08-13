@@ -43,14 +43,9 @@
     "for_": "[ Apply if… line ]",
     "not": "[ Do not apply if… line ]"
   },
-  "faq": {
-    "eyebrow": "VIII",
-    "heading": "Questions a Serious Man Asks",
-    "questions": "Do you wish not only to get fit, but to transform and prosper in every arena?\nAre you tired of programs that train the body and abandon the man?\nAre you capable and courageous enough to pass an eight-week transformative program?\nDo you want to stand in a global brotherhood of strong, disciplined, savage gentlemen?\nDo you want to attend daring, physical, life-changing adventures and bond with high calibre brethren?\nDo you want to be held accountable daily, in training, eating, sleeping and recovering, toward lasting transformation?\nDo you want to inhabit the strongest, healthiest, most capable version of yourself, released from the shackles of comfort?"
-  },
   "howWeOperate": {
     "eyebrow": "VII",
-    "heading": "How We Operate &amp; What to Expect",
+    "heading": "How We Operate &amp; What to Expect<strong> </strong>Next",
     "paragraphs": [
       "We meet virtually (online) -- except for in-person retreats.",
       "<strong>AND YOU START HERE:</strong> Each man conducts his initial Rite-of-Passage, an eight-week program, alongside other prospecting brethren, dubbed \"The Program.\" This is your entire initial focus and pathway to The Order: learning to become your own mentor, your own sovereign commander; to push through limiting beliefs and courageously charge through any and all fear holding you back; to meet the real you, the \"youest you,\" the man you were always destined to be -- you know him. Ultimately, to forge each man as his most glorious version, worthy of like-minded, self determined and prosperous brothers. I hope you meet him.",
@@ -61,6 +56,11 @@
       "After one to two years as an alumnus -- once you have shown commitment, dedication and awareness -- you will be \"accoutred\" by THE ORDER. I hope to see each of you there because I will be your biggest advocate."
     ],
     "pullQuote": "If it's not a fuck yes, it's a no."
+  },
+  "faq": {
+    "eyebrow": "VIII",
+    "heading": "Questions a Serious Man Asks",
+    "questions": "Do you wish not only to get fit, but to transform and prosper in every arena?\nAre you tired of programs that train the body and abandon the man?\nAre you capable and courageous enough to pass an eight-week transformative program?\nDo you want to stand in a global brotherhood of strong, disciplined, savage gentlemen?\nDo you want to attend daring, physical, life-changing adventures and bond with high calibre brethren?\nDo you want to be held accountable daily, in training, eating, sleeping and recovering, toward lasting transformation?\nDo you want to inhabit the strongest, healthiest, most capable version of yourself, released from the shackles of comfort?"
   },
   "founder": {
     "eyebrow": "V",
