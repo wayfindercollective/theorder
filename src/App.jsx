@@ -127,8 +127,8 @@ function PublicSite() {
             <EvidenceSection />
             <FounderSection />
             <WhatYouBecomeSection />
-            <FAQSection />
             <HowWeOperateSection />
+            <FAQSection />
             <ApplicationSection />
             <ClosingSection />
           </>

@@ -190,19 +190,10 @@ const SECTION_DEFS = [
     ],
   },
   {
-    key: 'faq', nav: 'Questions',
-    title: 'Questions a Serious Man Asks',
-    fields: [
-      { path: ['faq', 'eyebrow'],   label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VII' },
-      { path: ['faq', 'heading'],   label: 'Heading', hint: 'Display font, centered.' },
-      { path: ['faq', 'questions'], label: 'Questions', textarea: true, rows: 9, hint: 'One question per line. Each renders as a numbered reflective line. No answers.' },
-    ],
-  },
-  {
     key: 'howWeOperate', nav: 'How We Operate',
     title: 'How We Operate & What to Expect',
     fields: [
-      { path: ['howWeOperate', 'eyebrow'],       label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VIII' },
+      { path: ['howWeOperate', 'eyebrow'],       label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VII' },
       { path: ['howWeOperate', 'heading'],       label: 'Heading' },
       { path: ['howWeOperate', 'paragraphs', 0], label: 'Paragraph 1', textarea: true },
       { path: ['howWeOperate', 'paragraphs', 1], label: 'Paragraph 2', textarea: true },
@@ -212,6 +203,15 @@ const SECTION_DEFS = [
       { path: ['howWeOperate', 'paragraphs', 4], label: 'Paragraph 5', textarea: true },
       { path: ['howWeOperate', 'paragraphs', 5], label: 'Paragraph 6', textarea: true },
       { path: ['howWeOperate', 'paragraphs', 6], label: 'Paragraph 7', textarea: true },
+    ],
+  },
+  {
+    key: 'faq', nav: 'Questions',
+    title: 'Questions a Serious Man Asks',
+    fields: [
+      { path: ['faq', 'eyebrow'],   label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. VIII' },
+      { path: ['faq', 'heading'],   label: 'Heading', hint: 'Display font, centered.' },
+      { path: ['faq', 'questions'], label: 'Questions', textarea: true, rows: 9, hint: 'One question per line. Each renders as a numbered reflective line. No answers.' },
     ],
   },
   {

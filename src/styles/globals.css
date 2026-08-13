@@ -1134,6 +1134,45 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   background: linear-gradient(180deg, var(--brass), transparent);
 }
 
+/* The small hero lines sit directly over the painting on phones. The default
+   ash is intentionally subdued elsewhere, but loses too much contrast here —
+   especially in WhatsApp/Safari's compact browser. Lift only the mobile hero
+   copy and give it a dark relief shadow so the hierarchy survives without
+   washing out the artwork. */
+@media (max-width: 600px) {
+  .hero-eyebrow {
+    color: #ead9b4;
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: 0.24em;
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.98),
+      0 2px 12px rgba(0, 0, 0, 0.9),
+      0 0 24px rgba(0, 0, 0, 0.75);
+  }
+  .hero-eyebrow .brass-rule {
+    background: #d8bd7b;
+    opacity: 0.9;
+  }
+  .hero-restraint {
+    max-width: 34ch;
+    color: var(--parchment);
+    font-weight: 500;
+    line-height: 1.65;
+    letter-spacing: 0.15em;
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 1),
+      0 2px 12px rgba(0, 0, 0, 0.95),
+      0 0 28px rgba(0, 0, 0, 0.8);
+  }
+  .hero-fold-cue { opacity: 0.85; }
+  .hero-scroll {
+    color: var(--parchment);
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 1), 0 2px 10px rgba(0, 0, 0, 0.95);
+  }
+}
+
 /* ============================================================
    SECTION HEADINGS (shared)
    ============================================================ */
