@@ -3,7 +3,7 @@ import { HeroFilm } from '../showpiece/HeroFilm.jsx'
 import { heroContent, brandContent } from '../../config/sectionContent.js'
 import { useScrollToForm } from '../../hooks/useScrollToForm.js'
 import { DESIGN_V2, HERO_VIDEO } from '../../config/design.js'
-import { HeroVideoCard, HeroVideoBar } from '../ui/HeroVideo.jsx'
+import { HeroVideoTrigger, HeroVideoBar } from '../ui/HeroVideo.jsx'
 
 export function Hero() {
   const heroRef = useRef(null)
@@ -37,9 +37,9 @@ export function Hero() {
 
         <div className="hero-vignette" aria-hidden="true" />
 
-        {/* Desktop: framed click-to-play card over the right half (z2, same
-            layer as the content column, above film and vignette). */}
-        {HERO_VIDEO && <HeroVideoCard />}
+        {/* Desktop: the horseman film itself is the play button — one click
+            opens the fullscreen player. */}
+        {HERO_VIDEO && <HeroVideoTrigger />}
 
         <div className="hero-content shell">
           <img className="logo-mark hero-logo-mark" src={brandContent?.logo || '/images/logo-mark.png'} alt={brandContent?.wordmark || 'The Order'} />
