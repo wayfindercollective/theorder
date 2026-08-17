@@ -59,16 +59,27 @@ function OverlayPlayer({ open, onClose, videoRef, videoSrc, preload }) {
   )
 }
 
-function useOverlayPlayer(preload) {
+// `nativeFullscreen` (the mobile bar): the tap goes STRAIGHT to the device's
+// own fullscreen player, and leaving it by the native minimise control closes
+// the whole thing, same as the X. The CSS overlay stays as the fallback for
+// browsers where the fullscreen request is refused.
+function useOverlayPlayer(preload, nativeFullscreen = false) {
   const [open, setOpen] = useState(false)
   const videoRef = useRef(null)
   const [videoSrc] = useState(() => pickVideoSource(founderContent.video, founderContent.videoMobile))
 
   const show = () => {
+    const el = videoRef.current
     // Synchronous play() within the user gesture: iOS then permits sound.
     // The overlay video is hidden this instant; unhiding follows in the same
     // render pass.
-    videoRef.current?.play()?.catch(() => {})
+    el?.play()?.catch(() => {})
+    if (nativeFullscreen && el) {
+      try {
+        if (el.webkitEnterFullscreen) el.webkitEnterFullscreen() // iOS Safari
+        else if (el.requestFullscreen) el.requestFullscreen().catch(() => {})
+      } catch { /* overlay fallback below */ }
+    }
     setOpen(true)
   }
   const close = () => {
@@ -77,11 +88,31 @@ function useOverlayPlayer(preload) {
       el.pause()
       el.currentTime = 0
     }
+    try {
+      if (document.fullscreenElement) document.exitFullscreen()?.catch?.(() => {})
+      else if (el?.webkitDisplayingFullscreen && el.webkitExitFullscreen) el.webkitExitFullscreen()
+    } catch { /* noop */ }
     setOpen(false)
     // Drop focus from the trigger so no focus ring lingers on the huge
     // click surface after ESC.
     try { document.activeElement?.blur() } catch { /* noop */ }
   }
+
+  // Leaving native fullscreen (the minimise control, iOS "Done", Android
+  // back) exits the video entirely — same as pressing the X.
+  useEffect(() => {
+    if (!open || !nativeFullscreen) return
+    const el = videoRef.current
+    const onFsChange = () => { if (!document.fullscreenElement) close() }
+    const onWebkitEnd = () => close()
+    document.addEventListener('fullscreenchange', onFsChange)
+    el?.addEventListener('webkitendfullscreen', onWebkitEnd)
+    return () => {
+      document.removeEventListener('fullscreenchange', onFsChange)
+      el?.removeEventListener('webkitendfullscreen', onWebkitEnd)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, nativeFullscreen])
 
   return {
     show,
@@ -114,9 +145,10 @@ export function HeroVideoTrigger() {
   )
 }
 
-// Mobile: compact play bar in the hero content column.
+// Mobile: compact play bar in the hero content column; opens the device's
+// native fullscreen player directly.
 export function HeroVideoBar() {
-  const { show, overlay } = useOverlayPlayer('none')
+  const { show, overlay } = useOverlayPlayer('none', true)
   if (!founderContent.video) return null
   return (
     <>
