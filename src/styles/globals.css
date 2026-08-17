@@ -427,7 +427,13 @@ button {
   transform: scale(1.1);
   background: rgba(30, 24, 17, 0.88);
 }
-.hero--video .hero-video-film-btn:focus-visible { outline: 2px solid var(--brass-light); outline-offset: -6px; }
+/* The focus ring belongs on the pill, not the invisible half-screen button —
+   outlining the whole film half read as a rendering glitch. */
+.hero--video .hero-video-film-btn { outline: none; }
+.hero--video .hero-video-film-btn:focus-visible .hero-video-pill {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 3px;
+}
 @media (max-width: 900px) {
   .hero--video .hero-video-film-btn { display: none; }
 }

@@ -41,10 +41,12 @@ function OverlayPlayer({ open, onClose, videoRef, videoSrc, preload }) {
       <button type="button" className="hero-video-overlay-close" onClick={onClose} aria-label="Close video">
         ✕
       </button>
+      {/* No poster: the portrait flashing up before the first frame loaded
+          read as a glitch. Black ground until the footage arrives. The
+          portrait image itself stays in the site and the admin library. */}
       <video
         ref={videoRef}
         src={videoSrc}
-        poster={founderContent.portrait || undefined}
         controls
         playsInline
         preload={preload}
@@ -76,6 +78,9 @@ function useOverlayPlayer(preload) {
       el.currentTime = 0
     }
     setOpen(false)
+    // Drop focus from the trigger so no focus ring lingers on the huge
+    // click surface after ESC.
+    try { document.activeElement?.blur() } catch { /* noop */ }
   }
 
   return {
