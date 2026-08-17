@@ -20,16 +20,24 @@ import { maxPreload, pickVideoSource } from '../../lib/video.js'
 const videoLabel = () => founderContent.videoLabel || "Watch Nico's Story"
 
 function OverlayPlayer({ open, onClose, videoRef, videoSrc, preload }) {
-  // Lock page scroll behind the fullscreen overlay.
+  // Lock page scroll behind the fullscreen overlay; ESC closes it.
   useEffect(() => {
     if (!open) return
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = prev }
-  }, [open])
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open, onClose])
 
+  // Shown/hidden via the `open` class (not `hidden`) so the player can zoom
+  // in and fade like a YouTube fullscreen transition; `visibility` in the CSS
+  // keeps the closed overlay out of the way and the a11y tree.
   return createPortal(
-    <div className="hero-video-overlay" hidden={!open} role="dialog" aria-modal="true" aria-label={videoLabel()}>
+    <div className={'hero-video-overlay' + (open ? ' open' : '')} role="dialog" aria-modal="true" aria-label={videoLabel()}>
       <button type="button" className="hero-video-overlay-close" onClick={onClose} aria-label="Close video">
         ✕
       </button>
@@ -91,8 +99,10 @@ export function HeroVideoTrigger() {
   return (
     <>
       <button type="button" className="hero-video-film-btn" onClick={show} aria-label={videoLabel()}>
-        <span className="founder-video-play" aria-hidden="true">▶</span>
-        <span className="founder-video-label display">{videoLabel()}</span>
+        <span className="hero-video-pill">
+          <span className="founder-video-play" aria-hidden="true">▶</span>
+          <span className="founder-video-label display">{videoLabel()}</span>
+        </span>
       </button>
       {overlay}
     </>
@@ -105,7 +115,7 @@ export function HeroVideoBar() {
   if (!founderContent.video) return null
   return (
     <>
-      <button type="button" className="hero-video-bar" onClick={show}>
+      <button type="button" className="hero-video-bar hero-video-pill" onClick={show}>
         <span className="founder-video-play" aria-hidden="true">▶</span>
         <span className="founder-video-label display">{videoLabel()}</span>
       </button>
