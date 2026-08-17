@@ -35,6 +35,9 @@ export const RESERVED_VARIANT_SLUGS = [
 export const SYSTEM_PATHS = [
   'admin', 'presentations', 'application', 'booking', 'api', 'images', 'videos',
   'testimonials', 'assets', 'favicon', 'robots', 'sitemap', 'index', 'index.html', '2',
+  // The hero-video test-run URL (HERO_VIDEO flag in design.js): a real page
+  // of the site while the preview runs, never a campaign, never a page slug.
+  'preview',
 ]
 
 // "Primal & Adventure" -> "primal-adventure"

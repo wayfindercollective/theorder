@@ -5,6 +5,7 @@ import { renderRich } from '../../lib/richtext.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
 import { bgImage } from '../../lib/img.js'
 import { maxPreload, pickVideoSource } from '../../lib/video.js'
+import { HERO_VIDEO } from '../../config/design.js'
 
 export function FounderSection() {
   const { ref, inView } = useInView()
@@ -40,8 +41,10 @@ export function FounderSection() {
           <div className="section-divider" style={{ margin: '2rem auto 3.5rem' }} />
         </div>
 
-        <div className={'founder-grid stagger ' + (inView ? 'in-view' : '')}>
-          <div
+        {/* With the video promoted to the hero (HERO_VIDEO), the portrait
+            card is redundant mid-page — the text takes the full section. */}
+        <div className={'founder-grid ' + (HERO_VIDEO ? 'founder-grid--solo ' : '') + 'stagger ' + (inView ? 'in-view' : '')}>
+          {!HERO_VIDEO && <div
             className={
               'founder-portrait card nailed ' +
               (founderContent.portrait ? 'has-portrait' : 'card-stitched') +
@@ -96,7 +99,7 @@ export function FounderSection() {
             {founderContent.templated && !founderContent.portrait && (
               <span className="template-flag">{founderContent.templatedLabel || 'TEMPLATED'}</span>
             )}
-          </div>
+          </div>}
 
           <div className="founder-text">
             {founderContent.paragraphs.map((p, i) => (

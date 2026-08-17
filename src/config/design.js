@@ -14,6 +14,16 @@
 export const DESIGN_V2 = true
 
 /**
+ * Hero video test run (HERO_VIDEO_PLAN.md): Nico's "Who Am I" video playable
+ * on the hero before any scroll. Path-gated to theorder.global/preview while
+ * he reviews the layout; approving it site-wide = replace the path check with
+ * `true` (one line), which applies it to the main site and every variant page.
+ */
+import { pathToSlug } from './variantFields.js'
+export const HERO_VIDEO =
+  typeof window !== 'undefined' && pathToSlug(window.location.pathname) === 'preview'
+
+/**
  * Which side the painting sits on in v2, per section key. The text takes the
  * opposite half. Chosen so each painting's focal subject lands in the outer
  * (un-faded) half — see THE_ORDER_PLAN / the v2 plan for the per-image reasoning.

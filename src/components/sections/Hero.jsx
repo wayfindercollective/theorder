@@ -2,7 +2,8 @@ import { useRef } from 'react'
 import { HeroFilm } from '../showpiece/HeroFilm.jsx'
 import { heroContent, brandContent } from '../../config/sectionContent.js'
 import { useScrollToForm } from '../../hooks/useScrollToForm.js'
-import { DESIGN_V2 } from '../../config/design.js'
+import { DESIGN_V2, HERO_VIDEO } from '../../config/design.js'
+import { HeroVideoCard, HeroVideoBar } from '../ui/HeroVideo.jsx'
 
 export function Hero() {
   const heroRef = useRef(null)
@@ -24,13 +25,21 @@ export function Hero() {
   )
 
   return (
-    <section id="top" className={'hero' + (DESIGN_V2 ? ' hero--split' : '')} ref={heroRef}>
+    <section
+      id="top"
+      className={'hero' + (DESIGN_V2 ? ' hero--split' : '') + (HERO_VIDEO ? ' hero--video' : '')}
+      ref={heroRef}
+    >
       <div className="hero-sticky">
         <div className="hero-canvas">
           <HeroFilm scrollEl={heroRef} />
         </div>
 
         <div className="hero-vignette" aria-hidden="true" />
+
+        {/* Desktop: framed click-to-play card over the right half (z2, same
+            layer as the content column, above film and vignette). */}
+        {HERO_VIDEO && <HeroVideoCard />}
 
         <div className="hero-content shell">
           <img className="logo-mark hero-logo-mark" src={brandContent?.logo || '/images/logo-mark.png'} alt={brandContent?.wordmark || 'The Order'} />
@@ -48,6 +57,10 @@ export function Hero() {
           {heroContent.verseLine && (
             <p className="hero-verse display">{heroContent.verseLine}</p>
           )}
+
+          {/* Mobile: compact play bar between the verse and the CTA; opens
+              the fullscreen overlay player. Hidden on desktop by CSS. */}
+          {HERO_VIDEO && <HeroVideoBar />}
 
           {/* v2: CTA flows with the logo/headline/verse as one aligned column.
               v1: CTA stays anchored low in the foot (under the candle). */}
