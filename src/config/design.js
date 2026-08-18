@@ -14,14 +14,16 @@
 export const DESIGN_V2 = true
 
 /**
- * Hero video test run (HERO_VIDEO_PLAN.md): Nico's "Who Am I" video playable
- * on the hero before any scroll. Path-gated to theorder.global/preview while
- * he reviews the layout; approving it site-wide = replace the path check with
- * `true` (one line), which applies it to the main site and every variant page.
+ * Hero video (HERO_VIDEO_PLAN.md): Nico's "Who Am I" video playable on the
+ * hero before any scroll — desktop: the horseman is the play surface; mobile:
+ * a play bar opening the native fullscreen player. The Who Am I section shows
+ * the letter full-width, no portrait card.
+ *
+ * Nico approved the /preview test run 2026-08-18; now on for EVERY page (main
+ * site and all variant pages). /preview stays reserved and simply renders the
+ * same site. Flip to a path check again if a layout test run is ever needed.
  */
-import { pathToSlug } from './variantFields.js'
-export const HERO_VIDEO =
-  typeof window !== 'undefined' && pathToSlug(window.location.pathname) === 'preview'
+export const HERO_VIDEO = true
 
 /**
  * Which side the painting sits on in v2, per section key. The text takes the

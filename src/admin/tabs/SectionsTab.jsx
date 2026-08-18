@@ -174,14 +174,13 @@ const SECTION_DEFS = [
   {
     key: 'founder', nav: 'Founder',
     title: 'Who Am I (Founder)',
+    note: 'Nico\'s video plays from the hero at the top of the page — the "Watch Nico\'s Story" button on the horseman. This section itself shows the letter text, full width.',
     previewWrap: 'section-founder-preview',
     fields: [
       { path: ['founder', 'eyebrow'],         label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. V' },
       { path: ['founder', 'heading'],         label: 'Heading', hint: 'Display font, centered.' },
-      { path: ['founder', 'placeholderMark'], label: 'Portrait label', hint: 'Caption in the portrait frame until a photo is uploaded. e.g. Nico Seedsman — Afghanistan' },
-      { path: ['founder', 'templatedLabel'],  label: 'Placeholder badge', hint: 'Small corner badge on the portrait frame while no photo is uploaded. Internal marker — e.g. TEMPLATED.' },
-      { path: ['founder', 'video'], mobilePath: ['founder', 'videoMobile'], video: true, label: 'Founder video', hint: 'When set, the portrait becomes a click-to-play video. Clear both boxes to go back to a plain portrait.' },
-      { path: ['founder', 'videoLabel'],       label: 'Founder video button', hint: 'Text shown over the portrait. e.g. Watch Nico\'s Story' },
+      { path: ['founder', 'video'], mobilePath: ['founder', 'videoMobile'], video: true, label: 'Nico\'s story video', hint: 'Plays from the hero\'s "Watch Nico\'s Story" button, on every page. Uploading here replaces it everywhere; clear both boxes to remove the button from the hero.' },
+      { path: ['founder', 'videoLabel'],       label: 'Hero play button text', hint: 'The label on the hero\'s play button. e.g. Watch Nico\'s Story' },
       { path: ['founder', 'paragraphs', 0],   label: 'Paragraph 1', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
       { path: ['founder', 'paragraphs', 1],   label: 'Paragraph 2', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
       { path: ['founder', 'paragraphs', 2],   label: 'Paragraph 3', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
@@ -275,7 +274,7 @@ const SECTION_DEFS = [
 // Extra guidance shown under a section title on variant pages, where shared
 // fields have been filtered out.
 const VARIANT_NOTES = {
-  founder: 'The founder video is shared with the main site — edit it on the Main Site page.',
+  founder: 'Nico\'s video is shared with the main site and plays from this page\'s hero — edit the clip on the Main Site page. The hero play button text below is this page\'s own.',
   qualifiedScreen: 'The video, poster and Instagram details are shared with the main site — edit them on the Main Site page.',
 }
 
