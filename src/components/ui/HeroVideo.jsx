@@ -28,6 +28,26 @@ const MOBILE_NATIVE_FULLSCREEN = false
 const videoLabel = () => founderContent.videoLabel || "Watch Nico's Story"
 
 function OverlayPlayer({ open, onClose, videoRef, videoSrc, preload }) {
+  // Swipe to close (mobile): a mostly-vertical drag dismisses the overlay.
+  // Horizontal drags stay with the player (scrubbing), taps are unaffected.
+  const touchRef = useRef(null)
+  const onTouchStart = (e) => {
+    const t = e.touches[0]
+    touchRef.current = { x: t.clientX, y: t.clientY }
+  }
+  const onTouchMove = (e) => {
+    const s = touchRef.current
+    if (!s) return
+    const t = e.touches[0]
+    const dy = t.clientY - s.y
+    const dx = t.clientX - s.x
+    if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx) * 1.5) {
+      touchRef.current = null
+      onClose()
+    }
+  }
+  const onTouchEnd = () => { touchRef.current = null }
+
   // Lock page scroll behind the overlay; ESC closes it (but never while the
   // native fullscreen entered from the controls is active — ESC belongs to
   // the browser there).
@@ -49,7 +69,15 @@ function OverlayPlayer({ open, onClose, videoRef, videoSrc, preload }) {
   // in and fade like a YouTube fullscreen transition; `visibility` in the CSS
   // keeps the closed overlay out of the way and the a11y tree.
   return createPortal(
-    <div className={'hero-video-overlay' + (open ? ' open' : '')} role="dialog" aria-modal="true" aria-label={videoLabel()}>
+    <div
+      className={'hero-video-overlay' + (open ? ' open' : '')}
+      role="dialog"
+      aria-modal="true"
+      aria-label={videoLabel()}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <button type="button" className="hero-video-overlay-close" onClick={onClose} aria-label="Close video">
         ✕
       </button>
@@ -143,6 +171,9 @@ export function HeroVideoTrigger() {
   const videoRef = useRef(null)
   const [videoSrc] = useState(() => pickVideoSource(founderContent.video, founderContent.videoMobile))
   const [preload] = useState(maxPreload)
+  // The tile takes the footage's OWN aspect ratio once metadata arrives, so
+  // the frame hugs the video exactly — no black bars around it.
+  const [ratio, setRatio] = useState(null)
   // Not mounted on phones: the bar takes over there.
   const [isDesktop] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(min-width: 901px)').matches
@@ -188,7 +219,10 @@ export function HeroVideoTrigger() {
         </button>
       )}
       <div className="hero-video-slot" hidden={!playing}>
-        <div className="hero-video-tile card nailed">
+        <div
+          className="hero-video-tile card nailed"
+          style={ratio ? { '--tile-ratio': ratio } : undefined}
+        >
           <span className="nail-tl" />
           <span className="nail-br" />
           <video
@@ -199,6 +233,10 @@ export function HeroVideoTrigger() {
             playsInline
             preload={preload}
             onEnded={stop}
+            onLoadedMetadata={(e) => {
+              const { videoWidth: w, videoHeight: h } = e.target
+              if (w > 0 && h > 0) setRatio((w / h).toFixed(4))
+            }}
           >
             Your browser does not support embedded video.
           </video>

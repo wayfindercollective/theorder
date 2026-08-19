@@ -458,10 +458,15 @@ button {
   pointer-events: auto;
   isolation: isolate;
   padding: 0;
-  width: min(44vw, 700px);
+  /* --tile-ratio is set inline from the video's real dimensions the moment
+     metadata loads (HeroVideo.jsx), so the frame hugs the footage exactly —
+     portrait clips get a portrait tile, no black bars. The 70vh term keeps
+     any shape inside the hero; aspect-ratio derives height from the FINAL
+     used width, so every cap preserves the ratio. */
+  --tile-ratio: 0.5625;
+  width: min(44vw, 700px, calc(70vh * var(--tile-ratio)));
   max-width: 94%;
-  aspect-ratio: 16 / 9;
-  max-height: 66vh;
+  aspect-ratio: var(--tile-ratio);
   background: #050403;
   box-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.85);
   animation: hero-tile-in 380ms var(--ease-order);
@@ -606,6 +611,10 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Reserve a strip above the video for the X, so it can never sit on top of
+     the player's own controls (mute lives in the video's top corner on some
+     mobile players). */
+  padding-top: calc(4rem + env(safe-area-inset-top, 0px));
   opacity: 0;
   visibility: hidden;
   transition: opacity 340ms var(--ease-order), visibility 0s linear 340ms;
@@ -633,7 +642,8 @@ button {
 }
 .hero-video-overlay-close {
   position: absolute;
-  top: calc(0.9rem + env(safe-area-inset-top, 0px));
+  /* Inside the reserved strip, clear of the video area below it. */
+  top: calc(0.7rem + env(safe-area-inset-top, 0px));
   right: 0.9rem;
   z-index: 2;
   width: 2.6rem;
