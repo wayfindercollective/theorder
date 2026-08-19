@@ -438,6 +438,78 @@ button {
   .hero--video .hero-video-film-btn { display: none; }
 }
 
+/* Playing state (desktop): a framed tile centred over the right half with the
+   video INLINE — the treatment the founder card used to have. Fullscreen is
+   the visitor's choice via the player's own controls, never forced. */
+.hero--video .hero-video-slot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 56%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+.hero--video .hero-video-slot[hidden] { display: none; }
+.hero--video .hero-video-tile {
+  pointer-events: auto;
+  isolation: isolate;
+  padding: 0;
+  width: min(44vw, 700px);
+  max-width: 94%;
+  aspect-ratio: 16 / 9;
+  max-height: 66vh;
+  background: #050403;
+  box-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.85);
+  animation: hero-tile-in 380ms var(--ease-order);
+}
+.hero--video .hero-video-tile-video {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #050403;
+  object-fit: contain;
+}
+.hero--video .hero-video-tile::before,
+.hero--video .hero-video-tile::after,
+.hero--video .hero-video-tile > .nail-tl,
+.hero--video .hero-video-tile > .nail-br {
+  z-index: 4;
+  pointer-events: none;
+}
+.hero--video .hero-video-tile-close {
+  position: absolute;
+  top: -0.9rem;
+  right: -0.9rem;
+  z-index: 5;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--brass-deep);
+  background: rgba(8, 7, 6, 0.9);
+  color: var(--parchment);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.hero--video .hero-video-tile-close:hover { color: var(--brass-light); border-color: var(--brass); }
+@keyframes hero-tile-in {
+  from { opacity: 0; transform: scale(0.84); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@media (max-width: 900px) {
+  .hero--video .hero-video-slot { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero--video .hero-video-tile { animation: none; }
+}
+
 /* The pill both play buttons share (the "bubble"): translucent dark ground so
    the label reads over any painting, plus a slow brass sheen sweeping across
    so it is unmistakably clickable. */

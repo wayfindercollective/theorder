@@ -1,31 +1,43 @@
 /**
- * Hero video — Nico's "Who Am I" playable before any scroll (HERO_VIDEO flag,
- * previewing at /preview; see HERO_VIDEO_PLAN.md).
+ * Hero video — Nico's "Who Am I" playable before any scroll (HERO_VIDEO flag
+ * in design.js; see HERO_VIDEO_PLAN.md).
  *
- * Desktop (>=901px): the horseman film itself is the play surface — the whole
- * right half of the split hero is one button with a play glyph and label over
- * the painting. No framed card (a fixed-frame poster letterboxed the footage).
+ * Desktop (>=901px): idle, the horseman film is the play surface — the whole
+ * right half is one button with the pill over the painting. Clicking it plays
+ * the video INLINE in a framed tile centred over that half (the treatment the
+ * founder-section card used to have); fullscreen is an option via the
+ * player's own controls, never forced. ESC or the tile's X returns to idle.
  *
- * Mobile (<901px): a compact play bar between the verse line and the CTA.
+ * Mobile (<901px): a compact play bar between the verse line and the CTA,
+ * opening the dark overlay player — again with fullscreen available from the
+ * native controls rather than entered automatically (flip
+ * MOBILE_NATIVE_FULLSCREEN below to restore straight-to-fullscreen).
  *
- * Both open the same fullscreen overlay player. play() runs inside the
- * click/tap call stack so iOS permits sound; the overlay's video fetches
- * nothing until then (desktop warms metadata via maxPreload).
+ * play() always runs inside the click/tap call stack so iOS permits sound.
  */
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { founderContent } from '../../config/sectionContent.js'
 import { maxPreload, pickVideoSource } from '../../lib/video.js'
 
+// Nico's call 2026-08-19: tapping play shows the player, it does not slam to
+// fullscreen. Set true to make the mobile tap open the device's fullscreen
+// player directly again (the native minimise control then exits fully).
+const MOBILE_NATIVE_FULLSCREEN = false
+
 const videoLabel = () => founderContent.videoLabel || "Watch Nico's Story"
 
 function OverlayPlayer({ open, onClose, videoRef, videoSrc, preload }) {
-  // Lock page scroll behind the fullscreen overlay; ESC closes it.
+  // Lock page scroll behind the overlay; ESC closes it (but never while the
+  // native fullscreen entered from the controls is active — ESC belongs to
+  // the browser there).
   useEffect(() => {
     if (!open) return
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    const onKey = (e) => {
+      if (e.key === 'Escape' && !document.fullscreenElement) onClose()
+    }
     window.addEventListener('keydown', onKey)
     return () => {
       document.body.style.overflow = prev
@@ -59,10 +71,10 @@ function OverlayPlayer({ open, onClose, videoRef, videoSrc, preload }) {
   )
 }
 
-// `nativeFullscreen` (the mobile bar): the tap goes STRAIGHT to the device's
-// own fullscreen player, and leaving it by the native minimise control closes
-// the whole thing, same as the X. The CSS overlay stays as the fallback for
-// browsers where the fullscreen request is refused.
+// `nativeFullscreen`: the tap goes STRAIGHT to the device's own fullscreen
+// player, and leaving it by the native minimise control closes the whole
+// thing, same as the X. The CSS overlay stays as the fallback for browsers
+// where the fullscreen request is refused.
 function useOverlayPlayer(preload, nativeFullscreen = false) {
   const [open, setOpen] = useState(false)
   const videoRef = useRef(null)
@@ -98,8 +110,10 @@ function useOverlayPlayer(preload, nativeFullscreen = false) {
     try { document.activeElement?.blur() } catch { /* noop */ }
   }
 
-  // Leaving native fullscreen (the minimise control, iOS "Done", Android
-  // back) exits the video entirely — same as pressing the X.
+  // Only when fullscreen was AUTO-entered: leaving it (minimise, iOS "Done",
+  // Android back) exits the video entirely, same as the X. When fullscreen is
+  // the visitor's own choice via the controls, leaving it just returns to the
+  // overlay.
   useEffect(() => {
     if (!open || !nativeFullscreen) return
     const el = videoRef.current
@@ -122,33 +136,84 @@ function useOverlayPlayer(preload, nativeFullscreen = false) {
   }
 }
 
-// Desktop: the horseman IS the button. Covers the film's geometry (right 56%).
+// Desktop: idle = the horseman is the button; playing = a framed tile over
+// the right half with the video inline. Fullscreen only via the controls.
 export function HeroVideoTrigger() {
+  const [playing, setPlaying] = useState(false)
+  const videoRef = useRef(null)
+  const [videoSrc] = useState(() => pickVideoSource(founderContent.video, founderContent.videoMobile))
   const [preload] = useState(maxPreload)
-  const { show, overlay } = useOverlayPlayer(preload)
-  // Not mounted on phones: the bar takes over there, and this keeps exactly
-  // one openable overlay per breakpoint.
+  // Not mounted on phones: the bar takes over there.
   const [isDesktop] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(min-width: 901px)').matches
   )
+
+  // ESC stops inline playback and returns to the pill — unless the visitor is
+  // in the fullscreen they chose via the controls, where ESC is the browser's.
+  useEffect(() => {
+    if (!playing) return
+    const onKey = (e) => {
+      if (e.key === 'Escape' && !document.fullscreenElement) stop()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing])
+
   if (!founderContent.video || !isDesktop) return null
+
+  const start = () => {
+    // play() inside the click's call stack; the tile unhides in this render.
+    videoRef.current?.play()?.catch(() => {})
+    setPlaying(true)
+  }
+  function stop() {
+    const el = videoRef.current
+    if (el) {
+      el.pause()
+      el.currentTime = 0
+    }
+    setPlaying(false)
+    try { document.activeElement?.blur() } catch { /* noop */ }
+  }
+
   return (
     <>
-      <button type="button" className="hero-video-film-btn" onClick={show} aria-label={videoLabel()}>
-        <span className="hero-video-pill">
-          <span className="founder-video-play" aria-hidden="true">▶</span>
-          <span className="founder-video-label display">{videoLabel()}</span>
-        </span>
-      </button>
-      {overlay}
+      {!playing && (
+        <button type="button" className="hero-video-film-btn" onClick={start} aria-label={videoLabel()}>
+          <span className="hero-video-pill">
+            <span className="founder-video-play" aria-hidden="true">▶</span>
+            <span className="founder-video-label display">{videoLabel()}</span>
+          </span>
+        </button>
+      )}
+      <div className="hero-video-slot" hidden={!playing}>
+        <div className="hero-video-tile card nailed">
+          <span className="nail-tl" />
+          <span className="nail-br" />
+          <video
+            ref={videoRef}
+            className="hero-video-tile-video"
+            src={videoSrc}
+            controls
+            playsInline
+            preload={preload}
+            onEnded={stop}
+          >
+            Your browser does not support embedded video.
+          </video>
+          <button type="button" className="hero-video-tile-close" onClick={stop} aria-label="Close video">
+            ✕
+          </button>
+        </div>
+      </div>
     </>
   )
 }
 
-// Mobile: compact play bar in the hero content column; opens the device's
-// native fullscreen player directly.
+// Mobile: compact play bar in the hero content column.
 export function HeroVideoBar() {
-  const { show, overlay } = useOverlayPlayer('none', true)
+  const { show, overlay } = useOverlayPlayer('none', MOBILE_NATIVE_FULLSCREEN)
   if (!founderContent.video) return null
   return (
     <>
