@@ -464,7 +464,9 @@ button {
      any shape inside the hero; aspect-ratio derives height from the FINAL
      used width, so every cap preserves the ratio. */
   --tile-ratio: 0.5625;
-  width: min(44vw, 700px, calc(70vh * var(--tile-ratio)));
+  /* As big as the hero allows: the 90vh term is the ceiling for portrait
+     footage (the tile still needs breathing room inside the 100vh hero). */
+  width: min(56vw, 900px, calc(90vh * var(--tile-ratio)));
   max-width: 94%;
   aspect-ratio: var(--tile-ratio);
   background: #050403;
