@@ -31,10 +31,10 @@
  *    ONCE, and does not re-emit it if the iframe reloads onto its
  *    confirmation screen. Act on first receipt.
  */
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { BOOKING_URL, bookingUrlWithAttribution } from '../../config/booking.js'
 import { finalScreenContent } from '../../config/sectionContent.js'
-import { track } from '../../lib/analytics.js'
+import { pushDataLayerEvent, track } from '../../lib/analytics.js'
 
 // Frame height is CSS now (see `.booking-frame-wrap` in globals.css) so it can
 // differ per breakpoint — a phone needs roughly twice a desktop's height.
@@ -88,6 +88,17 @@ export function BookingWidget({ onBooked, booked }) {
   // reloads and the visitor loses their place in the calendar. BOOKING_ORIGIN
   // above is derived from the bare URL, so the confirmation check is unaffected.
   const url = useMemo(() => bookingUrlWithAttribution(BOOKING_URL), [])
+
+  // The fire-once guard covers duplicate messages as well as React re-renders.
+  // This is called only after the trusted calendar confirms the booking (or by
+  // the development-only simulator below), never from a booking-button click.
+  const confirmBooking = useCallback((data) => {
+    if (bookedRef.current) return
+    bookedRef.current = true
+    track('booking_confirmed', { slug: data.slug || '' })
+    pushDataLayerEvent('appointment_scheduled')
+    onBookedRef.current?.(data)
+  }, [])
 
   // CalendarView restores the visitor's last selected date from localStorage,
   // then calls scrollIntoView for the corresponding time pane. Because the
@@ -162,14 +173,11 @@ export function BookingWidget({ onBooked, booked }) {
       const h = resizeHeight(event.data)
       if (h) setAutoHeight(h)
       if (event.data?.type !== 'wf-booking-confirmed') return
-      if (bookedRef.current) return
-      bookedRef.current = true
-      track('booking_confirmed', { slug: event.data.slug || '' })
-      onBookedRef.current?.(event.data)
+      confirmBooking(event.data)
     }
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
-  }, [])
+  }, [confirmBooking])
 
   const onLoad = () => {
     setLoaded(true)
@@ -238,9 +246,7 @@ export function BookingWidget({ onBooked, booked }) {
           className="btn btn-ghost"
           style={{ marginTop: '0.9rem' }}
           onClick={() => {
-            if (bookedRef.current) return
-            bookedRef.current = true
-            onBookedRef.current?.({
+            confirmBooking({
               type: 'wf-booking-confirmed',
               slug: 'dev-simulated',
               bookingId: `dev_${Date.now()}`,

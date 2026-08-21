@@ -150,6 +150,14 @@ export function bootAnalytics() {
   bootMetaPixel()
 }
 
+// Push the small set of conversion events owned by Google Tag Manager in the
+// object format its Custom Event triggers consume. Keep this separate from
+// gtag(): GA4 queues `arguments` objects, while GTM expects `{ event: ... }`.
+export function pushDataLayerEvent(event, props = {}) {
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push({ ...props, event })
+}
+
 export function track(event, props = {}) {
   if (POSTHOG_KEY) loadPostHog().then((ph) => ph && ph.capture(event, props))
   if (_ga4Ready && window.gtag) {

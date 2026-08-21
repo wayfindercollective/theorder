@@ -5,7 +5,7 @@ import { QuestionSlide } from '../ui/QuestionSlide.jsx'
 import { QualifiedScreen } from '../ui/QualifiedScreen.jsx'
 import { DeclineScreen } from '../ui/DeclineScreen.jsx'
 import { getLastCTA } from '../../lib/utm.js'
-import { track } from '../../lib/analytics.js'
+import { pushDataLayerEvent, track } from '../../lib/analytics.js'
 import { useInView } from '../../hooks/useInView.js'
 import { bgImage } from '../../lib/img.js'
 
@@ -104,6 +104,7 @@ export function ApplicationSection() {
       result: shouldDecline ? 'declined' : 'qualified',
       last_cta_location: getLastCTA(),
     })
+    if (!shouldDecline) pushDataLayerEvent('submit_application')
     setDeclined(shouldDecline)
     setFinished(true)
     setFormData({})
