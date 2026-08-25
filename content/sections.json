@@ -77,15 +77,15 @@
   "qualifiedScreen": {
     "heading": "God Wills It Indeed",
     "sub": "Legend. Let's go get it",
-    "video": "/videos/post-questionnaire-cta-720.mp4",
-    "poster": "/videos/post-questionnaire-cta-poster.jpg",
+    "video": "https://fwh6olzjiyo8qhjv.public.blob.vercel-storage.com/videos/1787676692944-Web-Intro-View-720.mp4",
+    "poster": "https://fwh6olzjiyo8qhjv.public.blob.vercel-storage.com/images/1787676666109-Web-Intro-View-poster.jpg",
     "videoLabel": "Watch Nico's Message",
     "message": "^ As a minimum, text or voice message us sharing whatever lets us know \"YOU.\" If you don’t contact us, we won’t know you at all… take the shot",
     "note": "",
     "button": "Message @theorder.global",
     "instagramHandle": "@theorder.global",
     "instagramUrl": "https://ig.me/m/theorder.global",
-    "videoMobile": "/videos/post-questionnaire-cta-540.mp4"
+    "videoMobile": "https://fwh6olzjiyo8qhjv.public.blob.vercel-storage.com/videos/1787676696447-Web-Intro-View-540.mp4"
   },
   "commitmentGate": {
     "acceptance": "WELL DONE",
