@@ -55,6 +55,9 @@ const SECTION_DEFS = [
       { path: ['hero', 'cta'],       label: 'CTA button', hint: '2–4 words. Action verb.' },
       { path: ['hero', 'restraint'], label: 'Restraint line (under CTA)', hint: 'One quiet line under the button. Optional — leave blank to hide.' },
       { path: ['hero', 'scrollLabel'], label: 'Scroll cue', hint: 'Tiny word at the bottom of the hero inviting the visitor to scroll. e.g. Scroll' },
+      { divider: 'Nico’s story video' },
+      { path: ['founder', 'video'], mobilePath: ['founder', 'videoMobile'], video: true, label: 'Nico’s story video', hint: 'Plays from the "Watch Nico’s Story" button on the horseman (desktop) and the play bar (phones), on EVERY page. Uploading here replaces it everywhere; clear both boxes to remove the button.' },
+      { path: ['founder', 'videoLabel'],       label: 'Play button text', hint: 'The label on the hero’s play button, on every page. e.g. Watch Nico’s Story' },
     ],
   },
   {
@@ -128,8 +131,8 @@ const SECTION_DEFS = [
     fields: [
       { path: ['qualifiedScreen', 'heading'], label: 'Heading', hint: 'Confirms that the application has been submitted.' },
       { path: ['qualifiedScreen', 'sub'], label: 'Sub line', hint: 'Short line confirming they passed the first stage.' },
-      { path: ['qualifiedScreen', 'video'], mobilePath: ['qualifiedScreen', 'videoMobile'], video: true, label: 'Nico’s video', hint: 'Shown to applicants who pass the filter. Clear both boxes to show the development placeholder.' },
-      { path: ['qualifiedScreen', 'poster'], label: 'Video poster URL', hint: 'Optional still image shown before the video plays.' },
+      { path: ['qualifiedScreen', 'video'], mobilePath: ['qualifiedScreen', 'videoMobile'], posterPath: ['qualifiedScreen', 'poster'], video: true, label: 'Nico’s video', hint: 'Shown to applicants who pass the filter, on EVERY page. Uploading replaces the clip everywhere and captures a new still frame automatically. Clear both boxes to show the development placeholder.' },
+      { path: ['qualifiedScreen', 'poster'], label: 'Video poster URL', hint: 'Filled in automatically when you upload a clip. Paste another image URL here only to override the captured still.' },
       { path: ['qualifiedScreen', 'videoLabel'], label: 'Video play button', hint: 'Text shown beneath the play icon. e.g. Watch Nico\'s Message' },
       { path: ['qualifiedScreen', 'message'], label: 'Next-step instruction', textarea: true, rows: 3, hint: 'Short encouragement to watch the video and continue.' },
       { path: ['qualifiedScreen', 'note'], label: 'Optional extra line', textarea: true, rows: 2, hint: 'Leave blank to keep the page concise.' },
@@ -174,13 +177,11 @@ const SECTION_DEFS = [
   {
     key: 'founder', nav: 'Founder',
     title: 'Who Am I (Founder)',
-    note: 'Nico\'s video plays from the hero at the top of the page — the "Watch Nico\'s Story" button on the horseman. This section itself shows the letter text, full width.',
+    note: 'This section is the letter only, full width. Nico’s video and its play button moved to the hero at the top of the page — edit them under Hero, up in the jump row.',
     previewWrap: 'section-founder-preview',
     fields: [
       { path: ['founder', 'eyebrow'],         label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. V' },
       { path: ['founder', 'heading'],         label: 'Heading', hint: 'Display font, centered.' },
-      { path: ['founder', 'video'], mobilePath: ['founder', 'videoMobile'], video: true, label: 'Nico\'s story video', hint: 'Plays from the hero\'s "Watch Nico\'s Story" button, on every page. Uploading here replaces it everywhere; clear both boxes to remove the button from the hero.' },
-      { path: ['founder', 'videoLabel'],       label: 'Hero play button text', hint: 'The label on the hero\'s play button. e.g. Watch Nico\'s Story' },
       { path: ['founder', 'paragraphs', 0],   label: 'Paragraph 1', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic. Optional inline formatting: **bold**, [link](url).' },
       { path: ['founder', 'paragraphs', 1],   label: 'Paragraph 2', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
       { path: ['founder', 'paragraphs', 2],   label: 'Paragraph 3', markdown: true, italic: true, previewClass: 'founder-p', hint: 'Whole paragraph renders italic.' },
@@ -274,8 +275,8 @@ const SECTION_DEFS = [
 // Extra guidance shown under a section title on variant pages, where shared
 // fields have been filtered out.
 const VARIANT_NOTES = {
-  founder: 'Nico\'s video is shared with the main site and plays from this page\'s hero — edit the clip on the Main Site page. The hero play button text below is this page\'s own.',
-  qualifiedScreen: 'The video, poster and Instagram details are shared with the main site — edit them on the Main Site page.',
+  hero: 'Nico\u2019s story video and its play button text are shared with the main site \u2014 edit them on the Main Site page.',
+  qualifiedScreen: 'The video, its still frame, the play button text and the Instagram details are shared with the main site \u2014 edit them on the Main Site page.',
 }
 
 function variantField(f) {
@@ -440,11 +441,16 @@ export function SectionsTab({
                     hint={f.hint}
                     value={getAt(sections, f.path) ?? ''}
                     mobileValue={getAt(sections, f.mobilePath) ?? ''}
-                    // One update for the pair: two sequential `update` calls
-                    // would each read a stale `sections` and the second would
-                    // discard the first.
-                    onChange={({ video, videoMobile }) =>
-                      onChange((cur) => setAt(setAt(cur, f.path, video), f.mobilePath, videoMobile))
+                    withPoster={!!f.posterPath}
+                    // One update for the set: sequential `update` calls would
+                    // each read a stale `sections` and the later ones would
+                    // discard the earlier.
+                    onChange={({ video, videoMobile, poster }) =>
+                      onChange((cur) => {
+                        let next = setAt(setAt(cur, f.path, video), f.mobilePath, videoMobile)
+                        if (f.posterPath && poster) next = setAt(next, f.posterPath, poster)
+                        return next
+                      })
                     }
                   />
                 )

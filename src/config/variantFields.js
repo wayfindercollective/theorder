@@ -78,11 +78,14 @@ export const VARIANT_FIELDS = {
   considered:      ['eyebrow', 'heading', 'for_', 'not'],
   howWeOperate:    ['eyebrow', 'heading', 'paragraphs', 'pullQuote'],
   faq:             ['eyebrow', 'heading', 'questions'],
-  founder:         ['eyebrow', 'heading', 'placeholderMark', 'templatedLabel', 'videoLabel', 'paragraphs', 'signature'],
+  founder:         ['eyebrow', 'heading', 'placeholderMark', 'templatedLabel', 'paragraphs', 'signature'],
   closing:         ['wordmark', 'verses'],
   cta:             ['label'],
   application:     ['eyebrow', 'stepLabel', 'backButton'],
-  qualifiedScreen: ['heading', 'sub', 'videoLabel', 'message', 'note', 'button'],
+  // videoLabel (both here and on founder) is SHARED: the play-button text
+  // belongs with the video it labels, and a video change applies to every
+  // page, so its label does too.
+  qualifiedScreen: ['heading', 'sub', 'message', 'note', 'button'],
   // declineScreen stays SHARED: it is edited in the Application tab alongside
   // the questions and filter, and that whole flow is shared across pages.
 }
