@@ -253,15 +253,27 @@ function TestimonialCard({ card, index, total, sections, savedSections, onPatch,
           )
         }
         setBusy('compressing')
+        // Compressed or not published. The old fallback here uploaded the raw
+        // clip when compression failed, which is how a 73 MB, 60 fps phone
+        // recording ended up in the testimonial rail. A failed compression now
+        // stops the upload with a clear message instead.
+        let result
         try {
-          const result = await transcodeVideo(file, { onProgress: setProgress })
-          if (!result.skipped && result.outputs[0]) {
-            upload = result.outputs[0].file
-            savedFrom = file.size
-          }
+          result = await transcodeVideo(file, { onProgress: setProgress })
         } catch (err) {
-          if (file.size > HARD_LIMIT_BYTES) throw err
-          setNote(`Couldn’t compress this clip (${humanizeError(err)}) — uploading it as it is.`)
+          throw new Error(
+            `Couldn’t compress this clip (${humanizeError(err)}). Nothing was uploaded — ` +
+            'try again in Chrome, Edge or Safari, or send the clip to Nathan to compress.'
+          )
+        }
+        if (!result.skipped && result.outputs[0]) {
+          upload = result.outputs[0].file
+          savedFrom = file.size
+        } else if (result.skipped && result.reason !== 'already-small' && file.size > HARD_LIMIT_BYTES) {
+          throw new Error(
+            `This clip is ${bytes(file.size)} and couldn’t be made smaller here. ` +
+            'Nothing was uploaded ' + '— send it to Nathan to compress.'
+          )
         }
         setProgress(0)
       }

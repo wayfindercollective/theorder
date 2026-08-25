@@ -18,7 +18,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { founderContent } from '../../config/sectionContent.js'
-import { maxPreload, pickVideoSource } from '../../lib/video.js'
+import { pickVideoSource } from '../../lib/video.js'
 
 // Nico's call 2026-08-19: tapping play shows the player, it does not slam to
 // fullscreen. Set true to make the mobile tap open the device's fullscreen
@@ -170,7 +170,11 @@ export function HeroVideoTrigger() {
   const [playing, setPlaying] = useState(false)
   const videoRef = useRef(null)
   const [videoSrc] = useState(() => pickVideoSource(founderContent.video, founderContent.videoMobile))
-  const [preload] = useState(maxPreload)
+  // Metadata only. This player is on screen the instant the page opens, and
+  // maxPreload() resolves to 'auto' on any normal connection — that pulled the
+  // whole 11 MB story clip on every desktop visit, competing with the painting
+  // and fonts for the first paint. The clip buffers from the click instead.
+  const preload = 'metadata'
   // The tile takes the footage's OWN aspect ratio once metadata arrives, so
   // the frame hugs the video exactly — no black bars around it.
   const [ratio, setRatio] = useState(null)
