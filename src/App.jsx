@@ -8,6 +8,7 @@ import { WhatYouBecomeSection } from './components/sections/WhatYouBecomeSection
 import { ApplicationSection } from './components/sections/ApplicationSection.jsx'
 import { ApplicationGatePage } from './components/sections/ApplicationGatePage.jsx'
 import { BookingPage } from './components/sections/BookingPage.jsx'
+import { PostFormPreviewPage } from './components/sections/PostFormPreviewPage.jsx'
 import { FounderSection } from './components/sections/FounderSection.jsx'
 import { EvidenceSection } from './components/sections/EvidenceSection.jsx'
 import { FAQSection } from './components/sections/FAQSection.jsx'
@@ -44,6 +45,9 @@ function privateApplicationRoute() {
   const path = window.location.pathname.replace(/\/+$/, '')
   if (path === '/application' || path === '/booking') return 'gate'
   if (path === '/application/booking') return 'booking'
+  // Post-questionnaire screens, viewable without submitting a form.
+  if (path === '/preview/qualified') return 'qualified'
+  if (path === '/preview/declined') return 'declined'
   return false
 }
 
@@ -118,6 +122,8 @@ function PublicSite() {
           <ApplicationGatePage />
         ) : applicationRoute === 'booking' ? (
           <BookingPage />
+        ) : applicationRoute === 'qualified' || applicationRoute === 'declined' ? (
+          <PostFormPreviewPage screen={applicationRoute} />
         ) : (
           <>
             <Hero />
