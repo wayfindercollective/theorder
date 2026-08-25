@@ -14,8 +14,9 @@
  */
 
 import { useRef, useState } from 'react'
-import { humanizeError, uploadVideo } from './adminApi.js'
+import { humanizeError, uploadImage, uploadVideo } from './adminApi.js'
 import { canTranscode, transcodeVideo, RENDITION_540, RENDITION_720 } from './videoTranscode.js'
+import { posterFromFile } from './videoPoster.js'
 
 const VIDEO_ACCEPT = 'video/mp4,video/quicktime,video/webm,video/x-m4v'
 
@@ -27,9 +28,16 @@ function bytes(n) {
 
 /**
  * @param {{ value: string, mobileValue: string, label: string, hint: string,
- *           onChange: (patch: { video: string, videoMobile: string }) => void }} props
+ *           withPoster?: boolean,
+ *           onChange: (patch: { video: string, videoMobile: string, poster?: string }) => void }} props
+ *
+ * `withPoster`: also capture a still from the clip and upload it, returned as
+ * `poster` in the patch. Without it, replacing the post-questionnaire clip
+ * left the OLD clip's opening frame showing until someone edited the poster
+ * URL by hand — the exact step a non-technical admin skips. Best-effort: a
+ * capture failure never blocks the video upload.
  */
-export function SectionVideoField({ value, mobileValue, label, hint, onChange }) {
+export function SectionVideoField({ value, mobileValue, label, hint, withPoster = false, onChange }) {
   const fileRef = useRef(null)
   const [busy, setBusy] = useState('')   // '' | 'compressing' | 'uploading'
   const [progress, setProgress] = useState(0)
@@ -53,6 +61,16 @@ export function SectionVideoField({ value, mobileValue, label, hint, onChange })
     }
 
     try {
+      // Poster first: reading the local file is instant and same-origin.
+      let poster
+      if (withPoster) {
+        try {
+          const still = await posterFromFile(file)
+          if (still) poster = (await uploadImage(still)).url
+        } catch { poster = undefined }
+      }
+      const withPosterPatch = (patch) => (poster ? { ...patch, poster } : patch)
+
       setBusy('compressing')
       const result = await transcodeVideo(file, {
         renditions: [RENDITION_720, RENDITION_540],
@@ -68,8 +86,8 @@ export function SectionVideoField({ value, mobileValue, label, hint, onChange })
 
       if (!outputs.length) {
         const { url } = await uploadVideo(file, setProgress)
-        onChange({ video: url, videoMobile: '' })
-        setNote(`Uploaded ${bytes(file.size)} — already small enough to use as-is on both.`)
+        onChange(withPosterPatch({ video: url, videoMobile: '' }))
+        setNote(`Uploaded ${bytes(file.size)} — already small enough to use as-is on both.` + (poster ? ' Poster frame captured.' : ''))
         return
       }
 
@@ -81,14 +99,15 @@ export function SectionVideoField({ value, mobileValue, label, hint, onChange })
         uploaded[out.shortEdge] = { url, size: out.file.size }
         setProgress(0)
       }
-      onChange({
+      onChange(withPosterPatch({
         video: uploaded[RENDITION_720]?.url || '',
         videoMobile: uploaded[RENDITION_540]?.url || '',
-      })
+      }))
       setNote(
         `Uploaded — ${bytes(file.size)} in, ` +
         `${bytes(uploaded[RENDITION_720]?.size)} for desktop and ` +
-        `${bytes(uploaded[RENDITION_540]?.size)} for phones.`
+        `${bytes(uploaded[RENDITION_540]?.size)} for phones.` +
+        (poster ? ' Poster frame captured.' : '')
       )
     } catch (err) {
       setError(humanizeError(err))
