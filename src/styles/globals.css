@@ -1869,8 +1869,16 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .qualified-next.in { opacity: 1; transform: translateY(0); }
 .qualified-video {
   display: block;
-  width: min(100%, 420px);
-  aspect-ratio: 3 / 4;
+  /* The frame takes the clip's OWN aspect ratio (set from the video's
+     metadata in QualifiedScreen.jsx, default portrait 9:16 since Nico films
+     upright) so the picture fills it edge to edge: a 9:16 clip in the old
+     fixed 3:4 box left black pillars either side. */
+  --qual-ratio: 0.5625;
+  /* Bound by height for upright clips (640px tall at 9:16 = 360px wide) and
+     by width for landscape ones; aspect-ratio derives height from the final
+     width, so every cap keeps the picture edge to edge. */
+  width: min(100%, 400px, calc(640px * var(--qual-ratio)));
+  aspect-ratio: var(--qual-ratio);
   margin: 0 auto;
   border: 1px solid rgba(166, 136, 74, 0.45);
   border-radius: 6px;

@@ -35,6 +35,7 @@ function instagramDetails() {
 export function QualifiedScreen({ inView = true }) {
   const [stage, setStage] = useState(0)
   const [videoStarted, setVideoStarted] = useState(false)
+  const [ratio, setRatio] = useState(null)
   const videoRef = useRef(null)
   const [videoSrc] = useState(() => pickVideoSource(
     qualifiedScreenContent.video,
@@ -90,9 +91,14 @@ export function QualifiedScreen({ inView = true }) {
         {qualifiedScreenContent.video ? (
           <div
             className="qualified-video qualified-video-frame"
-            style={qualifiedScreenContent.poster
-              ? { backgroundImage: bgImage(qualifiedScreenContent.poster) }
-              : undefined}
+            style={{
+              ...(qualifiedScreenContent.poster
+                ? { backgroundImage: bgImage(qualifiedScreenContent.poster) }
+                : {}),
+              // The frame hugs the footage: its ratio comes from the clip's own
+              // dimensions once metadata loads (default upright 9:16 in CSS).
+              ...(ratio ? { '--qual-ratio': ratio } : {}),
+            }}
           >
             <video
               ref={videoRef}
@@ -113,6 +119,10 @@ export function QualifiedScreen({ inView = true }) {
                 setVideoStarted(false)
               }}
               onError={() => setVideoStarted(false)}
+              onLoadedMetadata={(e) => {
+                const { videoWidth: w, videoHeight: h } = e.target
+                if (w > 0 && h > 0) setRatio((w / h).toFixed(4))
+              }}
             >
               Your browser does not support embedded video.
             </video>
