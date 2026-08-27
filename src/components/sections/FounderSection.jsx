@@ -2,17 +2,16 @@ import { useInView } from '../../hooks/useInView.js'
 import { founderContent } from '../../config/sectionContent.js'
 import { renderRich } from '../../lib/richtext.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
-import { bgImage } from '../../lib/img.js'
+import { DeferredBackground } from '../ui/DeferredBackground.jsx'
 
 export function FounderSection() {
   const { ref, inView } = useInView()
   return (
     <section className="section section-founder" ref={ref}>
       {founderContent.image && (
-        <div
+        <DeferredBackground
+          image={founderContent.image}
           className="section-bg-image"
-          style={{ backgroundImage: bgImage(founderContent.image) }}
-          aria-hidden="true"
         />
       )}
       <div className="shell">
@@ -25,12 +24,13 @@ export function FounderSection() {
         </div>
 
         <div className={'founder-grid stagger ' + (inView ? 'in-view' : '')}>
-          <div
+          <DeferredBackground
+            image={founderContent.portrait}
+            ariaHidden={false}
             className={
               'founder-portrait card nailed ' +
               (founderContent.portrait ? 'has-portrait' : 'card-stitched')
             }
-            style={founderContent.portrait ? { backgroundImage: bgImage(founderContent.portrait) } : undefined}
           >
             <span className="nail-tl" />
             <span className="nail-br" />
@@ -44,7 +44,7 @@ export function FounderSection() {
             {founderContent.templated && !founderContent.portrait && (
               <span className="template-flag">{founderContent.templatedLabel || 'TEMPLATED'}</span>
             )}
-          </div>
+          </DeferredBackground>
 
           <div className="founder-text">
             {founderContent.paragraphs.map((p, i) => (

@@ -3,7 +3,7 @@ import { codeContent } from '../../config/sectionContent.js'
 import { renderRich } from '../../lib/richtext.js'
 import { sectionAlign } from '../../config/design.js'
 import { CtaButton } from '../ui/CtaButton.jsx'
-import { bgImage } from '../../lib/img.js'
+import { DeferredBackground } from '../ui/DeferredBackground.jsx'
 
 // "Who We Are" — heading + manifesto prose, round-table image behind it.
 // The Principles wall lives in its own section (PrinciplesSection).
@@ -15,12 +15,11 @@ export function TheCodeSection() {
     <section className={'section section-code' + splitClass} ref={ref}>
       <div className="code-bg" aria-hidden="true" />
       {codeContent.image && (
-        <div
+        <DeferredBackground
+          image={codeContent.image}
           className={align === 'full'
             ? 'section-bg-image'
             : `section-side-image section-side-image-${align}`}
-          style={{ backgroundImage: bgImage(codeContent.image) }}
-          aria-hidden="true"
         />
       )}
       <div className="shell-narrow code-inner">

@@ -7,7 +7,7 @@ import { DeclineScreen } from '../ui/DeclineScreen.jsx'
 import { getLastCTA } from '../../lib/utm.js'
 import { pushDataLayerEvent, track } from '../../lib/analytics.js'
 import { useInView } from '../../hooks/useInView.js'
-import { bgImage } from '../../lib/img.js'
+import { DeferredBackground } from '../ui/DeferredBackground.jsx'
 
 // LOCAL QUALIFICATION FILTER.
 //
@@ -154,10 +154,9 @@ export function ApplicationSection() {
   return (
     <section id="application" className="section section-application" ref={sectionRef}>
       {applicationCopy.image && (
-        <div
+        <DeferredBackground
+          image={applicationCopy.image}
           className="section-bg-image"
-          style={{ backgroundImage: bgImage(applicationCopy.image) }}
-          aria-hidden="true"
         />
       )}
       <div className="shell-narrow application-shell">

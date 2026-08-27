@@ -4,6 +4,7 @@ import { heroContent, brandContent } from '../../config/sectionContent.js'
 import { useScrollToForm } from '../../hooks/useScrollToForm.js'
 import { DESIGN_V2, HERO_VIDEO } from '../../config/design.js'
 import { HeroVideoTrigger, HeroVideoBar } from '../ui/HeroVideo.jsx'
+import { siteLogo } from '../../lib/img.js'
 
 export function Hero() {
   const heroRef = useRef(null)
@@ -42,7 +43,7 @@ export function Hero() {
         {HERO_VIDEO && <HeroVideoTrigger />}
 
         <div className="hero-content shell">
-          <img className="logo-mark hero-logo-mark" src={brandContent?.logo || '/images/logo-mark.png'} alt={brandContent?.wordmark || 'The Order'} />
+          <img className="logo-mark hero-logo-mark" src={siteLogo(brandContent?.logo)} alt={brandContent?.wordmark || 'The Order'} />
 
           {heroContent.eyebrow && (
             <div className="hero-eyebrow eyebrow">

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { applicationCopy } from '../../config/sectionContent.js'
-import { bgImage } from '../../lib/img.js'
 import { CommitmentGate } from '../ui/CommitmentGate.jsx'
+import { SectionPainting } from '../ui/SectionPainting.jsx'
 
 /**
  * Private acceptance page shared by Nico after the Instagram conversation.
@@ -15,13 +15,7 @@ export function ApplicationGatePage() {
 
   return (
     <section id="top" className="section section-application booking-page application-gate-page">
-      {applicationCopy.image && (
-        <div
-          className="section-bg-image"
-          style={{ backgroundImage: bgImage(applicationCopy.image) }}
-          aria-hidden="true"
-        />
-      )}
+      <SectionPainting image={applicationCopy.image} eager />
       <div className="shell booking-page-shell">
         <div className="application-card booking-page-card application-gate-card card card-stitched nailed">
           <span className="nail-tl" />

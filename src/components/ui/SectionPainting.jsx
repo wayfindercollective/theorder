@@ -8,18 +8,18 @@
  * occupies one half of the section and fades into the centre — the v2 split
  * layout. Drop it in as the first child of a <section>. No-ops when image is unset.
  */
-import { bgImage } from '../../lib/img.js'
+import { DeferredBackground } from './DeferredBackground.jsx'
 
-export function SectionPainting({ image, align = 'full' }) {
+export function SectionPainting({ image, align = 'full', eager = false }) {
   if (!image) return null
   const className = align === 'full'
     ? 'section-bg-image'
     : `section-side-image section-side-image-${align}`
   return (
-    <div
+    <DeferredBackground
+      image={image}
       className={className}
-      style={{ backgroundImage: bgImage(image) }}
-      aria-hidden="true"
+      eager={eager}
     />
   )
 }

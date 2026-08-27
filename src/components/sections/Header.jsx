@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { brandContent, footerContent } from '../../config/sectionContent.js'
+import { siteLogo } from '../../lib/img.js'
 
-const LOGO_SRC = brandContent?.logo || '/images/logo-mark.png'
+const LOGO_SRC = siteLogo(brandContent?.logo)
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
+  const scrolledRef = useRef(false)
   useEffect(() => {
     // The top bar stays hidden over the hero (the hero shows its own logo) and
     // slides in only once the hero has scrolled past, then stays for the rest.
@@ -16,7 +18,12 @@ export function Header() {
       const hero = document.getElementById('top')
       trigger = (hero ? hero.offsetHeight : window.innerHeight) - 90
     }
-    const on = () => setScrolled(window.scrollY > trigger)
+    const on = () => {
+      const next = window.scrollY > trigger
+      if (next === scrolledRef.current) return
+      scrolledRef.current = next
+      setScrolled(next)
+    }
     const onResize = () => {
       measure()
       on()

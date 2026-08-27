@@ -5,7 +5,7 @@ import {
   qualifiedScreenContent,
 } from '../../config/sectionContent.js'
 import { track } from '../../lib/analytics.js'
-import { bgImage } from '../../lib/img.js'
+import { bgImage, siteLogo } from '../../lib/img.js'
 import { maxPreload, pickVideoSource } from '../../lib/video.js'
 
 function instagramDetails() {
@@ -75,7 +75,7 @@ export function QualifiedScreen({ inView = true }) {
       <div className={'final-mark' + (stage >= 1 ? ' in' : '')}>
         <img
           className="logo-mark final-logo"
-          src={brandContent?.logo || '/images/logo-mark.png'}
+          src={siteLogo(brandContent?.logo)}
           alt="The Order"
         />
       </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { brandContent, declineScreenContent } from '../../config/sectionContent.js'
+import { siteLogo } from '../../lib/img.js'
 
 /**
  * The negation screen — shown instead of FinalScreen when the applicant chose
@@ -19,7 +20,7 @@ export function DeclineScreen() {
       <div className={'final-mark' + (stage >= 1 ? ' in' : '')}>
         <img
           className="logo-mark final-logo"
-          src={brandContent?.logo || '/images/logo-mark.png'}
+          src={siteLogo(brandContent?.logo)}
           alt="The Order"
         />
       </div>

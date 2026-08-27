@@ -6,11 +6,11 @@
  */
 import { heroContent, brandContent } from '../config/sectionContent.js'
 import { SITE_IMAGES } from './siteImages.js'
-import { bgImage } from '../lib/img.js'
+import { bgImage, siteLogo } from '../lib/img.js'
 
 export function PresHero() {
   const heroImg = SITE_IMAGES[0].src
-  const logo = brandContent?.logo || '/images/logo-mark.png'
+  const logo = siteLogo(brandContent?.logo)
   return (
     <div className="pres-stage pres-hero">
       {/* bgImage() routes to the lean WebP derivative when one exists */}

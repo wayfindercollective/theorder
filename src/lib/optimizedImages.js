@@ -3,6 +3,7 @@
 export const OPTIMIZED = new Set([
   "founder-portrait",
   "hero-horseman",
+  "logo-mark",
   "oil-become",
   "oil-closing",
   "oil-faq",

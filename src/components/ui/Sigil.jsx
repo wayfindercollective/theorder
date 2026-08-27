@@ -10,13 +10,14 @@
  */
 
 import { brandContent } from '../../config/sectionContent.js'
+import { optImage } from '../../lib/img.js'
 
 export function Sigil({ size = 56, variant = 'full', className = '' }) {
   const customLogo = brandContent?.logo
   if (customLogo) {
     return (
       <img
-        src={customLogo}
+        src={optImage(customLogo)}
         alt={brandContent?.wordmark || 'The Order'}
         height={size}
         className={`sigil sigil-custom ${className}`.trim()}

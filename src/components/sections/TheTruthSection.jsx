@@ -1,7 +1,7 @@
 import { useInView } from '../../hooks/useInView.js'
 import { truthContent } from '../../config/sectionContent.js'
 import { renderRich, richText } from '../../lib/richtext.js'
-import { bgImage } from '../../lib/img.js'
+import { DeferredBackground } from '../ui/DeferredBackground.jsx'
 
 export function TheTruthSection() {
   const { ref, inView } = useInView()
@@ -12,12 +12,11 @@ export function TheTruthSection() {
   return (
     <section className="section section-truth" ref={ref}>
       {truthContent.image && (
-        <div
+        <DeferredBackground
+          image={truthContent.image}
           className={isFull
             ? 'section-bg-image'
             : `section-side-image section-side-image-${truthContent.imageAlign || 'right'}`}
-          style={{ backgroundImage: bgImage(truthContent.image) }}
-          aria-hidden="true"
         />
       )}
       <div className="shell">

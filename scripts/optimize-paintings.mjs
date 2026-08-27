@@ -26,6 +26,8 @@ const DEFAULT = { maxLong: 2000, quality: 80 }
 const OVERRIDES = {
   // the hero is the LCP + shown at full viewport height — keep it a touch larger
   'hero-horseman': { maxLong: 2400, quality: 82 },
+  // Repeated throughout the public site but never rendered above ~170px high.
+  'logo-mark': { maxLong: 640, quality: 90 },
 }
 
 // The /presentations deck backgrounds NOT referenced from sections.json (the
@@ -33,6 +35,7 @@ const OVERRIDES = {
 // They render through the same bgImage() router, so a manifest entry is all
 // they need to serve as WebP.
 const STATIC_EXTRAS = [
+  'logo-mark',
   'pres-soldier', 'pres-squad', 'pres-base', 'pres-dog', 'pres-blade', 'pres-sentinel',
 ]
 

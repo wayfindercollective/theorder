@@ -1,16 +1,15 @@
 import { useInView } from '../../hooks/useInView.js'
 import { consideredContent } from '../../config/sectionContent.js'
-import { bgImage } from '../../lib/img.js'
+import { DeferredBackground } from '../ui/DeferredBackground.jsx'
 
 export function WhoIsConsideredSection() {
   const { ref, inView } = useInView()
   return (
     <section className="section section-considered" ref={ref}>
       {consideredContent.image && (
-        <div
+        <DeferredBackground
+          image={consideredContent.image}
           className={`section-side-image section-side-image-${consideredContent.imageAlign || 'left'}`}
-          style={{ backgroundImage: bgImage(consideredContent.image) }}
-          aria-hidden="true"
         />
       )}
       <div className="shell-narrow">

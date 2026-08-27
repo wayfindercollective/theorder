@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { brandContent, finalScreenContent, submitConsent } from '../../config/sectionContent.js'
 import { BookingWidget } from './BookingWidget.jsx'
 import { track } from '../../lib/analytics.js'
+import { siteLogo } from '../../lib/img.js'
 
 // Renders the booked time in the timezone the booking page reported, so the
 // line always agrees with the confirmation email. Falls back to the browser's
@@ -127,7 +128,7 @@ export function FinalScreen() {
       <div className={'final-mark' + (stage >= 1 ? ' in' : '')}>
         <img
           className="logo-mark final-logo"
-          src={brandContent?.logo || '/images/logo-mark.png'}
+          src={siteLogo(brandContent?.logo)}
           alt="The Order"
         />
       </div>

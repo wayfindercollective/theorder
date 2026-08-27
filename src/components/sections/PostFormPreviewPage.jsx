@@ -15,18 +15,12 @@
 import { applicationCopy } from '../../config/sectionContent.js'
 import { QualifiedScreen } from '../ui/QualifiedScreen.jsx'
 import { DeclineScreen } from '../ui/DeclineScreen.jsx'
-import { bgImage } from '../../lib/img.js'
+import { SectionPainting } from '../ui/SectionPainting.jsx'
 
 export function PostFormPreviewPage({ screen = 'qualified' }) {
   return (
     <section id="application" className="section section-application">
-      {applicationCopy.image && (
-        <div
-          className="section-bg-image"
-          style={{ backgroundImage: bgImage(applicationCopy.image) }}
-          aria-hidden="true"
-        />
-      )}
+      <SectionPainting image={applicationCopy.image} eager />
       <div className="shell-narrow application-shell">
         <div className="application-card card card-stitched nailed">
           <span className="nail-tl" />

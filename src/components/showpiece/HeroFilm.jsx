@@ -109,34 +109,36 @@ function HeroVideo({ progressRef, activeRef }) {
 
 function HeroFrames({ progressRef, activeRef }) {
   const refs = useRef([])
+  const frameCount = heroFilm.frames.length
 
   useEffect(() => {
+    // A single still needs no crossfade loop. Avoid waking the main thread and
+    // writing the same opacity value 60 times a second for the entire visit.
+    if (frameCount <= 1) return
     let rafId
-    const n = heroFilm.frames.length
-    if (n === 0) return
     function tick() {
       // Off screen: nothing to crossfade — skip the per-frame opacity writes.
       if (activeRef && !activeRef.current) {
         rafId = requestAnimationFrame(tick)
         return
       }
-      const p = progressRef.current * (n - 1)
+      const p = progressRef.current * (frameCount - 1)
       const i = Math.floor(p)
       const t = p - i
-      for (let k = 0; k < n; k++) {
+      for (let k = 0; k < frameCount; k++) {
         const node = refs.current[k]
         if (!node) continue
         let op = 0
         if (k === i) op = 1 - t
         else if (k === i + 1) op = t
-        else if (k < i && i === n - 1 && k === n - 2) op = 0 // edge
+        else if (k < i && i === frameCount - 1 && k === frameCount - 2) op = 0 // edge
         node.style.opacity = op.toFixed(3)
       }
       rafId = requestAnimationFrame(tick)
     }
     rafId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafId)
-  }, [progressRef])
+  }, [progressRef, activeRef, frameCount])
 
   return (
     <div className="hero-film hero-film-frames">
@@ -148,7 +150,7 @@ function HeroFrames({ progressRef, activeRef }) {
           alt=""
           loading={i === 0 ? 'eager' : 'lazy'}
           decoding="async"
-          fetchpriority={i === 0 ? 'high' : 'auto'}
+          fetchPriority={i === 0 ? 'high' : 'auto'}
           style={{ opacity: i === 0 ? 1 : 0 }}
         />
       ))}

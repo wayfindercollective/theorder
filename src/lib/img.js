@@ -20,3 +20,8 @@ export function optImage(src) {
 export function bgImage(src) {
   return `url("${optImage(src)}")`
 }
+
+/** The bundled default has a WebP derivative; uploaded logo URLs pass through. */
+export function siteLogo(src) {
+  return optImage(src || '/images/logo-mark.png')
+}
