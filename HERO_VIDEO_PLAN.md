@@ -99,15 +99,10 @@ No dynamic chunk: the code is small and becomes permanent at rollout anyway.
 
 ## Who Am I section (in the new layout)
 
-The portrait/video card column is removed (the video now lives in the hero;
-keeping a second copy mid-page is redundant). The text keeps its position in
-the page order but spans the full section: `founder-grid--solo` modifier sets
-the grid to one column with the text in the existing reading measure, centred
-block, keeping the radial scrim and text shadows that make it legible over the
-painting. Eyebrow, heading, signature and the CTA band stay exactly as they
-are. The CMS founder fields all still apply (paragraphs, heading, signature);
-the portrait and video fields simply stop rendering mid-page once the flag is
-global (they still feed the hero card).
+The video lives in the hero, while the Who Am I section keeps its original
+framed portrait on the left and the letter on the right. These are independent
+assets: the portrait is editable in the admin Images tab and the clip stays
+under Hero. Both render on the main site and every variant page.
 
 ## What deliberately does NOT change
 
@@ -128,7 +123,7 @@ global (they still feed the hero card).
 - `/preview` mobile width: play bar sits between verse and CTA, everything
   fits a ~844px phone viewport; tap opens the fullscreen overlay, video plays
   with sound, close returns to the hero; no video bytes fetched before tap.
-- `/preview` founder section: no portrait card, full-width text, scrim intact.
+- Who Am I: portrait tile left, letter right; the hero video remains separate.
 - `/preview?utm_source=x` attribution captured; `preview` never becomes a
   vanity campaign; Add Page rejects the name "preview".
 - Build passes; off-preview DOM unchanged.

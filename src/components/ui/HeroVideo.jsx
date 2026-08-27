@@ -4,8 +4,8 @@
  *
  * Desktop (>=901px): idle, the horseman film is the play surface — the whole
  * right half is one button with the pill over the painting. Clicking it plays
- * the video INLINE in a framed tile centred over that half (the treatment the
- * founder-section card used to have); fullscreen is an option via the
+ * the video INLINE in a framed tile centred over that half (matching the
+ * founder-section card treatment); fullscreen is an option via the
  * player's own controls, never forced. ESC or the tile's X returns to idle.
  *
  * Mobile (<901px): a compact play bar between the verse line and the CTA,

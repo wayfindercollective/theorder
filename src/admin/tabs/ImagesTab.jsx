@@ -17,10 +17,7 @@ const IMAGE_SLOTS = [
   { key: ['principles', 'image'],  label: 'The Principles — background painting' },
   { key: ['become', 'image'],      label: "We're Offering You — background painting" },
   { key: ['evidence', 'image'],    label: 'Testimonials — background painting' },
-  // The framed portrait no longer renders since Nico's video moved to the
-  // hero (the Who Am I section is now full-width text). The stored image and
-  // this slot are kept in case the portrait card ever returns.
-  { key: ['founder', 'portrait'],  label: 'Who Am I — portrait photo (currently unused: the video plays from the hero instead)' },
+  { key: ['founder', 'portrait'],  label: 'Who Am I — left portrait tile' },
   { key: ['founder', 'image'],     label: 'Who Am I — background painting' },
   { key: ['howWeOperate', 'image'],label: 'How We Operate — background painting' },
   { key: ['faq', 'image'],         label: 'Questions a Serious Man Asks — background painting' },

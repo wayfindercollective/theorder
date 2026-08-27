@@ -16,8 +16,9 @@ export const DESIGN_V2 = true
 /**
  * Hero video (HERO_VIDEO_PLAN.md): Nico's "Who Am I" video playable on the
  * hero before any scroll — desktop: the horseman is the play surface; mobile:
- * a play bar opening the native fullscreen player. The Who Am I section shows
- * the letter full-width, no portrait card.
+ * a play bar opening the native fullscreen player. The Who Am I section keeps
+ * its own portrait tile beside the letter; that tile is independent of the
+ * hero video.
  *
  * Nico approved the /preview test run 2026-08-18; now on for EVERY page (main
  * site and all variant pages). /preview stays reserved and simply renders the

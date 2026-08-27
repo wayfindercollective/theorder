@@ -177,7 +177,7 @@ const SECTION_DEFS = [
   {
     key: 'founder', nav: 'Founder',
     title: 'Who Am I (Founder)',
-    note: 'This section is the letter only, full width. Nico’s video and its play button moved to the hero at the top of the page — edit them under Hero, up in the jump row.',
+    note: 'The portrait tile appears to the left of this letter and is editable under Images. Nico’s video remains in the hero at the top of every page — edit it under Hero, up in the jump row.',
     previewWrap: 'section-founder-preview',
     fields: [
       { path: ['founder', 'eyebrow'],         label: 'Numeral / eyebrow', hint: 'Small numeral above the heading. e.g. V' },

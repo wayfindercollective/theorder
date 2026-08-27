@@ -439,7 +439,7 @@ button {
 }
 
 /* Playing state (desktop): a framed tile centred over the right half with the
-   video INLINE — the treatment the founder card used to have. Fullscreen is
+   video INLINE — matching the founder card treatment. Fullscreen is
    the visitor's choice via the player's own controls, never forced. */
 .hero--video .hero-video-slot {
   position: absolute;
@@ -1897,10 +1897,9 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .qualified-video-player {
   position: absolute;
   inset: 0;
-  /* Both players now stay mounted so they can buffer before the press, which
-     leaves them underneath their play button instead of swapped out for it.
-     The layering is the same in both cards: player 2, trigger 3, and the
-     founder card's frame and nails 4 on top of everything. */
+  /* The player stays mounted so it can buffer before the press, which leaves
+     it underneath its play button instead of swapped out for it: player 2,
+     trigger 3. */
   z-index: 2;
   display: block;
   width: 100%;
@@ -2259,18 +2258,10 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   background-position: center top;
   background-repeat: no-repeat;
 }
-.founder-portrait.has-video { overflow: hidden; }
-.founder-portrait.has-video::before,
-.founder-portrait.has-video::after,
-.founder-portrait.has-video > .nail-tl,
-.founder-portrait.has-video > .nail-br {
-  z-index: 4;
-  pointer-events: none;
-}
 .founder-video-trigger {
   position: absolute;
   inset: 0;
-  /* Above the player it covers (z-index 2), below the frame and nails (4). */
+  /* Above the qualified player it covers (z-index 2). */
   z-index: 3;
   display: flex;
   flex-direction: column;
@@ -2310,17 +2301,6 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   background: rgba(30, 24, 17, 0.88);
 }
 .founder-video-trigger:focus-visible { outline: 2px solid var(--brass-light); outline-offset: -5px; }
-.founder-video {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: #050403;
-  object-fit: contain;
-}
 .founder-portrait-inner {
   position: absolute;
   inset: 16px;
@@ -2348,10 +2328,6 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 
 .founder-text { display: flex; flex-direction: column; gap: 1.2rem; }
-/* HERO_VIDEO layout: the video lives in the hero, so the Who Am I text takes
-   the whole section — one column, held to a reading measure, centred block. */
-.founder-grid--solo { grid-template-columns: 1fr; }
-.founder-grid--solo .founder-text { max-width: 46rem; margin: 0 auto; }
 .founder-p {
   font-size: 1.1rem;
   line-height: 1.7;
