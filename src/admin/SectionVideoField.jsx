@@ -17,6 +17,7 @@ import { useRef, useState } from 'react'
 import { humanizeError, uploadImage, uploadVideo } from './adminApi.js'
 import { canTranscode, transcodeVideo, RENDITION_540, RENDITION_720 } from './videoTranscode.js'
 import { posterFromFile } from './videoPoster.js'
+import { VideoPlayPill } from '../components/ui/VideoPlayPill.jsx'
 
 const VIDEO_ACCEPT = 'video/mp4,video/quicktime,video/webm,video/x-m4v'
 
@@ -28,7 +29,7 @@ function bytes(n) {
 
 /**
  * @param {{ value: string, mobileValue: string, label: string, hint: string,
- *           withPoster?: boolean,
+ *           withPoster?: boolean, playLabel?: string,
  *           onChange: (patch: { video: string, videoMobile: string, poster?: string }) => void }} props
  *
  * `withPoster`: also capture a still from the clip and upload it, returned as
@@ -37,7 +38,15 @@ function bytes(n) {
  * URL by hand — the exact step a non-technical admin skips. Best-effort: a
  * capture failure never blocks the video upload.
  */
-export function SectionVideoField({ value, mobileValue, label, hint, withPoster = false, onChange }) {
+export function SectionVideoField({
+  value,
+  mobileValue,
+  label,
+  hint,
+  withPoster = false,
+  playLabel = '',
+  onChange,
+}) {
   const fileRef = useRef(null)
   const [busy, setBusy] = useState('')   // '' | 'compressing' | 'uploading'
   const [progress, setProgress] = useState(0)
@@ -77,17 +86,18 @@ export function SectionVideoField({ value, mobileValue, label, hint, withPoster 
         onProgress: setProgress,
       })
 
-      // `skipped` means the clip was already small; there is then no 540
-      // rendition to upload, so both fields point at the one file rather than
-      // leaving the mobile field stale.
+      // `skipped` means the clip was already small; it has still passed the MP4
+      // duration/streaming check and `result.file` carries any metadata repair.
+      // There is no 540 rendition, so both fields use the one verified file.
       const outputs = result.skipped ? [] : result.outputs
       setBusy('uploading')
       setProgress(0)
 
       if (!outputs.length) {
-        const { url } = await uploadVideo(file, setProgress)
+        const upload = result.file || file
+        const { url } = await uploadVideo(upload, setProgress)
         onChange(withPosterPatch({ video: url, videoMobile: '' }))
-        setNote(`Uploaded ${bytes(file.size)} — already small enough to use as-is on both.` + (poster ? ' Poster frame captured.' : ''))
+        setNote(`Uploaded ${bytes(upload.size)} — already small enough, with full playback verified.` + (poster ? ' Poster frame captured.' : ''))
         return
       }
 
@@ -106,7 +116,7 @@ export function SectionVideoField({ value, mobileValue, label, hint, withPoster 
       setNote(
         `Uploaded — ${bytes(file.size)} in, ` +
         `${bytes(uploaded[RENDITION_720]?.size)} for desktop and ` +
-        `${bytes(uploaded[RENDITION_540]?.size)} for phones.` +
+        `${bytes(uploaded[RENDITION_540]?.size)} for phones. Full playback verified.` +
         (poster ? ' Poster frame captured.' : '')
       )
     } catch (err) {
@@ -176,6 +186,16 @@ export function SectionVideoField({ value, mobileValue, label, hint, withPoster 
         Filled in automatically by the upload above. A smaller copy sent to phones so the
         video starts faster; leave blank to send everyone the same file.
       </span>
+
+      {value && playLabel && (
+        <div className="admin-video-pill-preview" aria-label="Public play button preview">
+          <span className="admin-field-label">Public play button preview</span>
+          <VideoPlayPill label={playLabel} className="video-play-pill--large" />
+          <p className="admin-field-hint">
+            This branded pill is part of the player and stays in place when the video is replaced.
+          </p>
+        </div>
+      )}
 
       {error && <p className="admin-field-hint tm-warn">{error}</p>}
       {note && !error && <p className="admin-field-hint">{note}</p>}

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:video-upload": "node --test src/admin/mp4Duration.test.js",
     "crop:saturday": "node scripts/crop-saturday.mjs",
     "migrate:images": "node scripts/migrate-images-to-blob.mjs",
     "make:signature-lockup": "node scripts/make-signature-lockup.mjs",

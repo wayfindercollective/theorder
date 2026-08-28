@@ -7,6 +7,7 @@ import {
 import { track } from '../../lib/analytics.js'
 import { bgImage, siteLogo } from '../../lib/img.js'
 import { maxPreload, pickVideoSource } from '../../lib/video.js'
+import { VideoPlayPill } from './VideoPlayPill.jsx'
 
 function instagramDetails() {
   const url = qualifiedScreenContent.instagramUrl || footerContent.instagram || ''
@@ -133,10 +134,10 @@ export function QualifiedScreen({ inView = true }) {
                 aria-label={videoLabel}
                 onClick={startVideo}
               >
-                <span className="hero-video-pill qualified-video-pill">
-                  <span className="founder-video-play" aria-hidden="true">▶</span>
-                  <span className="founder-video-label display">{videoLabel}</span>
-                </span>
+                <VideoPlayPill
+                  label={videoLabel}
+                  className="qualified-video-pill video-play-pill--large"
+                />
               </button>
             )}
           </div>

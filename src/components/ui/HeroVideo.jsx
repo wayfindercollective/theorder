@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { founderContent } from '../../config/sectionContent.js'
 import { pickVideoSource } from '../../lib/video.js'
+import { VideoPlayPill } from './VideoPlayPill.jsx'
 
 // Nico's call 2026-08-19: tapping play shows the player, it does not slam to
 // fullscreen. Set true to make the mobile tap open the device's fullscreen
@@ -216,10 +217,7 @@ export function HeroVideoTrigger() {
     <>
       {!playing && (
         <button type="button" className="hero-video-film-btn" onClick={start} aria-label={videoLabel()}>
-          <span className="hero-video-pill">
-            <span className="founder-video-play" aria-hidden="true">▶</span>
-            <span className="founder-video-label display">{videoLabel()}</span>
-          </span>
+          <VideoPlayPill label={videoLabel()} className="video-play-pill--large" />
         </button>
       )}
       <div className="hero-video-slot" hidden={!playing}>
@@ -259,10 +257,13 @@ export function HeroVideoBar() {
   if (!founderContent.video) return null
   return (
     <>
-      <button type="button" className="hero-video-bar hero-video-pill" onClick={show}>
-        <span className="founder-video-play" aria-hidden="true">▶</span>
-        <span className="founder-video-label display">{videoLabel()}</span>
-      </button>
+      <VideoPlayPill
+        as="button"
+        type="button"
+        className="hero-video-bar"
+        label={videoLabel()}
+        onClick={show}
+      />
       {overlay}
     </>
   )

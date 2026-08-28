@@ -24,6 +24,8 @@
  * and the caller blocks the upload instead of shipping something unplayable.
  */
 
+import { finalizeRecordedMp4 } from './mp4Duration.js'
+
 // Short edge, matching scripts/optimize-hero-videos.mjs. Portrait phone video
 // becomes 720x1280; landscape becomes 1280x720.
 export const RENDITION_720 = 720
@@ -88,12 +90,23 @@ function loadVideo(file) {
   })
 }
 
+function isMp4File(file) {
+  return file.type === 'video/mp4' || /\.mp4$/i.test(file.name || '')
+}
+
+async function browserSafeMp4(blob, name, expectedDuration) {
+  const finalised = await finalizeRecordedMp4(blob, expectedDuration)
+  const base = (name || 'clip.mp4').replace(/\.[^.]+$/, '') || 'clip'
+  return new File([finalised.blob], `${base}.mp4`, { type: 'video/mp4' })
+}
+
 /**
  * @param {File} file
  * @param {{ renditions?: number[], onProgress?: (pct:number)=>void }} opts
- * @returns {Promise<{ skipped: boolean, reason?: string, width?: number, height?: number,
+ * @returns {Promise<{ skipped: boolean, reason?: string, file?: File, width?: number, height?: number,
  *                     outputs: Array<{ shortEdge: number, file: File, width: number, height: number }> }>}
- *   `skipped` means the original should be uploaded as-is.
+ *   `skipped` means no re-encode was needed; `file` is still the duration-checked
+ *   MP4 that should be uploaded (it may carry repaired header metadata).
  */
 export async function transcodeVideo(file, { renditions = [RENDITION_720], onProgress } = {}) {
   if (!canTranscode()) throw new Error('This browser cannot compress video.')
@@ -109,15 +122,35 @@ export async function transcodeVideo(file, { renditions = [RENDITION_720], onPro
     cleanupUrl()
     throw new Error('This video has no picture track.')
   }
-  // A live stream or a file with an unreadable header reports Infinity; without
-  // a duration there is no progress and no reliable end, so leave it alone.
+  // A live stream or a file with an unreadable header reports Infinity. It
+  // cannot be checked for truncation, so it must not reach the public site.
   if (!Number.isFinite(duration) || duration <= 0) {
     cleanupUrl()
-    return { skipped: true, reason: 'unknown-duration', outputs: [] }
+    throw new Error('This video does not report a reliable duration.')
   }
-  if (file.size <= SKIP_BELOW_BYTES && Math.min(srcW, srcH) <= SKIP_BELOW_SHORT_EDGE) {
-    cleanupUrl()
-    return { skipped: true, reason: 'already-small', width: srcW, height: srcH, outputs: [] }
+  if (
+    file.size <= SKIP_BELOW_BYTES &&
+    Math.min(srcW, srcH) <= SKIP_BELOW_SHORT_EDGE &&
+    isMp4File(file)
+  ) {
+    try {
+      // Small clips keep their encoded picture, but never bypass the structural
+      // check. Fragmented MP4s get their full duration written into the header;
+      // malformed/non-faststart files fall through and are rebuilt below.
+      const safeFile = await browserSafeMp4(file, file.name, duration)
+      cleanupUrl()
+      return {
+        skipped: true,
+        reason: 'already-small',
+        file: safeFile,
+        width: srcW,
+        height: srcH,
+        outputs: [],
+      }
+    } catch {
+      // Playback already proved this browser can read the source. Re-encoding
+      // gives it a new MP4 structure which is finalised below.
+    }
   }
 
   const mimeType = supportedMp4Type()
@@ -222,7 +255,10 @@ export async function transcodeVideo(file, { renditions = [RENDITION_720], onPro
       video.play().then(() => {
         nextFrame(() => {
           started = true
-          jobs.forEach((j) => j.recorder.start(1000))
+          // Do not request one-second data chunks. All output lives in memory
+          // until upload anyway, and forcing chunks encourages extra fragments.
+          // Browsers may still emit fMP4, so every result is finalised below.
+          jobs.forEach((j) => j.recorder.start())
           draw(true)
           startPump()
         })
@@ -235,15 +271,16 @@ export async function transcodeVideo(file, { renditions = [RENDITION_720], onPro
   }
 
   const base = (file.name || 'clip.mp4').replace(/\.[^.]+$/, '')
-  const outputs = jobs.map((j) => {
+  const outputs = await Promise.all(jobs.map(async (j) => {
     const blob = new Blob(j.chunks, { type: 'video/mp4' })
+    const safeFile = await browserSafeMp4(blob, `${base}-${j.shortEdge}.mp4`, duration)
     return {
       shortEdge: j.shortEdge,
       width: j.width,
       height: j.height,
-      file: new File([blob], `${base}-${j.shortEdge}.mp4`, { type: 'video/mp4' }),
+      file: safeFile,
     }
-  })
+  }))
 
   if (outputs.some((o) => o.file.size === 0)) {
     throw new Error('Compression produced an empty file.')
@@ -251,7 +288,22 @@ export async function transcodeVideo(file, { renditions = [RENDITION_720], onPro
   // A re-encode that grew the file has done the opposite of its job. Only
   // meaningful for a single rendition; a multi-rendition ask is deliberate.
   if (outputs.length === 1 && outputs[0].file.size >= file.size) {
-    return { skipped: true, reason: 'no-saving', width: srcW, height: srcH, outputs: [] }
+    if (isMp4File(file)) {
+      try {
+        const safeFile = await browserSafeMp4(file, file.name, duration)
+        return {
+          skipped: true,
+          reason: 'no-saving',
+          file: safeFile,
+          width: srcW,
+          height: srcH,
+          outputs: [],
+        }
+      } catch {
+        // The source is structurally unsafe, so prefer the larger verified
+        // rendition to uploading it unchanged.
+      }
+    }
   }
 
   onProgress?.(100)

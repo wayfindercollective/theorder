@@ -552,14 +552,12 @@ button {
 }
 /* Desktop pill: larger glyph and a bigger, brighter label than the buried
    caption it replaced. */
-.hero--video .hero-video-film-btn .hero-video-pill .founder-video-play,
-.qualified-video-pill .founder-video-play {
+.video-play-pill--large .founder-video-play {
   width: 3.2rem;
   height: 3.2rem;
   font-size: 1rem;
 }
-.hero--video .hero-video-film-btn .hero-video-pill .founder-video-label,
-.qualified-video-pill .founder-video-label {
+.video-play-pill--large .founder-video-label {
   font-size: 1.02rem;
   letter-spacing: 0.16em;
   color: var(--parchment);
@@ -3637,6 +3635,18 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   flex-direction: column;
   gap: 0.4rem;
 }
+
+.admin-video-pill-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+  padding: 1rem;
+  border: 1px solid var(--iron);
+  background: linear-gradient(135deg, rgba(8, 7, 6, 0.92), rgba(28, 23, 17, 0.82));
+}
+.admin-video-pill-preview .admin-field-hint { margin: 0; }
 
 .admin-field-label {
   font-family: var(--font-mono);

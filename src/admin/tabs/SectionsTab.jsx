@@ -442,6 +442,7 @@ export function SectionsTab({
                     value={getAt(sections, f.path) ?? ''}
                     mobileValue={getAt(sections, f.mobilePath) ?? ''}
                     withPoster={!!f.posterPath}
+                    playLabel={getAt(sections, [f.path[0], 'videoLabel']) ?? ''}
                     // One update for the set: sequential `update` calls would
                     // each read a stale `sections` and the later ones would
                     // discard the earlier.

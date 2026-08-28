@@ -266,7 +266,15 @@ function TestimonialCard({ card, index, total, sections, savedSections, onPatch,
             'try again in Chrome, Edge or Safari, or send the clip to Nathan to compress.'
           )
         }
-        if (!result.skipped && result.outputs[0]) {
+        if (result.skipped && result.file) {
+          if (result.reason !== 'already-small' && result.file.size > HARD_LIMIT_BYTES) {
+            throw new Error(
+              `This clip is ${bytes(result.file.size)} and couldn’t be made smaller here. ` +
+              'Nothing was uploaded — send it to Nathan to compress.'
+            )
+          }
+          upload = result.file
+        } else if (!result.skipped && result.outputs[0]) {
           upload = result.outputs[0].file
           savedFrom = file.size
         } else if (result.skipped && result.reason !== 'already-small' && file.size > HARD_LIMIT_BYTES) {
