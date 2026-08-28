@@ -133,8 +133,10 @@ export function QualifiedScreen({ inView = true }) {
                 aria-label={videoLabel}
                 onClick={startVideo}
               >
-                <span className="founder-video-play" aria-hidden="true">▶</span>
-                <span className="founder-video-label display">{videoLabel}</span>
+                <span className="hero-video-pill qualified-video-pill">
+                  <span className="founder-video-play" aria-hidden="true">▶</span>
+                  <span className="founder-video-label display">{videoLabel}</span>
+                </span>
               </button>
             )}
           </div>
