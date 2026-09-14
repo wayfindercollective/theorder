@@ -16,6 +16,7 @@ import { HowWeOperateSection } from './components/sections/HowWeOperateSection.j
 import { ClosingSection } from './components/sections/ClosingSection.jsx'
 import { FooterSection } from './components/sections/FooterSection.jsx'
 import { captureAttribution } from './lib/utm.js'
+import { usePendingLeadsSync } from './hooks/usePendingLeadsSync.js'
 import { variantSlugFromPath } from './config/variantPages.js'
 import { bootAnalytics, track } from './lib/analytics.js'
 import { DESIGN_V2 } from './config/design.js'
@@ -68,6 +69,9 @@ function PresentationsRoot() {
 }
 
 function PublicSite() {
+  // Resends any application lead this browser queued but could not deliver.
+  usePendingLeadsSync()
+
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
     // Retire the old split-design preview URL. /2 and ?v=2 now collapse to /.

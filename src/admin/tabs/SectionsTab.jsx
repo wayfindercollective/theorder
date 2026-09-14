@@ -125,6 +125,23 @@ const SECTION_DEFS = [
     ],
   },
   {
+    key: 'contactStep', nav: 'Contact step',
+    title: 'Application — contact details step',
+    note: 'The last step of the application, after the questions. Everyone fills it in; applicants who pass the questions are sent to Wayfinder OS as a lead (and a deal), applicants who are declined have their details discarded without being sent. Shared by every page.',
+    fields: [
+      { path: ['contactStep', 'heading'],          label: 'Heading', hint: 'The line above the two fields. e.g. How do we reach you?' },
+      { path: ['contactStep', 'subtitle'],         label: 'Sub line', textarea: true, rows: 2, hint: 'Optional line under the heading. Leave blank to hide.' },
+      { path: ['contactStep', 'nameLabel'],        label: 'Name label' },
+      { path: ['contactStep', 'namePlaceholder'],  label: 'Name placeholder', hint: 'Grey text inside the empty box.' },
+      { path: ['contactStep', 'nameError'],        label: 'Name error', hint: 'Shown when the name is missing or a single letter.' },
+      { path: ['contactStep', 'emailLabel'],       label: 'Email label' },
+      { path: ['contactStep', 'emailPlaceholder'], label: 'Email placeholder', hint: 'Grey text inside the empty box.' },
+      { path: ['contactStep', 'emailError'],       label: 'Email error', hint: 'Shown when the email is missing or not a valid address.' },
+      { path: ['contactStep', 'submitButton'],     label: 'Submit button' },
+      { path: ['contactStep', 'submittingButton'], label: 'Submit button while sending', hint: 'Shown for the second or two while the details are sent. e.g. Submitting…' },
+    ],
+  },
+  {
     key: 'qualifiedScreen', nav: 'Qualified handoff',
     title: 'Qualified applicant — Instagram handoff',
     note: 'Shown only to applicants who pass the filter. The Instagram button opens a DM; Nico sends the private /application URL after they contact him.',
@@ -156,7 +173,7 @@ const SECTION_DEFS = [
   {
     key: 'consent', nav: 'Legal lines',
     title: 'Legal lines under the booking calendar',
-    note: 'The application no longer asks for name, email or phone — applicants type those into the booking calendar itself, so these disclosures sit directly under it.',
+    note: 'The privacy and terms links show under the application’s contact details step and under the booking calendar; the SMS line shows under the calendar only.',
     fields: [
       { path: ['consent', 'smsLine'],       label: 'SMS consent line', textarea: true, rows: 6, hint: 'Small print under the calendar. Carrier-required legal text — must name the brand, describe the messages, and include message frequency, rates, STOP, HELP and the no-third-party-sharing line. Change with care.' },
       { path: ['consent', 'privacyLabel'],  label: 'Privacy link text', hint: 'Link text shown under the calendar. Leave blank to hide.' },

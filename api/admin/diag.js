@@ -4,6 +4,7 @@
  */
 
 import { requireAuth } from '../_lib/auth.js'
+import { describeLeadConfig } from '../_lib/funnelLead.js'
 
 const CHECKS = [
   'ADMIN_PASSWORD',
@@ -13,6 +14,13 @@ const CHECKS = [
   'GITHUB_BRANCH',
   'BLOB_READ_WRITE_TOKEN',
   'IMAGES_BLOB_READ_WRITE_TOKEN',
+  // Application lead relay (api/funnel-lead.js)
+  'WAYFINDER_FUNNEL_SECRET',
+  'WAYFINDER_LEAD_URL',
+  'WAYFINDER_OS_ORIGIN',
+  'WAYFINDER_FUNNEL_SLUG',
+  'VITE_WAYFINDER_API_KEY',
+  'VITE_WAYFINDER_WEBHOOK_URL',
 ]
 
 export default async function handler(req, res) {
@@ -38,6 +46,7 @@ export default async function handler(req, res) {
     nodeVersion: process.version,
     present,
     previews,
+    leadRelay: describeLeadConfig(),
     blobTokenResolution: process.env.IMAGES_BLOB_READ_WRITE_TOKEN
       ? 'using IMAGES_BLOB_READ_WRITE_TOKEN'
       : process.env.BLOB_READ_WRITE_TOKEN

@@ -71,6 +71,22 @@ export const declineScreenContent = data.declineScreen || {
   notice: 'Your information has not been stored.',
 }
 
-// Contact details exist only inside the standalone Wayfinder booking widget,
-// so its privacy, terms and SMS disclosure are rendered directly beneath it.
+// The application's name + email step (ContactStep.jsx). Shared by every
+// page; the defaults keep the step working if the CMS block is ever missing.
+export const contactStepContent = {
+  heading: 'How do we reach you?',
+  subtitle: '',
+  nameLabel: 'Name',
+  namePlaceholder: 'Name',
+  nameError: 'Please enter your name.',
+  emailLabel: 'Email',
+  emailPlaceholder: 'example@gmail.com',
+  emailError: 'That email does not look right.',
+  submitButton: 'Submit',
+  submittingButton: 'Submitting…',
+  ...(data.contactStep || {}),
+}
+
+// Privacy and terms links, shown under the application's contact step and
+// under the standalone booking widget (which also carries the SMS line).
 export const submitConsent = data.consent || {}

@@ -74,6 +74,18 @@
     "stepLabel": "Step",
     "backButton": "← Back"
   },
+  "contactStep": {
+    "heading": "How do we reach you?",
+    "subtitle": "",
+    "nameLabel": "Name",
+    "namePlaceholder": "Name",
+    "nameError": "Please enter your name.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "example@gmail.com",
+    "emailError": "That email does not look right.",
+    "submitButton": "Submit",
+    "submittingButton": "Submitting…"
+  },
   "qualifiedScreen": {
     "heading": "God Wills It Indeed",
     "sub": "Legend. Let's get it",

@@ -1,6 +1,15 @@
 # Wayfinder OS Wiring — The Order
 
-> **Superseded.** The public application no longer submits any lead or answers
+> **Leads are live again from 2026-09-14.** After the questions, every
+> applicant gives name + email (src/components/ui/ContactStep.jsx). Qualified
+> applicants are POSTed to our own `/api/funnel-lead` relay, which adds
+> `WAYFINDER_FUNNEL_SECRET` and forwards to the funnel lead API (a lead and a
+> deal); declined applicants are never sent. The payload contract below still
+> holds (dual-shape answers, phone as a string, attribution, local retry
+> queue), minus phone and SMS consent, which are no longer collected. The
+> Instagram handoff after submitting is unchanged.
+
+> **2026-08-03 to 2026-09-14, superseded.** The public application no longer submits any lead or answers
 > to Wayfinder OS. It filters locally, sends qualified applicants to an
 > Instagram handoff. Nico shares the standalone `/application` acceptance page,
 > whose button opens the booking widget at `/application/booking`. The material below is retained

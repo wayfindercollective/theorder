@@ -9,9 +9,11 @@
  * applicant who picks a flagged answer sees the return-later screen; everyone
  * else sees the Nico video and Instagram handoff.
  *
- * The public form is a local filter only: there is no contact step, no booking
- * widget and no Wayfinder submission. A leftover contact step remains visible
- * here solely so it can be removed; the public site always ignores it.
+ * After these questions the public form asks every applicant for a name and
+ * email (a built-in step, edited under Sections → Contact step, not a question
+ * here). Qualified applicants are sent to Wayfinder OS as a lead; declined
+ * applicants' details are discarded. A leftover `contact` question remains
+ * visible here solely so it can be removed; the public site always ignores it.
  */
 
 import { useState } from 'react'
@@ -106,9 +108,9 @@ export function ApplicationTab({ questions, onChange, sections, onSectionsChange
       <p className="restraint admin-tab-intro">
         Edit the questions and answer options applicants see. Field IDs and option
         values are stable internal identifiers, so they stay locked unless you unlock
-        them below. Nothing on this screen is sent to Wayfinder OS. Tick
+        them below. After these questions every applicant gives a name and email. Tick
         “Declines the application” on an answer to turn away anyone who picks it:
-        they finish the form and see the negation screen below. Everyone else sees
+        they finish the form, see the negation screen below, and their details are never sent. Everyone else becomes a lead in Wayfinder OS and sees
         Nico's video and the Instagram handoff. The private /application URL is
         shared by Nico later, in DM; its commitment button leads to the calendar.
       </p>

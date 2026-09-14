@@ -1,15 +1,16 @@
 /**
- * One question in the application — multiple choice only.
+ * One multiple-choice question in the application.
  *
- * There is deliberately no contact step and no submit button. Answers are
- * evaluated locally to choose a result screen, then discarded without being
- * sent to Wayfinder OS.
+ * Picking an answer advances on its own, so there is no submit button here.
+ * The name + email step after the questions, and the submit that decides
+ * between a Wayfinder lead and the decline screen, live in ContactStep.jsx and
+ * ApplicationSection.jsx.
  */
 
 import { useEffect, useState } from 'react'
 import { applicationCopy } from '../../config/sectionContent.js'
 
-function Typewriter({ text, speed = 12 }) {
+export function Typewriter({ text, speed = 12 }) {
   const [out, setOut] = useState('')
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
