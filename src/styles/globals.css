@@ -25,7 +25,8 @@
   /* text */
   --parchment: #e8e0d0;
   --parchment-mute: #c2b9a6;
-  --ash: #a49b8b;
+  --ash: #7a7468;
+  --text-muted-readable: #a49b8b;
   --steel: #3a3a3a;
   --iron: #4a443c;
 
@@ -349,7 +350,7 @@ button {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.32em;
-  color: var(--brass-text);
+  color: var(--brass);
   font-weight: 400;
 }
 
@@ -369,7 +370,7 @@ button {
 }
 
 .engraved {
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 50%, var(--brass-deep) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -686,7 +687,7 @@ button {
   /* heavier weight so the label reads clearly against the brass (the loaded
      mono only went to 500 before — 600 is now loaded for this) */
   font-weight: 600;
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 50%, var(--brass-deep) 100%);
   border: 1px solid var(--brass);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
@@ -905,7 +906,7 @@ button {
 }
 
 .input-field::placeholder {
-  color: var(--ash);
+  color: var(--text-muted-readable);
   opacity: 1;
   font-style: italic;
 }
@@ -1395,7 +1396,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  opacity: 1;
+  opacity: 0.5;
   animation: fadeIn 1400ms var(--ease-order) 1600ms both;
 }
 .hero-scroll { font-size: 0.6rem; letter-spacing: 0.3em; }
@@ -1435,7 +1436,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
       0 2px 12px rgba(0, 0, 0, 0.95),
       0 0 28px rgba(0, 0, 0, 0.8);
   }
-  .hero-fold-cue { opacity: 1; }
+  .hero-fold-cue { opacity: 0.85; }
   .hero-scroll {
     color: var(--parchment);
     font-weight: 500;
@@ -4508,7 +4509,6 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .section-founder .founder-p,
 .section-truth .truth-line,
 .section-how .how-para {
-  color: var(--parchment);
   text-shadow: 0 1px 2px #080706, 0 0 5px rgba(8, 7, 6, 0.95);
 }
 .section-founder .founder-signature,
@@ -4521,6 +4521,9 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .section .sq-num { color: var(--brass-text); }
 .section-principles .eyebrow { color: var(--parchment); }
 .section:has(.section-bg-image) .restraint { color: var(--parchment-mute); }
+.footer-copyright,
+.footer-privacy,
+.qs-sub { color: var(--text-muted-readable); }
 
 @media (max-width: 900px) {
   .design-split .shell::before,
@@ -4533,6 +4536,4 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
       transparent 100%);
   }
 
-  /* The hero uses moving imagery: protect text across every frame/crop. */
-  .hero-vignette { background-color: rgba(10, 9, 8, 0.24); }
 }
