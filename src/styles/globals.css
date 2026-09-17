@@ -19,11 +19,13 @@
   --brass: #a6884a;
   --brass-light: #c4a45f;
   --brass-deep: #7d6635;
+  --brass-text: #c4a45f;
+  --error-text: #e59a90;
 
   /* text */
   --parchment: #e8e0d0;
   --parchment-mute: #c2b9a6;
-  --ash: #7a7468;
+  --ash: #a49b8b;
   --steel: #3a3a3a;
   --iron: #4a443c;
 
@@ -347,7 +349,7 @@ button {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.32em;
-  color: var(--brass);
+  color: var(--brass-text);
   font-weight: 400;
 }
 
@@ -367,7 +369,7 @@ button {
 }
 
 .engraved {
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 50%, var(--brass-deep) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -684,7 +686,7 @@ button {
   /* heavier weight so the label reads clearly against the brass (the loaded
      mono only went to 500 before — 600 is now loaded for this) */
   font-weight: 600;
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 50%, var(--brass-deep) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
   border: 1px solid var(--brass);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
@@ -904,6 +906,7 @@ button {
 
 .input-field::placeholder {
   color: var(--ash);
+  opacity: 1;
   font-style: italic;
 }
 
@@ -1392,7 +1395,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  opacity: 0.5;
+  opacity: 1;
   animation: fadeIn 1400ms var(--ease-order) 1600ms both;
 }
 .hero-scroll { font-size: 0.6rem; letter-spacing: 0.3em; }
@@ -1432,7 +1435,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
       0 2px 12px rgba(0, 0, 0, 0.95),
       0 0 28px rgba(0, 0, 0, 0.8);
   }
-  .hero-fold-cue { opacity: 0.85; }
+  .hero-fold-cue { opacity: 1; }
   .hero-scroll {
     color: var(--parchment);
     font-weight: 500;
@@ -1657,7 +1660,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .qs-error {
   font-family: var(--font-mono);
   font-size: 0.74rem;
-  color: var(--cordovan-light);
+  color: var(--error-text);
   letter-spacing: 0.1em;
 }
 
@@ -1803,7 +1806,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   font-size: clamp(1.25rem, 2.8vw, 1.7rem);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1834,7 +1837,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   max-width: 20ch;
   margin-left: auto;
   margin-right: auto;
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2027,7 +2030,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   letter-spacing: 0.1em;
   line-height: 1.18;
   text-transform: uppercase;
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2528,7 +2531,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   top: 67%;
   bottom: auto;
   margin: 0;
-  padding: 0 0.9rem;
+  padding: 0.35rem 0.9rem;
   /* always sits above the play ring and the video's own controls so the
      name/role stays visible at all times, including while a clip is playing.
      translateZ(0) forces its own compositing layer so iOS Safari paints it
@@ -2541,7 +2544,8 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   font-style: italic;
   font-size: 0.95rem;
   line-height: 1.3;
-  /* legible over the video without a dark fade on the tile's bottom edge */
+  /* Keep names readable even when a playing video cuts to a white frame. */
+  background: rgba(8, 7, 6, 0.78);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.85);
   /* let clicks pass through to the video controls underneath */
   pointer-events: none;
@@ -3226,15 +3230,13 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
 }
 
-/* Mark 12:30 / 12:31 citations — plain black, no glow, but at the same prominence
-   as the white version had: matched size + a heavier 700 weight so the black reads
-   just as bold without a halo carrying it. */
+/* Keep the citations in the warm gold palette, legible on the dark painting. */
 .section-closing .closing-ref {
   font-size: clamp(1rem, 1.6vw, 1.2rem);
   font-weight: 700;
   letter-spacing: 0.3em;
-  color: #0a0806;
-  text-shadow: none;
+  color: var(--brass-text);
+  text-shadow: 0 1px 3px rgba(8, 7, 6, 0.9);
 }
 
 .section-evidence .section-heading,
@@ -4486,29 +4488,39 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 
 /* ============================================================
-   TEXT PLATES — fully transparent (most sections).
-   Each painted section used to carry a translucent dark plate behind
-   its text (a soft radial scrim). Per request, those read as fully
-   transparent now: the words ride directly on the painting with only
-   their relief text-shadow — no visible box. The ::before pseudo-
-   elements stay (positioning intact) but paint nothing.
-
-   EXCEPTIONS — The Principles and Who Am I (Founder) keep their plates:
-   both lay light text over the brightest paintings (the gold library
-   ceiling, the sunset seascape) and wash out without the scrim, so they
-   are deliberately left OUT of this list. To bring another section's
-   plate back, drop its selector here; to drop one, add it.
-   This sits last so it wins over every earlier plate rule.
+   TEXT CONTRAST — shade the reading area, retaining the paintings.
+   A broad dark centre protects every line, with feathered edges outside
+   the text. Desktop split columns already sit on the dark ground; only
+   restore their shading when the painting moves behind them on mobile.
    ============================================================ */
 .truth-provocation::before,
-.section-code .code-inner::before,
-.section-become .shell::before,
-.section-evidence .shell::before,
-.section-faq .shell-narrow::before,
-.section-how .shell-narrow::before,
-.section-closing .shell-narrow::before,
-.design-split .shell::before,
-.design-split .shell-narrow::before,
-.design-split .code-inner::before {
-  background: none;
+.section-principles .shell::before,
+.section-founder .founder-text::before,
+.section-closing .shell-narrow::before {
+  filter: blur(18px);
+  background: radial-gradient(ellipse 100% 100% at center,
+    rgba(8, 7, 6, 0.8) 0%,
+    rgba(8, 7, 6, 0.74) 70%,
+    transparent 100%);
+}
+
+/* Small labels need the same contrast as prose, including over artwork. */
+.section .eyebrow,
+.section .sq-num { color: var(--brass-text); }
+.section-principles .eyebrow { color: var(--parchment); }
+.section:has(.section-bg-image) .restraint { color: var(--parchment-mute); }
+
+@media (max-width: 900px) {
+  .design-split .shell::before,
+  .design-split .shell-narrow::before,
+  .design-split .code-inner::before {
+    filter: blur(18px);
+    background: radial-gradient(ellipse 100% 100% at center,
+      rgba(8, 7, 6, 0.72) 0%,
+      rgba(8, 7, 6, 0.65) 70%,
+      transparent 100%);
+  }
+
+  /* The hero uses moving imagery: protect text across every frame/crop. */
+  .hero-vignette { background-color: rgba(10, 9, 8, 0.48); }
 }
