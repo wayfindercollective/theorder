@@ -4500,8 +4500,8 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .section-closing .shell-narrow::before {
   filter: blur(32px);
   background: radial-gradient(ellipse at center,
-    rgba(8, 7, 6, 0.6) 0%,
-    rgba(8, 7, 6, 0.42) 50%,
+    rgba(8, 7, 6, 0.7) 0%,
+    rgba(8, 7, 6, 0.56) 65%,
     transparent 100%);
 }
 
@@ -4531,9 +4531,79 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   .design-split .code-inner::before {
     filter: blur(32px);
     background: radial-gradient(ellipse at center,
-      rgba(8, 7, 6, 0.38) 0%,
-      rgba(8, 7, 6, 0.2) 50%,
+      rgba(8, 7, 6, 0.5) 0%,
+      rgba(8, 7, 6, 0.34) 65%,
       transparent 100%);
   }
 
+}
+
+/* Public-site reading scale. Keep the palette and typefaces, but give the
+   copy more size, weight and breathing room; private tools keep their scale. */
+html:has(main.design-v2) { font-size: 18px; }
+main.design-v2,
+.site-header,
+.site-footer { font-weight: 500; }
+
+.design-v2 :is(h1, h2, h3, h4, .display) { font-weight: 600; }
+.design-v2 :is(.eyebrow, .restraint, .qs-label, .qs-error) { font-weight: 500; }
+.design-v2 .eyebrow { font-size: 0.82rem; }
+.design-v2 .section-principles .eyebrow:not(.eyebrow--numeral) {
+  font-size: clamp(1rem, 2.2vw, 1.5rem);
+}
+.design-v2 :is(.btn, .qs-label, .qs-error, .booking-sms-note) { font-size: 0.85rem; }
+.design-v2 .btn { font-weight: 600; }
+.design-v2 :is(.founder-p, .how-para, .faq-a p, .faq-a li, .evidence-quote, .qs-sub) {
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+.design-v2 .values-intro p { font-size: clamp(1.25rem, 1.7vw, 1.5rem); }
+.design-v2 .sq-text { font-size: clamp(1.1rem, 1.8vw, 1.3rem); line-height: 1.5; }
+.design-v2 .offerings-grid--defined .offering-desc {
+  font-size: max(1.08rem, var(--offering-desc));
+  line-height: 1.6;
+  opacity: 1;
+}
+.design-v2 .offerings-grid--defined .offering-term {
+  font-size: max(1.2rem, var(--offering-term));
+}
+.design-v2 .values-wall {
+  display: flex;
+  gap: 0.25rem;
+}
+.design-v2 .value-word {
+  /* Wrap whole principles onto another row, never split a word to fit a column. */
+  flex: 1 0 auto;
+  width: max-content;
+  min-width: min(100%, 9rem);
+  max-width: 100%;
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  letter-spacing: 0.03em;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.design-v2 .evidence-video-title { font-size: 1rem; font-weight: 500; }
+.design-v2 .application-card {
+  background: linear-gradient(180deg, #12100f, #211914);
+}
+.design-v2 .hero-verse { font-size: clamp(1.1rem, 1.8vw, 1.28rem); }
+.design-v2 .hero-restraint { font-size: 0.85rem; }
+.design-v2 .hero-scroll { font-size: 0.7rem; }
+
+@media (max-width: 900px) {
+  /* Let the taller text determine the hero height instead of clipping its CTA. */
+  .design-v2 .hero { height: auto; }
+  .design-v2 .hero-sticky { min-height: 100svh; }
+  .design-v2 .hero-content { position: relative; padding-bottom: 8rem; }
+}
+
+@media (max-width: 400px) {
+  .design-v2 .application-eyebrow .brass-rule { width: 20px; margin: 0 0.4rem; }
+  .design-v2 .qs-nav { flex-wrap: wrap; }
+  .design-v2 .qs-nav .btn {
+    flex: 1 0 auto;
+    padding-inline: 0.8rem;
+    letter-spacing: 0.18em;
+    white-space: nowrap;
+  }
 }
