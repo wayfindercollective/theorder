@@ -4489,19 +4489,31 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 
 /* ============================================================
    TEXT CONTRAST — shade the reading area, retaining the paintings.
-   A broad dark centre protects every line, with feathered edges outside
-   the text. Desktop split columns already sit on the dark ground; only
+   A light, continuously fading veil keeps the artwork visible without
+   a solid-looking panel. Desktop split columns sit on the dark ground; only
    restore their shading when the painting moves behind them on mobile.
    ============================================================ */
 .truth-provocation::before,
 .section-principles .shell::before,
 .section-founder .founder-text::before,
 .section-closing .shell-narrow::before {
-  filter: blur(18px);
-  background: radial-gradient(ellipse 100% 100% at center,
-    rgba(8, 7, 6, 0.8) 0%,
-    rgba(8, 7, 6, 0.74) 70%,
+  filter: blur(32px);
+  background: radial-gradient(ellipse at center,
+    rgba(8, 7, 6, 0.6) 0%,
+    rgba(8, 7, 6, 0.42) 50%,
     transparent 100%);
+}
+
+/* Let the letters carry contrast instead of covering the painting. */
+.section-founder .founder-p,
+.section-truth .truth-line,
+.section-how .how-para {
+  color: var(--parchment);
+  text-shadow: 0 1px 2px #080706, 0 0 5px rgba(8, 7, 6, 0.95);
+}
+.section-founder .founder-signature,
+.section-principles .value-word.engraved {
+  text-shadow: 0 1px 2px #080706, 0 0 5px #080706;
 }
 
 /* Small labels need the same contrast as prose, including over artwork. */
@@ -4514,13 +4526,13 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   .design-split .shell::before,
   .design-split .shell-narrow::before,
   .design-split .code-inner::before {
-    filter: blur(18px);
-    background: radial-gradient(ellipse 100% 100% at center,
-      rgba(8, 7, 6, 0.72) 0%,
-      rgba(8, 7, 6, 0.65) 70%,
+    filter: blur(32px);
+    background: radial-gradient(ellipse at center,
+      rgba(8, 7, 6, 0.38) 0%,
+      rgba(8, 7, 6, 0.2) 50%,
       transparent 100%);
   }
 
   /* The hero uses moving imagery: protect text across every frame/crop. */
-  .hero-vignette { background-color: rgba(10, 9, 8, 0.48); }
+  .hero-vignette { background-color: rgba(10, 9, 8, 0.24); }
 }
