@@ -4600,7 +4600,13 @@ main.design-v2,
   .design-v2 .values-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 480px) {
-  .design-v2 .values-wall { grid-template-columns: 1fr; }
+  /* Keep two aligned columns, giving long names room without splitting them. */
+  .design-v2 .section-principles > .shell { padding-inline: 0.75rem; }
+  .design-v2 .value-word {
+    font-size: clamp(0.8rem, 4.2vw, 1rem);
+    letter-spacing: 0;
+    padding-inline: 0.1rem;
+  }
 }
 .design-v2 .evidence-video-title { font-size: 1rem; font-weight: 500; }
 .design-v2 .application-card {
