@@ -37,7 +37,7 @@ export const SYSTEM_PATHS = [
   'testimonials', 'assets', 'favicon', 'robots', 'sitemap', 'index', 'index.html', '2',
   // The hero-video test-run URL (HERO_VIDEO flag in design.js): a real page
   // of the site while the preview runs, never a campaign, never a page slug.
-  'preview',
+  'preview', 'old',
 ]
 
 // "Primal & Adventure" -> "primal-adventure"

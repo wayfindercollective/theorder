@@ -1,0 +1,4517 @@
+/* Frozen pre-contrast styling from e1d7b21 (before 428a2ed).
+   Loaded only at /old for comparison. Content, components and videos stay current.
+   Keep this snapshot unchanged when adjusting the current design. */
+@import 'tailwindcss';
+
+/* ============================================================
+   THE ORDER — material system
+   leather, metal, parchment. premium luxury, honest, integrity.
+   no chrome, no glassmorphism, no neon.
+   ============================================================ */
+
+:root {
+  /* surfaces */
+  --bg-deep: #0a0908;
+  --bg-surface: #171513;
+  --bg-leather: #2a1f1a;
+  --bg-parchment-shadow: #1a1612;
+
+  /* accents */
+  --cordovan: #5c1f1c;
+  --cordovan-light: #7a2a26;
+  --brass: #a6884a;
+  --brass-light: #c4a45f;
+  --brass-deep: #7d6635;
+
+  /* text */
+  --parchment: #e8e0d0;
+  --parchment-mute: #c2b9a6;
+  --ash: #7a7468;
+  --steel: #3a3a3a;
+  --iron: #4a443c;
+
+  /* type */
+  --font-display: 'Cinzel', 'Trajan Pro', serif;
+  --font-body: 'EB Garamond', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+
+  /* motion */
+  --ease-order: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-rise: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* dims */
+  --hairline: 1px;
+  --max-w: 1180px;
+  --reading-w: 680px;
+
+  /* Section edge fade — the soft blur each painting melts into top & bottom so
+     one section blends into the next. A FIXED physical distance (not vh/%) so
+     every seam blurs IDENTICALLY no matter the viewport: the old clamp(…22vh…)
+     made the band shrink on short (mobile) viewports and grow on tall (desktop)
+     ones, so mobile seams read as harder lines than desktop. A constant px keeps
+     desktop and mobile identical. Used by both full-bleed (.section-bg-image) and
+     split (.section-side-image) paintings. */
+  --edge-fade: 220px;
+}
+
+@theme inline {
+  --color-background: var(--bg-deep);
+  --color-foreground: var(--parchment);
+  --color-brass: var(--brass);
+  --color-brass-light: var(--brass-light);
+  --color-cordovan: var(--cordovan);
+  --color-parchment: var(--parchment);
+  --color-ash: var(--ash);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  background: var(--bg-deep);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-deep);
+  min-height: 100vh;
+}
+
+/* Subtle leather grain — two glows pinned to the viewport.
+   This USED to be `body { background-image: …; background-attachment: fixed }`,
+   which forced the browser to repaint the whole viewport background on every
+   scroll frame (the single biggest scroll-jank source, made worse by Lenis
+   re-scrolling every frame for ~1.2s after each wheel tick). Moving the exact
+   same gradients onto a `position: fixed` layer of their own gives the identical
+   look — glows locked to the viewport, behind all content — but the compositor
+   simply holds the layer in place while the page scrolls: zero per-frame repaint.
+   translateZ(0) guarantees it gets its own GPU layer. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgba(166, 136, 74, 0.08), transparent 60%),
+    radial-gradient(ellipse at 50% 110%, rgba(92, 31, 28, 0.06), transparent 60%);
+  transform: translateZ(0);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--parchment);
+  margin: 0;
+}
+
+h1 { font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.05; letter-spacing: 0.04em; }
+h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); line-height: 1.15; letter-spacing: 0.06em; }
+h3 { font-size: clamp(1.3rem, 2.2vw, 1.7rem); line-height: 1.25; letter-spacing: 0.04em; }
+
+p {
+  margin: 0;
+  color: var(--parchment-mute);
+  font-family: var(--font-body);
+}
+
+a {
+  color: var(--brass-light);
+  text-decoration: none;
+  transition: color 320ms var(--ease-order);
+}
+a:hover { color: var(--parchment); }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+::selection {
+  background: var(--brass);
+  color: var(--bg-deep);
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb {
+  background: var(--iron);
+  border: 2px solid var(--bg-deep);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--brass-deep); }
+
+/* ============================================================
+   LAYOUT WRAPPERS
+   ============================================================ */
+
+.shell { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
+.shell-narrow { max-width: var(--reading-w); margin: 0 auto; padding: 0 1.5rem; }
+
+.section {
+  position: relative;
+  overflow: hidden; /* contain side-image masks */
+  min-height: 100vh;
+  padding: clamp(2rem, 4vw, 3.5rem) 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* NOTE: content-visibility:auto was tried here to skip rendering offscreen
+   sections, but it ALSO defers fetching each section's background painting
+   until you scroll near it — so the oils loaded late, one at a time, and
+   sometimes appeared not to load at all. The paintings must load eagerly, so
+   this stays off. The real scroll win is the fixed-background fix above
+   (removing the per-frame full-viewport repaint), which stands on its own. */
+
+.section > .shell,
+.section > .shell-narrow {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.section-heading {
+  text-align: center;
+  margin: 0.8rem 0 0;
+  font-size: clamp(1.6rem, 3.3vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   SECTION IMAGES — layered between bg and text, edges faded
+   ============================================================ */
+
+/* Side image — occupies one half of section, fades into the centre.
+   Visible enough to register, faded at the inner edge to let text breathe. */
+.section-side-image {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 58%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.section-side-image-right {
+  right: 0;
+  -webkit-mask-image:
+    linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+  mask-image:
+    linear-gradient(to left, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.section-side-image-left {
+  left: 0;
+  -webkit-mask-image:
+    linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+  mask-image:
+    linear-gradient(to right, black 34%, rgba(0, 0, 0, 0.4) 74%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* Full-bleed image — fills the section behind the content, dimmed enough to
+   let the text dominate but visible enough to feel present. */
+.section-bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.96;
+  pointer-events: none;
+  z-index: 1;
+  /* the sources are already dark chiaroscuro oils — lift them hard so the
+     scene actually reads, with only a faint unifying glaze on top */
+  filter: sepia(0.08) saturate(1.08) contrast(0.97) brightness(1.36);
+  /* fade the top and bottom of every photo into the dark so the sections
+     melt into one another — the whole scroll reads as one continuous canvas.
+     Fixed-distance fade (--edge-fade) keeps every seam identical regardless of
+     section height. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+}
+
+/* Mobile: split paintings become full-bleed and dim so text stays readable —
+   but they must seam IDENTICALLY to the full-bleed sections, so they fade top &
+   bottom over the same --edge-fade (not a radial vignette, which fades in a
+   different elliptical shape and made split-section seams look unlike the rest). */
+@media (max-width: 900px) {
+  .section-side-image {
+    width: 100%;
+    opacity: 0.4;
+  }
+  .section-side-image-right,
+  .section-side-image-left {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent 100%);
+    -webkit-mask-composite: source-over;
+    mask-composite: add;
+  }
+}
+
+/* ============================================================
+   ONE GIANT PAINTING — every segment is a framed oil on canvas.
+   The warm grade on .section-bg-image unifies the palette; here we
+   add the canvas weave and a framed vignette so each background reads
+   as a real painting and the whole scroll as one continuous gallery
+   wall. Driven off :has(.section-bg-image), so existing and new
+   segments pick it up automatically. The hero (.hero, not .section)
+   is untouched — the warrior stays as shot.
+   ============================================================ */
+
+/* readable content rides above the painting and its two overlays */
+.section:has(.section-bg-image) > .shell,
+.section:has(.section-bg-image) > .shell-narrow,
+.section:has(.section-side-image) > .shell,
+.section:has(.section-side-image) > .shell-narrow { z-index: 3; }
+
+/* painted surface — fine linen weave over a broad, uneven varnish mottle,
+   both riding the paint in soft light so the scene reads as pigment on
+   canvas rather than a photograph */
+.section:has(.section-bg-image)::before,
+.section:has(.section-side-image)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.012' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23v)'/%3E%3C/svg%3E");
+  background-size: 190px 190px, 640px 640px;
+  opacity: 0.18;
+  mix-blend-mode: soft-light;
+}
+
+/* framed vignette — warm, oil-painting shadows (brown-black, never neutral)
+   set the picture back in its frame, melt each scene into the dark above and
+   below so the wall feels continuous, and keep the centre lit like a canvas
+   under a gallery light */
+.section:has(.section-bg-image)::after,
+.section:has(.section-side-image)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(20, 12, 6, 0.16) 92%, rgba(13, 8, 4, 0.42) 100%),
+    linear-gradient(180deg, rgba(13, 8, 4, 0.22) 0%, transparent 24%, transparent 80%, rgba(13, 8, 4, 0.34) 100%);
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(166, 136, 74, 0.35) 30%,
+    rgba(166, 136, 74, 0.35) 70%,
+    transparent);
+  margin: 0 auto;
+  max-width: 220px;
+}
+
+/* ============================================================
+   TYPE UTILITIES
+   ============================================================ */
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  color: var(--brass);
+  font-weight: 400;
+}
+
+.brass-rule {
+  display: inline-block;
+  width: 48px;
+  height: 1px;
+  background: var(--brass);
+  vertical-align: middle;
+  margin: 0 0.75rem;
+  opacity: 0.7;
+}
+
+.display {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+.engraved {
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 50%, var(--brass-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* tooled — used on key display headlines, a chiseled / engraved feel */
+.tooled {
+  color: var(--parchment);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.7),
+    0 -1px 0 rgba(196, 164, 95, 0.15);
+}
+
+.restraint {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+
+/* ============================================================
+   HERO VIDEO — Nico's "Who Am I" playable before any scroll.
+   Rendered only under the .hero--video flag (previewing at /preview,
+   HERO_VIDEO in design.js). See HERO_VIDEO_PLAN.md.
+   ============================================================ */
+
+/* Desktop: the horseman film itself is the play surface — one transparent
+   button matching the film's geometry (right 56%, same as .hero--split
+   .hero-film) at z2, above film (z0) and vignette (z1), with the play glyph
+   and label centred over the painting. */
+.hero--video .hero-video-film-btn {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 56%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--brass-light);
+  cursor: pointer;
+}
+.hero--video .hero-video-film-btn .founder-video-play {
+  transition: transform 240ms var(--ease-order), background 240ms var(--ease-order);
+}
+.hero--video .hero-video-film-btn:hover .founder-video-play,
+.hero--video .hero-video-film-btn:focus-visible .founder-video-play {
+  transform: scale(1.1);
+  background: rgba(30, 24, 17, 0.88);
+}
+/* The focus ring belongs on the pill, not the invisible half-screen button —
+   outlining the whole film half read as a rendering glitch. */
+.hero--video .hero-video-film-btn { outline: none; }
+.hero--video .hero-video-film-btn:focus-visible .hero-video-pill {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 3px;
+}
+@media (max-width: 900px) {
+  .hero--video .hero-video-film-btn { display: none; }
+}
+
+/* Playing state (desktop): a framed tile centred over the right half with the
+   video INLINE — matching the founder card treatment. Fullscreen is
+   the visitor's choice via the player's own controls, never forced. */
+.hero--video .hero-video-slot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 56%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+.hero--video .hero-video-slot[hidden] { display: none; }
+.hero--video .hero-video-tile {
+  pointer-events: auto;
+  isolation: isolate;
+  padding: 0;
+  /* --tile-ratio is set inline from the video's real dimensions the moment
+     metadata loads (HeroVideo.jsx), so the frame hugs the footage exactly —
+     portrait clips get a portrait tile, no black bars. The 70vh term keeps
+     any shape inside the hero; aspect-ratio derives height from the FINAL
+     used width, so every cap preserves the ratio. */
+  --tile-ratio: 0.5625;
+  /* As big as the hero allows: the 90vh term is the ceiling for portrait
+     footage (the tile still needs breathing room inside the 100vh hero). */
+  width: min(56vw, 900px, calc(90vh * var(--tile-ratio)));
+  max-width: 94%;
+  aspect-ratio: var(--tile-ratio);
+  background: #050403;
+  box-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.85);
+  animation: hero-tile-in 380ms var(--ease-order);
+}
+.hero--video .hero-video-tile-video {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #050403;
+  object-fit: contain;
+}
+.hero--video .hero-video-tile::before,
+.hero--video .hero-video-tile::after,
+.hero--video .hero-video-tile > .nail-tl,
+.hero--video .hero-video-tile > .nail-br {
+  z-index: 4;
+  pointer-events: none;
+}
+.hero--video .hero-video-tile-close {
+  position: absolute;
+  top: -0.9rem;
+  right: -0.9rem;
+  z-index: 5;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--brass-deep);
+  background: rgba(8, 7, 6, 0.9);
+  color: var(--parchment);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.hero--video .hero-video-tile-close:hover { color: var(--brass-light); border-color: var(--brass); }
+@keyframes hero-tile-in {
+  from { opacity: 0; transform: scale(0.84); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@media (max-width: 900px) {
+  .hero--video .hero-video-slot { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero--video .hero-video-tile { animation: none; }
+}
+
+/* The pill both play buttons share (the "bubble"): translucent dark ground so
+   the label reads over any painting, plus a slow brass sheen sweeping across
+   so it is unmistakably clickable. */
+.hero-video-pill {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.6rem 1.7rem 0.6rem 0.7rem;
+  border: 1px solid var(--brass-deep);
+  border-radius: 999px;
+  background: rgba(8, 7, 6, 0.74);
+  color: var(--brass-light);
+  box-shadow: 0 10px 34px -12px rgba(0, 0, 0, 0.8);
+}
+.hero-video-pill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 42%;
+  background: linear-gradient(105deg, transparent, rgba(236, 217, 160, 0.22), transparent);
+  transform: skewX(-18deg);
+  animation: hero-pill-shine 3.8s var(--ease-order) infinite;
+  pointer-events: none;
+}
+@keyframes hero-pill-shine {
+  0%   { left: -60%; }
+  55%  { left: 120%; }
+  100% { left: 120%; }
+}
+/* Desktop pill: larger glyph and a bigger, brighter label than the buried
+   caption it replaced. */
+.video-play-pill--large .founder-video-play {
+  width: 3.2rem;
+  height: 3.2rem;
+  font-size: 1rem;
+}
+.video-play-pill--large .founder-video-label {
+  font-size: 1.02rem;
+  letter-spacing: 0.16em;
+  color: var(--parchment);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+}
+
+/* Mobile: compact play bar in the content column; hidden on desktop where
+   the horseman itself is the button. */
+.hero-video-bar { display: none; }
+@media (max-width: 900px) {
+  .hero--video .hero-video-bar {
+    display: inline-flex;
+    cursor: pointer;
+  }
+  .hero--video .hero-video-bar .founder-video-play {
+    width: 2.1rem;
+    height: 2.1rem;
+    font-size: 0.8rem;
+  }
+
+  /* Make the whole column fit the clipped 100vh hero with the bar added:
+     the scroll cue goes (it overlapped the bar, and the bar is now the
+     invitation), the logo and paddings compact, and the CTA holds a size
+     that always fits narrow phones. Scoped to the preview flag only. */
+  .hero--video .hero-fold-cue { display: none; }
+  .hero--video .hero-logo-mark { height: min(clamp(110px, 20vw, 170px), 16vh); }
+  .hero--video .hero-content {
+    gap: 1rem;
+    padding-top: clamp(3.5rem, 8vh, 6rem);
+  }
+  .hero--video .hero-actions .btn {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    padding: 1rem 1.3rem;
+    max-width: 100%;
+  }
+}
+/* Short landscape phones: compact further. */
+@media (max-width: 900px) and (max-height: 560px) {
+  .hero--video .hero-logo-mark { height: min(clamp(80px, 18vh, 130px), 18vh); }
+  .hero--video .hero-content { padding-top: 2.2rem; gap: 0.7rem; }
+}
+
+/* Fullscreen overlay player, mounted via portal on document.body. Opens with
+   a YouTube-style zoom: the backdrop fades in while the player scales up from
+   ~2/3 size; closing reverses it. `visibility` keeps the closed overlay
+   non-interactive and out of the a11y tree without killing the transition. */
+.hero-video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Reserve a strip above the video for the X, so it can never sit on top of
+     the player's own controls (mute lives in the video's top corner on some
+     mobile players). */
+  padding-top: calc(4rem + env(safe-area-inset-top, 0px));
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 340ms var(--ease-order), visibility 0s linear 340ms;
+}
+.hero-video-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 340ms var(--ease-order);
+}
+.hero-video-overlay video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(0.64);
+  transition: transform 400ms var(--ease-order);
+}
+.hero-video-overlay.open video {
+  transform: scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-video-overlay,
+  .hero-video-overlay video { transition: none; }
+  .hero-video-overlay video { transform: none; }
+  .hero-video-pill::after { animation: none; }
+}
+.hero-video-overlay-close {
+  position: absolute;
+  /* Inside the reserved strip, clear of the video area below it. */
+  top: calc(0.7rem + env(safe-area-inset-top, 0px));
+  right: 0.9rem;
+  z-index: 2;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* ============================================================
+   BUTTONS — brushed metal feel
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.1rem 2.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 400;
+  position: relative;
+  transition: all 420ms var(--ease-order);
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn-primary {
+  color: #060504;
+  /* heavier weight so the label reads clearly against the brass (the loaded
+     mono only went to 500 before — 600 is now loaded for this) */
+  font-weight: 600;
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 50%, var(--brass-deep) 100%);
+  border: 1px solid var(--brass);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 8px 24px -10px rgba(166, 136, 74, 0.35);
+}
+
+/* Hover: the sword is drawn — the brass floods to blood-red, the button lifts
+   and swells, and a red glow blooms around it so there's no doubt it's the
+   thing to press. */
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.035);
+  color: var(--parchment);
+  border-color: var(--cordovan-light);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(122, 42, 38, 0.55),
+    0 14px 34px -8px rgba(140, 28, 24, 0.7),
+    0 0 36px -4px rgba(176, 46, 40, 0.72);
+}
+
+.btn-primary:active { transform: translateY(-1px) scale(1.01); }
+
+/* Blood wash — a cordovan fill painted over the brushed brass, faded in on
+   hover. Sits above the button's brass background but below the lettering and
+   the blade-glint (both ::before and ::after are z-index:-1; source order puts
+   the glint on top), so the glint still streaks across the red. */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, #a83430 0%, var(--cordovan) 55%, #3d1411 100%);
+  opacity: 0;
+  transition: opacity 360ms var(--ease-order);
+}
+.btn-primary:hover::before { opacity: 1; }
+
+/* CTA shine — a blade-glint sweep. A narrow specular highlight rides
+   left → right across the brushed brass, the way light runs down a sword
+   as it's drawn. Idle: one slow glint roughly every 1.75s. Hover: a single
+   deliberate draw. Painted under the label (z-index:-1) so the lettering
+   stays crisp; clipped to the button by overflow:hidden. The
+   prefers-reduced-motion block disables it automatically. */
+.btn-primary {
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  left: 0;
+  width: 48%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(95deg,
+    rgba(255, 250, 236, 0) 35%,
+    rgba(255, 250, 236, 0.75) 50%,
+    rgba(255, 250, 236, 0) 65%);
+  transform: skewX(-18deg) translateX(-220%);
+  animation: bladeGlint 1.75s var(--ease-order) infinite;
+}
+@keyframes bladeGlint {
+  0%   { transform: skewX(-18deg) translateX(-220%); }
+  56%  { transform: skewX(-18deg) translateX(320%); }
+  100% { transform: skewX(-18deg) translateX(320%); }
+}
+.btn-primary:hover::after {
+  animation: bladeGlintDraw 760ms var(--ease-order);
+}
+@keyframes bladeGlintDraw {
+  0%   { transform: skewX(-18deg) translateX(-220%); }
+  100% { transform: skewX(-18deg) translateX(320%); }
+}
+
+.btn-ghost {
+  color: var(--parchment);
+  background: transparent;
+  border: 1px solid var(--iron);
+  position: relative;
+}
+
+.btn-ghost::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(166, 136, 74, 0.05), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 320ms var(--ease-order);
+}
+
+.btn-ghost:hover {
+  border-color: var(--brass-deep);
+  color: var(--brass-light);
+}
+.btn-ghost:hover::before { opacity: 1; }
+
+/* ============================================================
+   CARDS — leather panels, saddle-stitched
+   ============================================================ */
+
+.card {
+  background:
+    linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-leather) 100%);
+  border: 1px solid var(--iron);
+  padding: 2rem;
+  position: relative;
+  transition: all 480ms var(--ease-order);
+}
+
+.card-stitched {
+  position: relative;
+}
+
+.card-stitched::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed rgba(166, 136, 74, 0.32);
+  pointer-events: none;
+}
+
+/* brass nail-head dots, one in each corner */
+.nailed { position: relative; }
+.nailed::before,
+.nailed::after,
+.nailed > .nail-tl,
+.nailed > .nail-br {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--brass-light), var(--brass-deep) 70%);
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.4);
+}
+.nailed::before { top: 10px; left: 10px; }
+.nailed::after  { bottom: 10px; right: 10px; }
+.nailed > .nail-tl { top: 10px; right: 10px; }
+.nailed > .nail-br { bottom: 10px; left: 10px; }
+
+/* ============================================================
+   APPLICATION — choice options + inputs
+   ============================================================ */
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.7rem 1.1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 320ms var(--ease-order);
+  position: relative;
+}
+
+.choice:hover {
+  border-color: var(--brass-deep);
+  background: var(--bg-leather);
+  transform: translateX(2px);
+}
+
+.choice.selected {
+  border-color: var(--brass);
+  background: linear-gradient(90deg, rgba(166, 136, 74, 0.12), transparent);
+  color: var(--parchment);
+}
+
+.choice-badge {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--brass-deep);
+  color: var(--brass);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+.choice.selected .choice-badge {
+  background: var(--brass);
+  color: var(--bg-deep);
+  border-color: var(--brass);
+}
+
+.input-field {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  transition: all 280ms var(--ease-order);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--brass);
+  background: var(--bg-leather);
+  box-shadow: 0 0 0 3px rgba(166, 136, 74, 0.15);
+}
+
+.input-field::placeholder {
+  color: var(--ash);
+  font-style: italic;
+}
+
+/* ============================================================
+   RICH TEXT EDITOR (TipTap) — /admin + /presentations editing UI.
+   The public site renders the stored HTML directly; these styles
+   only dress the editor. The library loads only in those lazy
+   chunks, never on the public site.
+   ============================================================ */
+.rt { position: relative; }
+/* While a field is being edited it must layer above its sibling fields so the
+   floating toolbar (and anything in it) is never covered or cut off. */
+.rt.is-focused, .rt:focus-within, .rt:hover { z-index: 40; }
+.rt-content-wrap { position: relative; }
+.rt-content .ProseMirror { outline: none; white-space: pre-wrap; word-break: break-word; }
+
+/* Word-style numeric font sizes — <span data-fs="N">. One universal scale: the
+   same number renders the same absolute size in every section of the site.
+   (Presentations map the same numbers to stage-proportional sizes — see
+   presentations.css — so slides still scale when presented fullscreen.) */
+[data-fs="8"]  { font-size: 8px; }
+[data-fs="9"]  { font-size: 9px; }
+[data-fs="10"] { font-size: 10px; }
+[data-fs="11"] { font-size: 11px; }
+[data-fs="12"] { font-size: 12px; }
+[data-fs="14"] { font-size: 14px; }
+[data-fs="16"] { font-size: 16px; }
+[data-fs="18"] { font-size: 18px; }
+[data-fs="20"] { font-size: 20px; }
+[data-fs="24"] { font-size: 24px; }
+[data-fs="28"] { font-size: 28px; }
+[data-fs="32"] { font-size: 32px; }
+[data-fs="36"] { font-size: 36px; }
+[data-fs="42"] { font-size: 42px; }
+[data-fs="48"] { font-size: 48px; }
+[data-fs="56"] { font-size: 56px; }
+[data-fs="64"] { font-size: 64px; }
+[data-fs="72"] { font-size: 72px; }
+.rt-placeholder {
+  position: absolute; left: 0; top: 0;
+  pointer-events: none; color: var(--ash); opacity: 0.75; font-style: italic;
+}
+.rt-toolbar {
+  position: absolute; left: 0; bottom: calc(100% + 4px);
+  display: flex; gap: 3px; align-items: center;
+  padding: 4px 5px;
+  background: rgba(12, 10, 8, 0.97);
+  border: 1px solid rgba(166, 136, 74, 0.4);
+  border-radius: 4px;
+  z-index: 30;
+  opacity: 0; pointer-events: none;
+  transition: opacity 120ms var(--ease-order);
+}
+/* :focus-within keeps the toolbar up while the size dropdown itself has focus
+   (opening the select blurs the editor, which must not hide the toolbar). */
+.rt:hover .rt-toolbar, .rt.is-focused .rt-toolbar, .rt:focus-within .rt-toolbar { opacity: 1; pointer-events: auto; }
+/* The size dropdown — used by BOTH toolbars (admin field bar + presentation box
+   bar), so styled unscoped. color-scheme: dark makes the browser render the
+   native popup list itself dark, matching the editor instead of flashing white. */
+select.rt-size {
+  appearance: auto;
+  color-scheme: dark;
+  font-family: var(--font-mono); font-size: 12px; line-height: 1;
+  color: var(--parchment); background: var(--bg-surface);
+  border: 1px solid rgba(166, 136, 74, 0.4); border-radius: 3px;
+  padding: 3px 4px;
+  max-height: none;
+  cursor: pointer;
+}
+select.rt-size:focus { outline: none; border-color: var(--brass); }
+select.rt-size option {
+  font-family: var(--font-mono);
+  background: var(--bg-surface);
+  color: var(--parchment);
+}
+select.rt-size option:checked { background: var(--brass); color: var(--bg-deep); }
+.rt-toolbar button {
+  font-family: var(--font-mono); font-size: 12px; line-height: 1;
+  color: var(--parchment-mute); padding: 4px 7px;
+  border: 1px solid transparent; border-radius: 3px; background: transparent;
+}
+.rt-toolbar button:hover { color: var(--parchment); border-color: rgba(166, 136, 74, 0.4); }
+.rt-toolbar button.on { color: var(--bg-deep); background: var(--brass); border-color: var(--brass); }
+.rt-sep { width: 1px; height: 14px; background: rgba(166, 136, 74, 0.3); margin: 0 2px; }
+
+/* Admin: the editor looks like an input field. */
+.admin-rich { margin-top: 1.7rem; }   /* room for the floating toolbar above */
+.admin-rich .rt-content {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  transition: border-color 280ms var(--ease-order);
+}
+.admin-rich.is-focused .rt-content {
+  border-color: var(--brass);
+  background: var(--bg-leather);
+  box-shadow: 0 0 0 3px rgba(166, 136, 74, 0.15);
+}
+.admin-rich .rt-placeholder { left: 1.2rem; top: 1rem; }
+.admin-rich-italic .rt-content { font-style: italic; }
+
+/* progress bar */
+.progress-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--iron);
+  position: relative;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brass-deep), var(--brass), var(--brass-light));
+  transition: width 600ms var(--ease-order);
+  position: relative;
+}
+
+/* ============================================================
+   KEYFRAMES — slow, weighted, choreographed
+   ============================================================ */
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes drawRule {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes lightSweep {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes sigilLockIn {
+  0%   { opacity: 0; transform: rotate(-12deg) scale(0.92); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: rotate(0deg) scale(1); }
+}
+
+@keyframes engrave {
+  0%   { background-position: 100% center; opacity: 0.4; }
+  100% { background-position: 0% center; opacity: 1; }
+}
+
+/* reveal helpers */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 1100ms var(--ease-order), transform 1100ms var(--ease-order);
+}
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* staggered children — each child waits a beat */
+.stagger > * { opacity: 0; transform: translateY(20px); transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order); }
+.stagger.in-view > *:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
+.stagger.in-view > *:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 200ms; }
+.stagger.in-view > *:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 400ms; }
+.stagger.in-view > *:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 600ms; }
+.stagger.in-view > *:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 800ms; }
+.stagger.in-view > *:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 1000ms; }
+
+/* header light sweep — runs once when section enters view */
+.h-sweep {
+  background: linear-gradient(90deg,
+    var(--parchment) 0%,
+    var(--parchment) 30%,
+    var(--brass-light) 50%,
+    var(--parchment) 70%,
+    var(--parchment) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.h-sweep.in-view {
+  animation: lightSweep 3200ms var(--ease-order) 200ms 1;
+  animation-fill-mode: forwards;
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+  .reveal, .stagger > * { opacity: 1 !important; transform: none !important; }
+}
+
+/* ============================================================
+   HONEYPOT
+   ============================================================ */
+
+.hp {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  padding: 1.1rem 0;
+  background: transparent;
+  transition: background 480ms var(--ease-order), border-color 480ms var(--ease-order),
+    transform 480ms var(--ease-order), opacity 480ms var(--ease-order);
+  border-bottom: 1px solid transparent;
+  /* Hidden over the hero — the hero carries its own logo. Slides in once the
+     hero has scrolled past (.is-scrolled), then stays for the rest of the page. */
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.site-header.is-scrolled {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+  background: rgba(10, 9, 8, 0.84);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom-color: var(--iron);
+}
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  text-decoration: none;
+}
+.header-wordmark {
+  font-size: 1.1rem;
+  letter-spacing: 0.28em;
+  color: var(--parchment);
+  text-transform: uppercase;
+}
+/* Instagram — pinned top-right so it rides with the header on scroll.
+   Name to the left, glyph to the right, brass so it reads as an invitation. */
+.header-instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+  color: var(--brass-light);
+  transition: color 320ms var(--ease-order);
+}
+.header-instagram:hover { color: var(--parchment); }
+.header-instagram svg { display: block; flex-shrink: 0; }
+/* Two lines, right-aligned so both sit flush to the glyph: the brand name
+   INSTAGRAM as a tracked display kicker, the handle beneath it in mono so it
+   reads as an address. Stacked rather than strung out in a row — it is the
+   narrower lockup, which is what buys both lines room on a phone. */
+.header-instagram-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.16rem;
+  line-height: 1;
+}
+.header-instagram-kicker {
+  font-size: 0.66rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  /* tracking pads the right of the last letter — pull it back so the ragged
+     right edge lines up with the handle below */
+  margin-right: -0.34em;
+}
+.header-instagram-handle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--parchment-mute);
+  transition: color 320ms var(--ease-order);
+}
+.header-instagram:hover .header-instagram-handle { color: var(--parchment); }
+
+@media (max-width: 600px) {
+  .header-wordmark { font-size: 0.95rem; letter-spacing: 0.2em; }
+  .header-mark { gap: 0.6rem; }
+  .header-instagram { gap: 0.45rem; }
+  .header-instagram-kicker { font-size: 0.58rem; letter-spacing: 0.26em; margin-right: -0.26em; }
+  .header-instagram-handle { font-size: 0.66rem; }
+  .header-instagram svg { width: 19px; height: 19px; }
+}
+/* Narrowest phones — the logo mark still carries the brand, so the wordmark
+   yields rather than crowding the Instagram lockup. */
+@media (max-width: 400px) {
+  .header-wordmark { display: none; }
+}
+
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+}
+
+.hero-sticky {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  /* dark ground behind the film, so the strip exposed when the hero
+     image is dropped reads as night sky rather than a transparent gap */
+  background: var(--bg-deep);
+}
+
+.hero-film {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-film video,
+.hero-film img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-film img {
+  transition: opacity 220ms var(--ease-order);
+  will-change: opacity;
+  /* Horseman is a tall portrait — centre the crop so the rider, the rearing
+     horse and the pyramids hold the middle band on wide screens; on mobile the
+     full portrait fills the tall hero. */
+  object-position: center;
+}
+
+.hero-film-placeholder {
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(166, 136, 74, 0.05), transparent 55%),
+    linear-gradient(180deg, #0e0c0a 0%, #0a0908 60%, #050403 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4rem;
+}
+
+.hero-placeholder-mark {
+  opacity: 0.4;
+  letter-spacing: 0.32em;
+}
+
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 60%, transparent 25%, rgba(10, 9, 8, 0.45) 70%, rgba(10, 9, 8, 0.9) 100%),
+    linear-gradient(180deg, rgba(10, 9, 8, 0.55) 0%, rgba(10, 9, 8, 0.12) 26%, transparent 45%, transparent 70%, rgba(10, 9, 8, 0.9) 100%);
+  z-index: 1;
+}
+
+.hero-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  padding-top: clamp(7rem, 14vh, 11rem);
+  padding-bottom: 5rem;
+}
+
+.hero-logo-mark {
+  display: block;
+  width: auto;
+  /* matches the closing-section mark (clamp(170px,26vw,280px)); capped by
+     viewport height so it shrinks rather than push the CTA off short screens */
+  height: min(clamp(170px, 26vw, 280px), 30vh);
+  margin: 0 auto 0.6rem;
+  opacity: 0.96;
+  animation: fadeIn 1600ms var(--ease-order) 80ms both;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.82rem;
+  animation: fadeIn 1400ms var(--ease-order) 200ms both;
+}
+
+.hero-headline {
+  font-size: clamp(2.8rem, 8vw, 6.2rem);
+  line-height: 0.98;
+  letter-spacing: 0.04em;
+  max-width: 18ch;
+  margin: 0 auto;
+  animation: riseIn 1500ms var(--ease-order) 400ms both;
+  /* THE ORDER sits over the brightest part of the horseman oil — back the
+     parchment letters with a deep oil-shadow halo (plus the faint gold relief)
+     so they read clearly on desktop and mobile without losing the painted feel. */
+  text-shadow:
+    0 -1px 0 rgba(196, 164, 95, 0.22),
+    0 2px 3px rgba(0, 0, 0, 0.7),
+    0 6px 26px rgba(0, 0, 0, 0.82),
+    0 0 54px rgba(0, 0, 0, 0.6);
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  animation: riseIn 1400ms var(--ease-order) 900ms both;
+}
+
+.hero-restraint {
+  color: var(--ash);
+  letter-spacing: 0.22em;
+}
+
+/* CTA + scroll cue, anchored low in the hero (under the candle) */
+.hero-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3.5rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+.hero-fold-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.5;
+  animation: fadeIn 1400ms var(--ease-order) 1600ms both;
+}
+.hero-scroll { font-size: 0.6rem; letter-spacing: 0.3em; }
+.hero-fold-line {
+  width: 1px; height: 22px;
+  background: linear-gradient(180deg, var(--brass), transparent);
+}
+
+/* The small hero lines sit directly over the painting on phones. The default
+   ash is intentionally subdued elsewhere, but loses too much contrast here —
+   especially in WhatsApp/Safari's compact browser. Lift only the mobile hero
+   copy and give it a dark relief shadow so the hierarchy survives without
+   washing out the artwork. */
+@media (max-width: 600px) {
+  .hero-eyebrow {
+    color: #ead9b4;
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: 0.24em;
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.98),
+      0 2px 12px rgba(0, 0, 0, 0.9),
+      0 0 24px rgba(0, 0, 0, 0.75);
+  }
+  .hero-eyebrow .brass-rule {
+    background: #d8bd7b;
+    opacity: 0.9;
+  }
+  .hero-restraint {
+    max-width: 34ch;
+    color: var(--parchment);
+    font-weight: 500;
+    line-height: 1.65;
+    letter-spacing: 0.15em;
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 1),
+      0 2px 12px rgba(0, 0, 0, 0.95),
+      0 0 28px rgba(0, 0, 0, 0.8);
+  }
+  .hero-fold-cue { opacity: 0.85; }
+  .hero-scroll {
+    color: var(--parchment);
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 1), 0 2px 10px rgba(0, 0, 0, 0.95);
+  }
+}
+
+/* ============================================================
+   SECTION HEADINGS (shared)
+   ============================================================ */
+
+/* override moved above into the section block */
+
+.eyebrow {
+  display: block;
+  text-align: center;
+}
+
+/* ============================================================
+   THE TRUTH
+   ============================================================ */
+
+.section-truth { background: var(--bg-deep); }
+.truth-eyebrow { letter-spacing: 0.4em; }
+.truth-body { display: flex; flex-direction: column; gap: 1.6rem; }
+.truth-p {
+  font-size: 1.18rem;
+  line-height: 1.65;
+  color: var(--parchment-mute);
+  text-align: center;
+  font-family: var(--font-body);
+}
+.truth-turn {
+  margin-top: 2rem;
+  text-align: center;
+  color: var(--brass-light);
+  font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+
+/* ============================================================
+   THE CODE
+   ============================================================ */
+
+.section-code {
+  background: linear-gradient(180deg, var(--bg-deep) 0%, #0f0c0a 50%, var(--bg-deep) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.code-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(166, 136, 74, 0.06) 0%, transparent 60%),
+    repeating-linear-gradient(0deg,
+      transparent 0px, transparent 2px,
+      rgba(166, 136, 74, 0.02) 2px, rgba(166, 136, 74, 0.02) 3px);
+}
+.code-inner { position: relative; z-index: 1; }
+.code-intro {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--ash);
+}
+.code-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+  align-items: center;
+}
+.code-principle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: center;
+}
+.code-roman {
+  font-size: 1.3rem;
+  letter-spacing: 0.3em;
+  display: inline-block;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--brass-deep);
+  min-width: 3.5rem;
+}
+.code-text {
+  font-size: clamp(1.5rem, 3.4vw, 2.4rem);
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  max-width: 22ch;
+  line-height: 1.25;
+}
+
+/* ============================================================
+   WHAT YOU BECOME
+   ============================================================ */
+
+.section-become { background: var(--bg-deep); }
+.become-head { text-align: center; }
+.become-heading { max-width: 30ch; margin-left: auto; margin-right: auto; }
+.become-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.6rem;
+}
+@media (max-width: 900px) {
+  .become-grid { grid-template-columns: 1fr; }
+}
+.become-block {
+  padding: 2.4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.become-numeral {
+  font-size: 0.95rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+.become-title {
+  font-size: 1.5rem;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+.become-body {
+  color: var(--parchment-mute);
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+/* ============================================================
+   WHO IS CONSIDERED
+   ============================================================ */
+
+.section-considered { background: var(--bg-deep); }
+.considered-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  text-align: center;
+  max-width: 30ch;
+  margin: 0 auto;
+}
+.considered-line {
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+}
+.considered-for { color: var(--parchment); }
+.considered-not { color: var(--ash); }
+
+/* ============================================================
+   APPLICATION
+   ============================================================ */
+
+.section-application {
+  background: linear-gradient(180deg, var(--bg-deep) 0%, #0d0b0a 50%, var(--bg-deep) 100%);
+}
+.application-shell { display: flex; flex-direction: column; gap: 1.2rem; }
+.application-head { text-align: center; }
+.application-head-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+}
+.application-progress {
+  width: 100%;
+  margin-bottom: 1.6rem;
+}
+.application-card {
+  padding: clamp(1.2rem, 3vw, 2rem);
+  /* room for the bottom-right step counter */
+  padding-bottom: clamp(2.4rem, 4vw, 3.2rem);
+}
+.application-step {
+  position: absolute;
+  right: clamp(1rem, 2.5vw, 1.6rem);
+  bottom: clamp(0.7rem, 2vw, 1rem);
+  z-index: 2;
+}
+.application-eyebrow {
+  text-align: center;
+  margin: 0 0 1.2rem;
+  color: var(--brass-light);
+  opacity: 0.95;
+}
+
+.qs { display: flex; flex-direction: column; gap: 1rem; }
+.qs-meta { display: flex; justify-content: space-between; align-items: center; }
+.qs-question {
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  margin: 0;
+}
+.qs-sub {
+  color: var(--ash);
+  font-style: italic;
+  font-size: 0.95rem;
+  margin: 0;
+}
+.qs-choices { display: flex; flex-direction: column; gap: 0.5rem; }
+.qs-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 0.8rem; }
+.qs-nav .btn-ghost { padding: 0.65rem 1.3rem; }
+
+.qs-contact { display: flex; flex-direction: column; gap: 1.4rem; }
+.qs-field { display: flex; flex-direction: column; gap: 0.4rem; position: relative; }
+.qs-label {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--brass-light);
+}
+.qs-error {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--cordovan-light);
+  letter-spacing: 0.1em;
+}
+
+.qs-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  font-size: 0.92rem;
+  color: var(--parchment-mute);
+  cursor: pointer;
+  line-height: 1.5;
+}
+.qs-consent input[type="checkbox"] {
+  margin-top: 0.25rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--brass);
+  flex-shrink: 0;
+}
+.qs-consent-links {
+  margin: 0.55rem 0 0 1.9rem;
+  font-size: 0.82rem;
+  color: var(--parchment-mute);
+}
+.qs-consent-links a {
+  color: var(--brass);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.qs-consent-links a:hover { color: var(--parchment); }
+
+/* phone */
+.phone-row { display: flex; gap: 0.6rem; }
+.phone-cc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  color: var(--parchment);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 240ms var(--ease-order);
+}
+.phone-cc:hover { border-color: var(--brass-deep); }
+.phone-cc-flag { color: var(--brass); }
+.phone-cc-caret { color: var(--ash); font-size: 0.7rem; }
+.phone-input { flex: 1; }
+.phone-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin-top: 0.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--brass-deep);
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+.phone-search { border: none; border-bottom: 1px solid var(--iron); }
+.phone-list { overflow-y: auto; }
+.phone-option {
+  display: grid;
+  grid-template-columns: 3rem 1fr auto;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: transparent;
+  color: var(--parchment);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(74, 68, 60, 0.4);
+  transition: background 200ms var(--ease-order);
+}
+.phone-option:hover { background: var(--bg-leather); }
+.phone-option-code { color: var(--brass); }
+.phone-option-name { color: var(--parchment-mute); font-family: var(--font-body); }
+.phone-option-dial { color: var(--ash); }
+
+.tw-caret {
+  display: inline-block;
+  width: 0.4ch;
+  color: var(--brass);
+  animation: blinkCaret 0.9s steps(2, end) infinite;
+}
+@keyframes blinkCaret {
+  from, to { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* ============================================================
+   FINAL SCREEN
+   ============================================================ */
+
+.final-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 0 1rem;
+}
+.final-mark {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
+}
+.final-mark.in { opacity: 1; transform: scale(1); }
+/* same painted mark as the hero/closing sections, scaled down to sit inside the card */
+.final-logo { height: clamp(140px, 20vw, 220px); margin: 0 auto; opacity: 0.94; }
+
+.final-heading {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
+  letter-spacing: 0.05em;
+}
+.final-heading.in { opacity: 1; transform: translateY(0); }
+
+.final-sub {
+  color: var(--parchment-mute);
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 900ms var(--ease-order) 120ms, transform 900ms var(--ease-order) 120ms;
+}
+.final-sub.in { opacity: 1; transform: translateY(0); }
+
+/* "God Wills It" — gilt (Nico, 2026-07-13). The same brass gradient as
+   .engraved, raised to a ceremonial size so the line reads as the seal of
+   the thank-you page. drop-shadow (not text-shadow) so the glow respects
+   the gradient-clipped glyphs. */
+.final-sub--gilded {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.8vw, 1.7rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(196, 164, 95, 0.3));
+}
+
+.final-begin {
+  color: var(--brass-light);
+  font-style: italic;
+  font-size: 1.1rem;
+  max-width: 32ch;
+  opacity: 0;
+  transition: opacity 1200ms var(--ease-order);
+}
+.final-begin.in { opacity: 1; }
+
+/* Decline (negation) screen typography (Nico, 2026-07-13): the
+   invitation-to-return line is the big, bold, gold hero; the privacy line is a
+   small white footnote. Compound selectors so these beat .final-sub /
+   .final-begin / .restraint regardless of source order. */
+.final-sub.decline-body {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3.2vw, 2.1rem);
+  line-height: 1.28;
+  letter-spacing: 0.03em;
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: auto;
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 16px rgba(196, 164, 95, 0.28));
+}
+.final-begin.decline-notice {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  max-width: none;
+}
+
+/* Qualified application handoff. The booking URL is intentionally absent:
+   applicants must send Nico a video DM before he shares it privately. */
+.final-screen.qualified-screen { padding-top: 0.35rem; }
+/* Keep the first action visible sooner on both post-questionnaire screens. */
+.qualified-screen .final-logo,
+.booking-page .final-logo {
+  height: clamp(90px, 12vw, 132px);
+}
+.qualified-next {
+  width: min(100%, 680px);
+  margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
+}
+.qualified-next.in { opacity: 1; transform: translateY(0); }
+.qualified-video {
+  display: block;
+  /* The frame takes the clip's OWN aspect ratio (set from the video's
+     metadata in QualifiedScreen.jsx, default portrait 9:16 since Nico films
+     upright) so the picture fills it edge to edge: a 9:16 clip in the old
+     fixed 3:4 box left black pillars either side. */
+  --qual-ratio: 0.5625;
+  /* Bound by height for upright clips (640px tall at 9:16 = 360px wide) and
+     by width for landscape ones; aspect-ratio derives height from the final
+     width, so every cap keeps the picture edge to edge. */
+  width: min(100%, 400px, calc(640px * var(--qual-ratio)));
+  aspect-ratio: var(--qual-ratio);
+  margin: 0 auto;
+  border: 1px solid rgba(166, 136, 74, 0.45);
+  border-radius: 6px;
+  background: #080706;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+  object-fit: cover;
+}
+.qualified-video-frame {
+  position: relative;
+  overflow: hidden;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.qualified-video-trigger { border-radius: inherit; }
+.qualified-video-trigger:focus-visible { outline: none; }
+.qualified-video-trigger:focus-visible .qualified-video-pill {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 3px;
+}
+.qualified-video-player {
+  position: absolute;
+  inset: 0;
+  /* The player stays mounted so it can buffer before the press, which leaves
+     it underneath its play button instead of swapped out for it: player 2,
+     trigger 3. */
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #050403;
+  object-fit: contain;
+}
+.qualified-video--placeholder {
+  display: grid;
+  place-content: center;
+  gap: 0.8rem;
+  color: var(--parchment-mute);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.qualified-video-mark {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  margin: 0 auto;
+  padding-left: 0.2rem;
+  border: 1px solid var(--brass);
+  border-radius: 50%;
+  color: var(--brass-light);
+  font-size: 1.15rem;
+}
+.qualified-message {
+  max-width: 48ch;
+  margin: 1.8rem auto 0;
+  color: var(--parchment);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  line-height: 1.55;
+  white-space: pre-line;
+}
+.qualified-note {
+  max-width: 54ch;
+  margin: 0.9rem auto 0;
+  color: var(--parchment-mute);
+  line-height: 1.65;
+  white-space: pre-line;
+}
+.qualified-instagram { margin-top: 1.7rem; }
+
+/* The acceptance gate and calendar live at /application and
+   /application/booking respectively. */
+.booking-page {
+  min-height: 100vh;
+  padding-top: clamp(2rem, 5vw, 4rem);
+  padding-bottom: clamp(3rem, 7vw, 6rem);
+  background: linear-gradient(180deg, var(--bg-deep) 0%, #0d0b0a 50%, var(--bg-deep) 100%);
+}
+.booking-page .final-screen { padding-top: 0.35rem; }
+.booking-page-shell { position: relative; z-index: 1; }
+.booking-page-card {
+  width: min(1020px, 96vw);
+  margin: 0 auto;
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+.application-gate-page {
+  display: grid;
+  align-items: center;
+}
+.application-gate-card {
+  width: min(760px, 92vw);
+  padding: clamp(1.8rem, 5vw, 3.4rem);
+}
+
+@media (max-width: 600px) {
+  .qualified-next { margin-top: 1.4rem; }
+  .qualified-message { margin-top: 1.3rem; }
+  .qualified-instagram { width: 100%; }
+  .booking-page { padding-top: 0.75rem; }
+  .booking-page-card { width: 100%; }
+}
+
+/* ---- Commitment gate (between the last question and the calendar) ---- */
+/* The moment the applicant commits to the call. The seal line carries the same
+   brass gradient as "God Wills It" and the challenge is the italic gold
+   question they answer by pressing the button; between them the terms of the
+   call are plain white, so the two gold lines keep all the weight. */
+/* Every size here is capped against viewport HEIGHT as well as width. The
+   section is min-height:100vh and centres its card, so type that only scales
+   with vw pushes the button below the fold on a short window — which is
+   exactly what happened at 100% zoom on a 16:10 laptop. min(Xvw, Yvh) keeps
+   the whole gate — seal, terms, challenge and button — on one screen. */
+.commitment-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.25rem 0 0;
+}
+
+.gate-line {
+  margin: 0;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
+}
+.gate-line.in { opacity: 1; transform: translateY(0); }
+
+.gate-line--acceptance {
+  max-width: 38ch;
+  margin-bottom: clamp(1.2rem, 3vh, 2rem);
+  color: var(--parchment);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, min(2.6vw, 3vh), 1.75rem);
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+}
+
+.gate-line--seal {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, min(3vw, 3.4vh), 1.95rem);
+  letter-spacing: 0.1em;
+  line-height: 1.18;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(196, 164, 95, 0.3));
+  /* Wide enough that "WE ARE INUNDATED / WITH APPLICATIONS" breaks over two
+     lines rather than three. */
+  max-width: 22ch;
+}
+
+.gate-line--warning {
+  margin-top: clamp(0.9rem, 2.2vh, 1.5rem);
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, min(1.7vw, 1.95vh), 1.15rem);
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+  /* White, not gold (Nico, 2026-07-29) — the terms of the call read as plain
+     fact between the two gold lines, which keeps the seal and the challenge as
+     the only gilded moments. */
+  color: var(--parchment);
+  max-width: 48ch;
+}
+
+.gate-divider { margin: clamp(1rem, 2.4vh, 1.7rem) 0; width: 100%; }
+
+.gate-line--challenge {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, min(2vw, 2.3vh), 1.35rem);
+  line-height: 1.35;
+  letter-spacing: 0.05em;
+  font-style: italic;
+  color: var(--brass);
+  max-width: 40ch;
+}
+
+.gate-action {
+  margin-top: clamp(1.1rem, 2.8vh, 2rem);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 900ms var(--ease-order), transform 900ms var(--ease-order);
+}
+.gate-action.in { opacity: 1; transform: translateY(0); }
+.gate-button {
+  font-size: clamp(0.85rem, 1.8vh, 1rem);
+  padding: clamp(0.75rem, 1.7vh, 1rem) clamp(1.6rem, 4vw, 2.4rem);
+  /* Never shrink below a comfortable thumb target, however short the window. */
+  min-height: 46px;
+}
+
+/* ---- Booking calendar on the final screen ---- */
+/* Once submitted, the shell widens past the reading column so the embedded
+   calendar gets room to lay out its month + time slots side by side. */
+.shell-narrow.application-shell--booking { max-width: min(1020px, 96vw); }
+
+.final-booking {
+  width: 100%;
+  /* Tight to the gilt line above it — with no encouragement copy there is
+     nothing between them, and the old 2.5rem read as a dead gap. */
+  margin-top: 1.2rem;
+  opacity: 0;
+  transition: opacity 1200ms var(--ease-order) 250ms;
+}
+.final-booking.in { opacity: 1; }
+.final-booking-heading {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  letter-spacing: 0.05em;
+  margin: 0.7rem 0 1.1rem;
+}
+
+.booking-widget { width: 100%; }
+/* Cross-origin frame with no resize postMessage → a fixed height per
+   breakpoint, and the PAGE does the scrolling. The frame must never be
+   SHORTER than the tallest state the applicant can reach, or the calendar
+   gets its own inner scrollbar and the two surfaces fight: dragging moves
+   the calendar instead of the page, and the lower fields and the confirm
+   button sit below an edge nobody expects to scroll.
+
+   The numbers below are MEASURED, not guessed — Playwright against the live
+   booking page (wayfindercollective.io/book/nico-seedsman-the-order), driven
+   to each step, reading document scrollHeight. Frame width, not viewport
+   width, is what drives content height, and the funnel gives the frame
+   `viewport - 48px (shell) - 2 x card padding`:
+
+     frame  974/908px (>=900 vp)  calendar  976   times 1300   details 1500
+     frame  514px      (600 vp)   calendar  978   times 1302   details 1504
+     frame  344px      (430 vp)   calendar 1062   times 1406   details 1676
+     frame  274px      (360 vp)   calendar 1235   times 1659   details 1890
+     frame  234px      (320 vp)   calendar 1338   times 1782   details 2091
+
+   "details" is the worst case: the form with the optional "add guest" and
+   "add phone" rows expanded. Each height below is that number plus ~3%
+   headroom for copy that wraps differently (a longer host name, a slot-lock
+   warning banner). The steps differ by ~500px, so sizing for the tallest
+   necessarily leaves dead space under the shorter ones — that is the trade
+   this breakpoint approach cannot avoid. The REAL fix is the OS posting its
+   content height; the listener for it already exists in BookingWidget.jsx
+   and overrides everything here the moment such a message arrives. */
+.booking-frame-wrap {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(166, 136, 74, 0.35);
+  border-radius: 6px;
+  background: rgba(8, 7, 6, 0.5);
+  height: 1560px;
+}
+@media (max-width: 900px) { .booking-frame-wrap { height: 1580px; } }
+/* PHONES. The narrower the frame the taller the form gets — every field
+   stacks and every label wraps — so one phone number does not fit all: a
+   320px handset needs ~440px more than a 430px one. Hence the extra steps,
+   which keep the dead space on a large phone from being half a screen. */
+@media (max-width: 600px) { .booking-frame-wrap { height: 1700px; } }
+@media (max-width: 480px) { .booking-frame-wrap { height: 1900px; } }
+@media (max-width: 380px) { .booking-frame-wrap { height: 2160px; } }
+
+/* After booking the frame holds the short confirmation screen, not the month
+   grid — without this the mobile height leaves a screen of dead space. */
+.booking-frame-wrap--confirmed { height: 900px; }
+@media (max-width: 900px) { .booking-frame-wrap--confirmed { height: 1150px; } }
+/* The confirmation screen is far shorter than the month grid, so the frame
+   shrinks once booked rather than leaving a screen of dead space. */
+@media (max-width: 600px) { .booking-frame-wrap--confirmed { height: 1350px; } }
+.booking-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.booking-frame-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 2rem;
+  pointer-events: none; /* the loading spinner must never block the calendar */
+}
+.booking-frame-status--solid {
+  pointer-events: auto;
+  background: var(--bg-surface);
+}
+.booking-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(166, 136, 74, 0.3);
+  border-top-color: var(--brass);
+  animation: booking-spin 900ms linear infinite;
+}
+@keyframes booking-spin { to { transform: rotate(360deg); } }
+.booking-slow { color: var(--parchment-mute); margin-bottom: 1.2rem; }
+
+.booking-escape { margin-top: 0.9rem; text-align: center; }
+.booking-escape a { color: var(--brass-light); text-decoration: underline; }
+.booking-escape a:hover { color: var(--parchment); }
+
+/* Shown once the calendar reports a confirmed booking. */
+/* pre-line because the CMS copy for this paragraph carries real line breaks —
+   the sign-off ("God Wills It, / Nico") is written on its own lines and was
+   otherwise collapsing into the end of the paragraph as one run-on. */
+.final-booked-note {
+  margin: 0 0 1.4rem;
+  text-align: center;
+  color: var(--parchment-mute);
+  white-space: pre-line;
+  line-height: 1.65;
+}
+.final-booked-note strong { color: var(--brass-light); font-weight: 600; }
+
+/* Contact details are typed inside the frame, so the SMS/appointment
+   disclosure sits with it — small, quiet, but present at the point of
+   collection. */
+.booking-sms-note {
+  margin-top: 0.9rem;
+  text-align: center;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--parchment-mute);
+  opacity: 0.72;
+}
+
+/* ---- Mobile: get to the calendar sooner ----
+   The ceremony (mark, wordmark, gilt line) is a full screen of scrolling on a
+   phone before the calendar even starts. Tighten it so the applicant reaches
+   the dates with one swipe instead of three. Long values (an email in the
+   confirmation line) wrap rather than run past the card edge. */
+@media (max-width: 600px) {
+  .final-screen { padding: 0.75rem 0 0.5rem; }
+  .final-logo { height: clamp(90px, 24vw, 130px); }
+  .final-heading { margin-top: 1rem; }
+  .final-sub { margin-top: 0.6rem; }
+  .final-booking { margin-top: 0.8rem; }
+  .final-booking-heading { margin: 0.5rem 0 0.8rem; }
+  .final-booked-note { margin-bottom: 1rem; }
+  /* Give the fallback line clear air beneath the frame so it never reads as
+     part of the calendar, or as an explanation for a cut-off one. */
+  .booking-escape { margin-top: 1.4rem; }
+}
+
+.final-booked-note,
+.booking-escape,
+.booking-sms-note { overflow-wrap: anywhere; }
+
+/* ============================================================
+   FOUNDER
+   ============================================================ */
+
+.section-founder { background: var(--bg-deep); }
+.founder-head { text-align: center; }
+.founder-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 2.4rem;
+  align-items: center;
+}
+@media (max-width: 800px) {
+  .founder-grid { grid-template-columns: 1fr; }
+}
+.founder-portrait {
+  aspect-ratio: 3 / 4;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background:
+    repeating-linear-gradient(45deg, var(--bg-leather) 0px, var(--bg-leather) 12px, var(--bg-surface) 12px, var(--bg-surface) 24px);
+}
+/* real portrait dropped into the frame — fill it, anchored to the top so the
+   head stays in view (the source is a tall full-body standing figure) */
+.founder-portrait.has-portrait {
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+.founder-video-trigger {
+  position: absolute;
+  inset: 0;
+  /* Above the qualified player it covers (z-index 2). */
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 1.5rem;
+  border: 0;
+  background: linear-gradient(180deg, rgba(8, 7, 6, 0.08), rgba(8, 7, 6, 0.58));
+  color: var(--parchment);
+  cursor: pointer;
+}
+.founder-video-play {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  padding-left: 0.2rem;
+  border: 1px solid var(--brass-light);
+  border-radius: 50%;
+  background: rgba(8, 7, 6, 0.72);
+  color: var(--brass-light);
+  font-size: 1.2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.42);
+  transition: transform 240ms var(--ease-order), background 240ms var(--ease-order);
+}
+.founder-video-label {
+  font-size: 0.86rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+}
+.founder-video-trigger:hover .founder-video-play,
+.founder-video-trigger:focus-visible .founder-video-play {
+  transform: scale(1.08);
+  background: rgba(30, 24, 17, 0.88);
+}
+.founder-video-trigger:focus-visible:not(.qualified-video-trigger) { outline: 2px solid var(--brass-light); outline-offset: -5px; }
+.founder-portrait-inner {
+  position: absolute;
+  inset: 16px;
+  border: 1px dashed var(--brass-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.founder-portrait-mark {
+  color: var(--brass-light);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+}
+.template-flag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--cordovan-light);
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--cordovan);
+  background: rgba(92, 31, 28, 0.15);
+}
+
+.founder-text { display: flex; flex-direction: column; gap: 1.2rem; }
+.founder-p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--parchment-mute);
+  font-style: italic;
+}
+.founder-signature {
+  margin-top: 1rem;
+  color: var(--brass-light);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   EVIDENCE
+   ============================================================ */
+
+.section-evidence { background: var(--bg-deep); }
+/* Pin the testimonial tiles to the bottom of the section so the soldiers'
+   faces and bodies read clearly above them: the shell fills the section height
+   with the heading at top and the tiles pushed down by an auto top margin. */
+/* The painting is only ~8% taller than a landscape viewport under cover, so
+   background-position can barely move it. Lift the whole layer instead to bring
+   the men up above the tiles — the dark this reveals at the bottom sits behind
+   the tiles, and the top simply clips against the section's overflow:hidden. */
+.section-evidence .section-bg-image {
+  background-position: center;
+  transform: translateY(-14%);
+  /* The -14% lift drags the painting's edge-fade mask up off the section's top
+     edge, which would clip the top fade into a hard line. Shift the fade-in down
+     by the same 14% so the seam still fades from black at the real top edge
+     (the bottom fade lands behind the tiles, so it can stay put). */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 14%, #000 calc(14% + var(--edge-fade)), #000 calc(100% - var(--edge-fade)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 14%, #000 calc(14% + var(--edge-fade)), #000 calc(100% - var(--edge-fade)), transparent 100%);
+}
+/* trim the section's bottom padding so the tiles can sit at the very bottom */
+.section-evidence { padding-bottom: clamp(0.5rem, 1vw, 1rem); }
+.section-evidence > .shell {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.section-evidence .evidence-grid { margin-top: auto; }
+.evidence-head { text-align: center; }
+.evidence-intro {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--ash);
+}
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  /* bottom-align tiles so a taller video tile doesn't stretch the text tiles */
+  align-items: end;
+}
+@media (max-width: 900px) {
+  .evidence-grid { grid-template-columns: 1fr; }
+}
+.evidence-card {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  /* every testimonial tile shares the same footprint as the video tile */
+  justify-self: center;
+  width: min(100%, 227px);
+  aspect-ratio: 2 / 3;
+}
+/* Carousel: a full-bleed marquee that scrolls the testimonial tiles in one
+   continuous loop. The tiles are rendered twice in the rail (EvidenceSection.jsx)
+   and the rail is translated left by exactly one set width, so the loop never
+   stops or shows a gap. Tiles are spaced so a full set is wider than the
+   viewport — you never see the same person twice on screen at once. The drift
+   pauses on hover/touch and once a clip is playing with sound. */
+.evidence-carousel {
+  display: block;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 80px,
+    #000 calc(100% - 80px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 80px,
+    #000 calc(100% - 80px),
+    transparent 100%
+  );
+}
+.evidence-rail {
+  display: flex;
+  width: max-content;
+  align-items: flex-end;
+  animation: evidence-marquee linear infinite;
+  will-change: transform;
+}
+.evidence-rail.is-paused {
+  animation-play-state: paused;
+}
+@keyframes evidence-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* one full set width, measured in JS and set as --evidence-period */
+    transform: translateX(calc(-1 * var(--evidence-period, 50%)));
+  }
+}
+.evidence-rail .evidence-card {
+  flex: 0 0 227px;
+  width: 227px;
+  justify-self: auto;
+  /* viewport-scaled spacing so one full set is wider than the screen (no
+     on-screen duplicates) and the tiles spread across the page; floored so
+     small screens keep a sane gap */
+  margin-right: max(1.5rem, calc(25vw - 170px));
+}
+/* Reduced motion: the rail keeps drifting, just far slower — handled in
+   EvidenceSection.jsx (it watches the media query and derives the duration).
+   `animation: none` here froze the carousel for every iOS Low Power Mode
+   visitor, which read as "the testimonials sometimes don't scroll". */
+.evidence-mark {
+  font-size: 3.5rem;
+  line-height: 0.5;
+  height: 1.5rem;
+  color: var(--brass);
+}
+.evidence-quote {
+  flex: 1;
+  font-style: italic;
+  color: var(--parchment-mute);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+.evidence-attr {
+  color: var(--ash);
+  font-size: 0.78rem;
+}
+/* A testimonial card can hold a video instead of a text quote. The video fills
+   the whole tile (no card background or stitching shows), cropped so the
+   speaker's head reads centred; the title is laid over the bottom of the clip.
+   Height is capped so the painting behind the tiles stays visible above them. */
+.evidence-card-video {
+  /* inherits the shared tile footprint from .evidence-card; the video fills it
+     edge-to-edge (no card padding/background) so more of the clip shows */
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--iron);
+  /* own stacking context so the caption/ring stack above the video per tile */
+  isolation: isolate;
+}
+.evidence-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* nudge this if Tony's head isn't centred — lower % shows more of the top */
+  object-position: center 35%;
+  background: #000;
+}
+/* In fullscreen the tile crop no longer applies — show the whole frame
+   (letterboxed) instead of the head-only cover crop. Separate rules so an
+   unknown prefix doesn't invalidate the others. */
+.evidence-video:fullscreen {
+  object-fit: contain;
+  object-position: center;
+}
+.evidence-video:-webkit-full-screen {
+  object-fit: contain;
+  object-position: center;
+}
+.evidence-video:-moz-full-screen {
+  object-fit: contain;
+  object-position: center;
+}
+.evidence-video-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Anchor the FIRST line (the name) at a fixed height so it sits at the same
+     spot on every tile; longer captions grow downward into the space below
+     rather than creeping up off the name line. 67% keeps even a 3-line caption
+     clear of the video's control bar. */
+  top: 67%;
+  bottom: auto;
+  margin: 0;
+  padding: 0 0.9rem;
+  /* always sits above the play ring and the video's own controls so the
+     name/role stays visible at all times, including while a clip is playing.
+     translateZ(0) forces its own compositing layer so iOS Safari paints it
+     ABOVE the video instead of behind it (caption vanished otherwise). */
+  z-index: 3;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  color: var(--parchment);
+  text-align: center;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  /* legible over the video without a dark fade on the tile's bottom edge */
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.85);
+  /* let clicks pass through to the video controls underneath */
+  pointer-events: none;
+}
+/* Centred play affordance shown on every card except the one currently playing.
+   Clicking it plays the clip from the top with sound. It's a centred target (not
+   a full-tile overlay) so it never covers the video's own control bar when a
+   paused clip shows both. */
+.evidence-video-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* translateZ(0) keeps the ring on its own layer above the video on iOS too */
+  transform: translate(-50%, -50%) translateZ(0);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.evidence-video-play-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid var(--brass);
+  background: rgba(0, 0, 0, 0.42);
+  box-shadow: 0 0 28px rgba(0, 0, 0, 0.55);
+  transition: transform 240ms var(--ease-order), background 240ms var(--ease-order);
+}
+.evidence-video-play:hover .evidence-video-play-ring,
+.evidence-video-play:focus-visible .evidence-video-play-ring {
+  transform: scale(1.08);
+  background: rgba(0, 0, 0, 0.62);
+}
+.evidence-video-play svg {
+  width: 26px;
+  height: 26px;
+  fill: var(--brass);
+  margin-left: 3px; /* optically centre the triangle in the ring */
+}
+.template-note {
+  text-align: center;
+  color: var(--ash);
+  margin-top: 2.5rem;
+  font-style: italic;
+}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+
+.section-faq { background: var(--bg-deep); }
+.faq-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.faq-item {
+  border-top: 1px solid var(--iron);
+  transition: background 320ms var(--ease-order);
+}
+.faq-item:last-child { border-bottom: 1px solid var(--iron); }
+.faq-item.open { background: rgba(166, 136, 74, 0.04); }
+
+.faq-q {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 3rem 1fr 2rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.6rem 0.6rem;
+  text-align: left;
+  color: var(--parchment);
+  transition: color 320ms var(--ease-order);
+}
+.faq-q:hover { color: var(--brass-light); }
+.faq-num {
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  color: var(--brass-deep);
+}
+.faq-q-text { font-size: 1.1rem; letter-spacing: 0.04em; }
+.faq-caret {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  color: var(--brass);
+  text-align: center;
+}
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 480ms var(--ease-order), padding 480ms var(--ease-order);
+  padding: 0 0.6rem;
+}
+.faq-item.open .faq-a {
+  max-height: 320px;
+  padding: 0 0.6rem 1.8rem 4rem;
+}
+.faq-a p,
+.faq-preview-p {
+  color: var(--parchment-mute);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.site-footer {
+  padding: 1.2rem 0;
+  border-top: 1px solid var(--iron);
+  background: var(--bg-deep);
+}
+/* one compact horizontal line: logo · email · copyright · privacy */
+.footer-inner {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem 1.8rem;
+  text-align: center;
+}
+.footer-mark { display: inline-flex; align-items: center; opacity: 0.85; }
+.footer-contact-link {
+  color: var(--brass-light);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
+.footer-contact-link:hover { color: var(--parchment); }
+.footer-social {
+  display: inline-flex;
+  align-items: center;
+  color: var(--brass-light);
+  padding: 0.35rem; /* keeps the tap target comfortable on mobile */
+  margin: -0.35rem;
+}
+.footer-social:hover { color: var(--parchment); }
+.footer-social svg { display: block; }
+.footer-copyright { color: var(--ash); }
+.footer-privacy { color: var(--ash); }
+.footer-privacy:hover { color: var(--brass-light); }
+
+/* ============================================================
+   COPY OVERHAUL — verse, provocation, Who We Are, offerings,
+   serious questions, CTA band, How We Operate, closing
+   ============================================================ */
+
+/* stagger: extend the cascade past 6 and guarantee later children reveal
+   (the base rules only covered nth-child 1–6, leaving longer lists hidden). */
+.stagger.in-view > *:nth-child(7)  { opacity: 1; transform: translateY(0); transition-delay: 1200ms; }
+.stagger.in-view > *:nth-child(8)  { opacity: 1; transform: translateY(0); transition-delay: 1400ms; }
+.stagger.in-view > *:nth-child(9)  { opacity: 1; transform: translateY(0); transition-delay: 1600ms; }
+.stagger.in-view > *:nth-child(10) { opacity: 1; transform: translateY(0); transition-delay: 1800ms; }
+/* Lists longer than 10 (e.g. the 12 offerings in "We're Offering You") need
+   their own delays — without these, items 11+ fall through to the catch-all
+   below with NO delay and pop in before the staggered ones. */
+.stagger.in-view > *:nth-child(11) { opacity: 1; transform: translateY(0); transition-delay: 2000ms; }
+.stagger.in-view > *:nth-child(12) { opacity: 1; transform: translateY(0); transition-delay: 2200ms; }
+.stagger.in-view > *:nth-child(13) { opacity: 1; transform: translateY(0); transition-delay: 2400ms; }
+.stagger.in-view > *:nth-child(14) { opacity: 1; transform: translateY(0); transition-delay: 2600ms; }
+.stagger.in-view > *:nth-child(15) { opacity: 1; transform: translateY(0); transition-delay: 2800ms; }
+.stagger.in-view > *:nth-child(16) { opacity: 1; transform: translateY(0); transition-delay: 3000ms; }
+.stagger.in-view > * { opacity: 1; transform: translateY(0); }
+
+/* Hero — verse line between headline and CTA */
+.hero-verse {
+  margin-top: 1.4rem;
+  /* A brighter, lighter gold than brass-light: gold-on-gold over the warm tan
+     painting was the real problem, so lift the colour AND carve it out with a
+     strong layered dark shadow. */
+  color: #ecd9a0;
+  font-size: clamp(1rem, 1.7vw, 1.18rem);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 2px 10px rgba(0, 0, 0, 0.85),
+    0 0 24px rgba(0, 0, 0, 0.6);
+  animation: fadeIn 1400ms var(--ease-order) 700ms both;
+}
+
+/* The Truth — provocation lines over the burning-city oil. The source is now a
+   warm dark chiaroscuro render, so lift it to read (was darkened hard for the
+   old cooler, brighter masterpiece). */
+.section-truth .section-bg-image {
+  opacity: 0.95;
+  /* push the crop up the image so the toppling statue (top-right) comes fully
+     into view */
+  background-position: center 30%;
+  filter: sepia(0.06) saturate(1.0) contrast(1.0) brightness(0.86);
+}
+
+/* We're Offering You — the knighting oil is now a warm dark render, so give it
+   the standard lift rather than holding it back. */
+.section-become .section-bg-image {
+  filter: sepia(0.1) saturate(1.05) contrast(1.0) brightness(1.22);
+}
+
+/* Closing — the new Creation render is bright (luminous fresco sky), so hold the
+   global lift back so it sits in the band and the verse stays readable. */
+.section-closing .section-bg-image {
+  filter: sepia(0.06) saturate(1.0) contrast(1.02) brightness(0.62);
+}
+
+/* Who Am I — the Noronha sunset seascape. A bright, warm sunburst sits behind
+   the text column, so hold brightness well back and ease saturation a touch so
+   it joins the band instead of reading as the hottest, most golden outlier.
+   The sun's centre is crop-shifted down-right, away from the letter. */
+.section-founder .section-bg-image {
+  filter: sepia(0.05) saturate(0.97) contrast(1.02) brightness(0.7);
+  background-position: center 70%;
+}
+
+/* FAQ — St George is a tall portrait; shift the crop down so the dragon at the
+   foot of the painting comes into view. The bottom fade now uses the shared
+   --edge-fade like every other section, so the seam matches the rest. */
+.section-faq .section-bg-image {
+  background-position: center 82%;
+}
+
+/* Who We Are — round-table image behind the manifesto. Bring the scene
+   right up so the three men and the table actually read, and widen the
+   vignette so the outer two aren't swallowed by the edge fade. The dark
+   plate below still sits between the picture and the text column (eyebrow,
+   heading, divider, prose), so the words stay legible even brightened. */
+.section-code .section-bg-image {
+  opacity: 0.96;
+  filter: sepia(0.08) saturate(1.0) brightness(1.3) contrast(0.98);
+}
+.section-code .code-bg { opacity: 0.2; }
+.section-code .code-inner {
+  padding: clamp(2rem, 5vw, 3.4rem) clamp(1.5rem, 4vw, 2.6rem);
+}
+.section-code .code-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 128% 112% at 50% 50%,
+    rgba(10, 9, 8, 0.78) 0%,
+    rgba(10, 9, 8, 0.66) 60%,
+    rgba(10, 9, 8, 0) 100%);
+}
+.section-code .section-heading { text-shadow: 0 2px 14px rgba(0, 0, 0, 0.82), 0 1px 0 rgba(0, 0, 0, 0.7); }
+.section-code .values-intro p { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.85); }
+
+/* How We Operate — the fighter at the pillar sits high in the frame; bias the
+   crop toward the top so his head stays in view (this image moved here from
+   "We're Offering You", which now carries the cavalry charge). */
+.section-how .section-bg-image { background-position: center 12%; }
+.truth-provocation {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1rem, 2.4vh, 1.85rem);
+  text-align: center;
+  margin: 0.4rem auto 0;
+  max-width: 1000px;
+}
+/* Feathered translucent plate so the provocation reads cleanly over the busy,
+   firelit city behind it (no hard box edge). */
+.truth-provocation::before {
+  content: '';
+  position: absolute;
+  inset: clamp(-3.5rem, -6vh, -2.5rem) clamp(-2rem, -6vw, -4.5rem);
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 100% 116% at 50% 50%,
+    rgba(8, 7, 6, 0.37) 0%,
+    rgba(8, 7, 6, 0.26) 55%,
+    rgba(8, 7, 6, 0) 100%);
+}
+.truth-line {
+  /* the connective words ("And", "Are you…") sit quieter; the adjective + its
+     question mark are emphasised via <strong> below */
+  font-size: clamp(1.3rem, 2.5vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  color: var(--parchment-mute);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.92), 0 1px 0 rgba(0, 0, 0, 0.95);
+  white-space: nowrap;
+}
+.truth-line strong {
+  font-weight: 700;
+  font-size: 1.32em;
+  color: #f4e9cd;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(0, 0, 0, 0.95);
+}
+.truth-gap { display: block; height: clamp(1.1rem, 2.4vh, 2rem); }
+@media (max-width: 680px) {
+  .truth-line { white-space: normal; font-size: clamp(1.4rem, 6vw, 1.9rem); }
+}
+
+/* The Principles — its own section. Give it a full viewport-height band so the
+   painting behind it isn't cropped to a thin strip; the base .section already
+   centres content vertically (justify-content: center), so the words sit dead
+   centre over the full image. */
+.section-principles {
+  background: var(--bg-deep);
+  min-height: 100vh;
+  padding: clamp(2.2rem, 5vw, 3.6rem) 0;
+}
+/* The Principles — render the label as a heading, not a caption (both designs).
+   White (parchment) instead of brass so the "III" numeral and "The Principles"
+   heading read easily on the bright library oil, while still matching the site's
+   warm off-white body text. */
+.section-principles .eyebrow { font-size: clamp(1rem, 2.2vw, 1.5rem); letter-spacing: 0.4em; color: var(--parchment); }
+.section-principles .eyebrow--numeral { font-size: 0.72rem; letter-spacing: 0.18em; }
+/* Narrow screens: tighten the label and its flanking rules so "THE PRINCIPLES"
+   stays on a single line instead of wrapping. */
+@media (max-width: 560px) {
+  .section-principles .eyebrow:not(.eyebrow--numeral) {
+    font-size: clamp(0.85rem, 4vw, 1.15rem);
+    letter-spacing: 0.16em;
+    white-space: nowrap;
+  }
+  .section-principles .eyebrow:not(.eyebrow--numeral) .brass-rule {
+    width: 20px;
+    margin: 0 0.4rem;
+  }
+}
+
+/* Who We Are — intro prose + the Principles wall */
+.values-intro { max-width: var(--reading-w); margin: 0 auto; }
+.values-intro p {
+  font-size: clamp(1.2rem, 1.55vw, 1.42rem);
+  line-height: 1.75;
+  color: var(--parchment-mute);
+  text-align: center;
+}
+.values-intro p + p { margin-top: 1.2rem; }
+.values-label { margin-top: 3rem; text-align: center; letter-spacing: 0.4em; }
+/* Flexbox (not grid) so the last partial row centres itself for symmetry,
+   and fixed 4-up columns wide enough that no word is ever clipped. */
+.values-wall {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem auto 0;
+  max-width: 1140px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.value-word {
+  flex: 0 0 20%;
+  max-width: 20%;
+  text-align: center;
+  padding: 0.5rem 0.5rem;
+  font-size: clamp(0.95rem, 1.45vw, 1.15rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+/* White (parchment) principle words — brighter and easier to read on the bright
+   library ground than the brass gradient, while still matching the site's warm
+   off-white body text. Override the .engraved gradient's transparent text-fill,
+   and carry a strong drop shadow so the light words stay legible over the oil. */
+.section-principles .value-word.engraved {
+  background: none;
+  -webkit-text-fill-color: var(--parchment);
+  color: var(--parchment);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92), 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+@media (max-width: 760px) {
+  .value-word { flex-basis: 33.333%; max-width: 33.333%; }
+}
+@media (max-width: 480px) {
+  .value-word { flex-basis: 50%; max-width: 50%; }
+}
+
+/* We're Offering You — engraved word list */
+.offerings-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 760px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.4rem 2rem;
+  text-align: center;
+}
+.offering {
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+  letter-spacing: 0.06em;
+  color: var(--parchment);
+  line-height: 1.2;
+}
+/* "become" is a split section (design.js), so this list lives in a ~600px well.
+   A single long word — "connectivity", "Prosperity" — was wider than its grid
+   column at the sizes above and punched out past the section edge, where it was
+   clipped rather than wrapped. Grid columns do not shrink below their longest
+   word unless told to, so this is a correctness rule, not a nicety. */
+.offering { overflow-wrap: break-word; min-width: 0; }
+
+/* ---- Term + description form ------------------------------------------------
+   Used when the offerings carry explanations. Two type sizes are set as custom
+   properties so the whole block scales from one CMS choice, and the tiers stay
+   fluid within themselves rather than jumping at a breakpoint. */
+.offerings-grid--defined {
+  grid-template-columns: 1fr;
+  gap: 0.95rem;
+  text-align: left;
+  max-width: 40rem;
+  --offering-term: clamp(1.12rem, 2vw, 1.4rem);
+  --offering-desc: clamp(0.95rem, 1.45vw, 1.04rem);
+}
+.offerings-grid--defined[data-size="small"] {
+  --offering-term: clamp(1rem, 1.7vw, 1.18rem);
+  --offering-desc: clamp(0.86rem, 1.25vw, 0.94rem);
+}
+.offerings-grid--defined[data-size="large"] {
+  --offering-term: clamp(1.3rem, 2.5vw, 1.75rem);
+  --offering-desc: clamp(1.04rem, 1.7vw, 1.18rem);
+}
+/* Two columns only where there is genuinely room. The split well is too narrow
+   for it below this width, so the choice is ignored rather than honoured into
+   an unreadable layout. */
+@media (min-width: 1250px) {
+  .offerings-grid--defined[data-columns="2"] {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 2.4rem;
+    max-width: 100%;
+  }
+}
+.offerings-grid--defined .offering {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  /* Cancel the label-list clamp; the two spans carry their own sizes. */
+  font-size: inherit;
+  letter-spacing: normal;
+  line-height: 1.3;
+}
+.offerings-grid--defined .offering-term {
+  font-size: var(--offering-term);
+  letter-spacing: 0.06em;
+  color: var(--brass-light);
+  line-height: 1.25;
+}
+.offerings-grid--defined .offering-desc {
+  font-family: var(--font-body);
+  font-size: var(--offering-desc);
+  letter-spacing: 0.01em;
+  line-height: 1.45;
+  color: var(--parchment);
+  /* The description is support, not a second heading — hold it back from the
+     brass term without dropping it below comfortable reading contrast. */
+  opacity: 0.88;
+  text-transform: none;
+}
+.offering-closing {
+  margin-top: 2rem;
+  text-align: center;
+  color: var(--brass-light);
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+@media (max-width: 600px) {
+  .offerings-grid { grid-template-columns: 1fr; gap: 1rem; }
+}
+
+/* Questions a Serious Man Asks — reflective list */
+.serious-questions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.serious-question {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--iron);
+}
+.serious-question:first-child { border-top: 1px solid var(--iron); }
+.sq-num { font-size: 0.82rem; letter-spacing: 0.25em; }
+.sq-text {
+  font-size: clamp(1rem, 1.7vw, 1.22rem);
+  line-height: 1.35;
+  letter-spacing: 0.03em;
+  color: var(--parchment);
+}
+@media (max-width: 600px) {
+  .serious-question { grid-template-columns: 1fr; gap: 0.5rem; }
+}
+
+/* "Come this way" — inline button at the foot of a content section,
+   sitting over whatever background that section already has. */
+.cta-inline {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2.2rem, 4.5vw, 3.5rem);
+  position: relative;
+  z-index: 2;
+}
+
+/* How We Operate & What to Expect */
+.section-how { background: var(--bg-deep); }
+.how-body { display: flex; flex-direction: column; gap: 0.9rem; }
+.how-para-wrap { display: flex; flex-direction: column; gap: 0.9rem; }
+.how-para {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--parchment-mute);
+  text-align: center;
+}
+.how-pullquote {
+  margin: 0.3rem 0;
+  text-align: center;
+  color: var(--brass-light);
+  font-size: clamp(1.3rem, 2.8vw, 1.9rem);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+/* Bolded phrase opening a paragraph ("AND YOU START HERE:") — promoted to its
+   own line at pull-quote size, held snug to the paragraph it introduces. */
+.how-leadin-group { display: flex; flex-direction: column; gap: 0.55rem; }
+.how-leadin { margin: 0.2rem 0 0; }
+
+/* Closing — sigil + wordmark + verses + CTA */
+.section-closing {
+  background: linear-gradient(180deg, var(--bg-deep) 0%, #0d0a09 50%, var(--bg-deep) 100%);
+  text-align: center;
+}
+.closing-inner { display: flex; flex-direction: column; align-items: center; }
+.closing-head { display: flex; flex-direction: column; align-items: center; }
+/* painted logo mark — replaces the vector sigil in header / closing / footer */
+.logo-mark { display: block; width: auto; }
+.header-logo { height: 38px; }
+.footer-logo { height: 32px; }
+.closing-sigil { height: clamp(170px, 26vw, 280px); width: auto; opacity: 0.94; }
+.closing-wordmark {
+  margin-top: 1.4rem;
+  font-size: clamp(2rem, 6vw, 3.6rem);
+  letter-spacing: 0.18em;
+  text-shadow:
+    0 -1px 0 rgba(196, 164, 95, 0.22),
+    0 2px 3px rgba(0, 0, 0, 0.65),
+    0 6px 26px rgba(0, 0, 0, 0.78);
+}
+.closing-verses {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  max-width: 42ch;
+  margin: 0 auto;
+}
+.closing-verse { margin: 0; }
+.closing-verse-text {
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+  color: var(--parchment);
+  font-style: italic;
+}
+.closing-ref {
+  display: block;
+  margin-top: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-style: normal;
+}
+.closing-cta { margin-top: 3.5rem; }
+
+/* ============================================================
+   LEGIBILITY OVER FULL-BLEED IMAGERY
+   Headings and prose that sit on top of a section-bg-image need a
+   protective shadow so light type never dissolves into a bright
+   patch of the picture — the founder's sunlit valley, the offering
+   floor, the table's candlelight. Mirrors the shadow the manifesto
+   already carries (.section-code .values-intro p).
+   ============================================================ */
+
+.section-become .section-heading,
+.section-founder .section-heading,
+.section-application .section-heading {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.82), 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* "I hope that you join us." — brass over the warm training floor;
+   the lightest pairing on the page, so give it the most help. */
+.section-become .offering-closing {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.88);
+}
+
+/* The accolade painting: the queen stands at ~35% across the canvas, the
+   kneeling knight at ~55%. Two things buried him: centered cropping put the
+   queen mid-frame with dead space to her left, and the left-panel mask fades
+   exactly where he kneels. So (1) bias the crop window hard toward his side
+   of the canvas — the queen's sword arm stays at the edge of frame — and
+   (2) hold the mask solid further across so he is lit, not dissolved.
+   Desktop-only: the phone layout drops the horizontal fade on purpose. */
+.section-become .section-side-image {
+  background-position: 78% 50%;
+}
+@media (min-width: 901px) {
+  .section-become .section-side-image-left {
+    -webkit-mask-image:
+      linear-gradient(to right, black 48%, rgba(0, 0, 0, 0.4) 84%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+    mask-image:
+      linear-gradient(to right, black 48%, rgba(0, 0, 0, 0.4) 84%, transparent 100%),
+      linear-gradient(to bottom, transparent 0, black var(--edge-fade), black calc(100% - var(--edge-fade)), transparent 100%);
+  }
+}
+
+/* The offerings list has the same problem, and worse below 901px where the
+   split collapses and the painting runs full-bleed behind the text: the
+   brightest part of the picture — the gold dress — lands under the middle of
+   the list, washing the brass terms out. Same remedy as the closing line, so
+   the painting stays visible instead of being covered by a plate. */
+.section-become .offering-term,
+.section-become .offering-desc {
+  text-shadow: 0 1px 10px rgba(8, 7, 6, 0.9), 0 1px 3px rgba(8, 7, 6, 0.85);
+}
+
+/* Founder — the letter is laid over the brightest region of the window
+   image (the sunburst valley sits directly behind the text column).
+   A soft local scrim dims that patch, and a shadow keeps the italic
+   prose crisp, without boxing the text or hiding the picture. */
+.section-founder .founder-text { position: relative; z-index: 1; }
+.section-founder .founder-text::before {
+  content: '';
+  position: absolute;
+  inset: -1.8rem -2.2rem;
+  background: radial-gradient(ellipse at center,
+    rgba(8, 7, 6, 0.86) 0%,
+    rgba(8, 7, 6, 0.6) 52%,
+    rgba(8, 7, 6, 0) 88%);
+  z-index: -1;
+  pointer-events: none;
+}
+.section-founder .founder-p,
+.section-founder .founder-signature {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* Newly-painted text segments — a feathered plate behind the words
+   (no hard box, so the gallery wall stays continuous) plus relief
+   shadows. Sections built on opaque cards (Testimonials, Application)
+   need only their heading/eyebrow lifted. */
+.section-become .shell::before,
+.section-evidence .shell::before,
+.section-principles .shell::before,
+.section-faq .shell-narrow::before,
+.section-how .shell-narrow::before,
+.section-closing .shell-narrow::before {
+  content: '';
+  position: absolute;
+  inset: -1.6rem -1.2rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center,
+    rgba(8, 7, 6, 0.78) 0%,
+    rgba(8, 7, 6, 0.6) 55%,
+    rgba(8, 7, 6, 0) 100%);
+}
+
+.section-principles .value-word,
+.section-faq .sq-text,
+.section-faq .sq-num,
+.section-how .how-para,
+.section-closing .closing-verse-text,
+.section-closing .closing-ref,
+.section-become .offering,
+.section-become .offering-closing {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
+}
+
+/* Mark 12:30 / 12:31 citations — plain black, no glow, but at the same prominence
+   as the white version had: matched size + a heavier 700 weight so the black reads
+   just as bold without a halo carrying it. */
+.section-closing .closing-ref {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #0a0806;
+  text-shadow: none;
+}
+
+.section-evidence .section-heading,
+.section-evidence .evidence-intro,
+.section-faq .section-heading,
+.section-how .section-heading,
+.section-principles .eyebrow,
+.section-evidence .eyebrow,
+.section-faq .eyebrow,
+.section-how .eyebrow {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* The Principles — the library oil is far brighter than the rest of the set, so
+   don't pile the global brightness-lift onto it (it's already bright). Brightness
+   eased back so the gold words win the contrast.
+   The hall's vanishing archway sits a touch right of the image's true centre, so
+   pan it left to sit under the middle column. Do this by widening the layer
+   HORIZONTALLY ONLY (left/right negative) plus a horizontal translate — never
+   scale(): a scale stretches the layer vertically too, lifting its top edge-fade
+   up off the section so overflow:hidden clips it into a hard seam line above.
+   Width + a horizontal translate leave the top & bottom seam fade flush. */
+.section-principles .section-bg-image {
+  left: -5%;
+  right: -5%;
+  transform: translateX(-2.6%);
+  transform-origin: center;
+  filter: sepia(0.08) saturate(1.04) contrast(1.01) brightness(1.18);
+}
+/* Feather the plate edge: a gradual multi-stop fall-off (not a 2-stop ramp) and
+   a slightly larger inset push the fade-out past the words, so the plate melts
+   into the library with no perceptible boundary — same core darkness as before. */
+.section-principles .shell::before {
+  inset: -2.2rem -1.8rem;
+  background: radial-gradient(ellipse at center,
+    rgba(6, 5, 4, 0.86) 0%,
+    rgba(6, 5, 4, 0.68) 46%,
+    rgba(6, 5, 4, 0.36) 70%,
+    rgba(6, 5, 4, 0.12) 87%,
+    rgba(6, 5, 4, 0) 100%);
+}
+
+/* ============================================================
+   ADMIN — /admin route
+   ============================================================ */
+
+.admin-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-deep);
+}
+
+/* Login */
+
+.admin-login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(166, 136, 74, 0.08), transparent 60%),
+    var(--bg-deep);
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.admin-login-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+}
+
+.admin-login-title {
+  text-align: center;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  margin: 0;
+}
+
+.admin-login-field { width: 100%; }
+.admin-login-error { text-align: center; }
+.admin-login-submit { width: 100%; justify-content: center; margin-top: 0.5rem; }
+
+/* Editor shell */
+
+.admin-shell {
+  min-height: 100vh;
+  background: var(--bg-deep);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: rgba(10, 9, 8, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--iron);
+}
+
+.admin-topbar-left,
+.admin-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-brand {
+  font-size: 0.95rem;
+  letter-spacing: 0.28em;
+  color: var(--parchment);
+  text-transform: uppercase;
+}
+
+.admin-save-status {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.admin-save-saving { color: var(--brass-light); }
+.admin-save-saved { color: var(--brass); }
+.admin-save-error { color: var(--cordovan-light); }
+
+.admin-save-btn { padding: 0.7rem 1.4rem; }
+.admin-logout { padding: 0.7rem 1.2rem; }
+
+/* Tabs */
+
+.admin-tabs {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.8rem 1.5rem 0;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--iron);
+}
+
+.admin-tab {
+  padding: 0.85rem 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ash);
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  cursor: pointer;
+  transition: color 240ms var(--ease-order), background 240ms var(--ease-order);
+}
+.admin-tab:hover { color: var(--parchment); }
+.admin-tab.active {
+  color: var(--brass-light);
+  background: var(--bg-surface);
+  border-color: var(--iron);
+  position: relative;
+  top: 1px;
+}
+
+/* Tab body */
+
+.admin-tab-body {
+  padding: 2rem 1.5rem 7rem;
+  max-width: 920px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.admin-tab-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.admin-tab-intro {
+  color: var(--ash);
+  font-style: italic;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.admin-section-block {
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  padding: 1.6rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  /* jump-nav targets land below the sticky topbar, not under it */
+  scroll-margin-top: 90px;
+}
+
+/* "Jump to" chip row at the top of the Sections tab */
+.admin-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.admin-jump-chip {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash);
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--iron);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition: color 180ms var(--ease-order), border-color 180ms var(--ease-order);
+}
+.admin-jump-chip:hover {
+  color: var(--brass-light);
+  border-color: var(--brass-deep);
+}
+
+/* Page selector — Main Site vs each variant landing page (Sections tab) */
+.admin-page-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--iron);
+}
+.admin-page-selector-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ash);
+  margin-right: 0.35rem;
+}
+.admin-page-chip.active {
+  color: var(--parchment, var(--brass-light));
+  border-color: var(--brass-deep);
+  background: rgba(255, 255, 255, 0.04);
+}
+.admin-page-add {
+  border-style: dashed;
+}
+/* Delete-page control on a variant page: an outlined button that arms an
+   inline confirm strip (Yes, Delete Page / Cancel) instead of a browser popup */
+.admin-delete-zone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1.2rem;
+}
+.admin-delete-question {
+  font-size: 0.82rem;
+  color: var(--parchment, #e8e0d0);
+}
+.admin-btn-danger-outline {
+  color: #c96a5a;
+  border: 1px solid rgba(201, 106, 90, 0.55);
+  background: transparent;
+}
+.admin-btn-danger-outline:hover:not(:disabled) {
+  border-color: #c96a5a;
+  background: rgba(201, 106, 90, 0.08);
+}
+.admin-btn-danger-outline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.admin-btn-danger {
+  color: #f2e6e2;
+  border: 1px solid #a84a3b;
+  background: #a84a3b;
+}
+.admin-btn-danger:hover {
+  background: #c05a49;
+  border-color: #c05a49;
+}
+/* Full-screen lock while a page deletion is in flight — nothing may be
+   edited between the request and the content re-seed. */
+.admin-busy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+/* Labelled rule sub-grouping fields inside a long block (testimonial cards) */
+.admin-fields-divider {
+  margin: 0.8rem 0 0;
+  padding-bottom: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-light);
+  border-bottom: 1px solid var(--iron);
+}
+
+.admin-section-title {
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+  color: var(--brass-light);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ── Email Signature tab ─────────────────────────────────────────────────── */
+
+/* White "email body" frame so the signature previews on its real background. */
+.sig-email-frame {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 26px 24px;
+  overflow-x: auto;
+}
+
+.sig-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sig-version-desc { margin: -0.5rem 0 0.9rem; }
+.sig-version-copy { margin-top: 0.9rem; }
+
+.sig-status {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+.sig-status-ok { color: var(--brass-light); }
+.sig-status-fail { color: var(--cordovan-light); }
+
+.sig-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.sig-tab {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--iron);
+  background: transparent;
+  color: var(--ash);
+  cursor: pointer;
+}
+.sig-tab.active {
+  background: var(--bg-leather);
+  border-color: var(--brass-deep);
+  color: var(--parchment);
+}
+
+.sig-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--parchment-mute);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.sig-steps li { margin-bottom: 0.4rem; }
+.sig-steps b { color: var(--parchment); }
+
+.admin-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-video-pill-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+  padding: 1rem;
+  border: 1px solid var(--iron);
+  background: linear-gradient(135deg, rgba(8, 7, 6, 0.92), rgba(28, 23, 17, 0.82));
+}
+.admin-video-pill-preview .admin-field-hint { margin: 0; }
+
+.admin-field-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+
+.admin-textarea {
+  font-family: var(--font-body);
+  resize: vertical;
+  min-height: 80px;
+}
+
+.admin-select {
+  /* `appearance: none` drops the platform arrow along with the platform
+     styling, so draw one back in — without it the control reads as a plain
+     text box and nobody discovers it opens. */
+  appearance: none;
+  padding-right: 2.6rem;
+  background-image: linear-gradient(45deg, transparent 50%, var(--brass) 50%),
+                    linear-gradient(135deg, var(--brass) 50%, transparent 50%);
+  background-position: calc(100% - 1.25rem) 55%, calc(100% - 0.85rem) 55%;
+  background-size: 0.4rem 0.4rem, 0.4rem 0.4rem;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+/* The dropdown list itself is drawn by the OS and does not inherit the dark
+   field, so state its colours explicitly or Windows renders black on black. */
+.admin-select option {
+  background: var(--bg-surface);
+  color: var(--parchment);
+}
+
+/* Options */
+
+.admin-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.admin-options-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 0.5rem;
+}
+
+.admin-options-hint {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: var(--ash);
+}
+
+.admin-option-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.6rem;
+}
+
+/* With per-option controls (move / remove) a third, fixed column appears. */
+.admin-option-row-managed {
+  grid-template-columns: 2fr 1fr auto;
+  align-items: center;
+}
+
+.admin-option-value {
+  color: var(--ash);
+  background: rgba(10, 9, 8, 0.5);
+  cursor: not-allowed;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.admin-value-unlocked {
+  color: var(--parchment);
+  cursor: text;
+  border-color: var(--brass-deep);
+}
+
+/* Question / option management controls */
+
+.admin-q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-q-toolbar {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.admin-mini-btn {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ash);
+  background: transparent;
+  border: 1px solid var(--iron);
+  cursor: pointer;
+}
+.admin-mini-btn:hover:not(:disabled) {
+  color: var(--parchment);
+  border-color: var(--brass-deep);
+}
+.admin-mini-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.admin-mini-danger:hover:not(:disabled) {
+  color: #c0392b;
+  border-color: #c0392b;
+}
+
+.admin-add-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-light);
+  background: transparent;
+  border: 1px dashed var(--brass-deep);
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+}
+.admin-add-btn:hover {
+  color: var(--parchment);
+  border-style: solid;
+}
+
+.admin-add-hint {
+  margin-left: 0.8rem;
+}
+
+.admin-q-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: flex-start;
+}
+
+.admin-unlock {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  color: var(--ash);
+  letter-spacing: 0.04em;
+  max-width: 56ch;
+  cursor: pointer;
+}
+.admin-unlock input {
+  margin-top: 0.25rem;
+  accent-color: var(--brass-deep);
+}
+.admin-unlock strong {
+  color: var(--brass-light);
+}
+
+/* Image rows */
+
+.admin-image-row {
+  display: grid;
+  grid-template-columns: 160px 1fr auto;
+  gap: 1.4rem;
+  align-items: center;
+  padding: 1.2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+}
+
+.admin-image-thumb {
+  width: 160px;
+  height: 90px;
+  background: var(--bg-leather);
+  border: 1px solid var(--iron);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.admin-image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.admin-image-thumb-logo {
+  background: var(--bg-deep);
+}
+.admin-image-empty {
+  color: var(--ash);
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+}
+
+.admin-image-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.admin-image-label {
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--parchment);
+}
+
+.admin-image-src {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ash);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-image-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Floating save bar */
+
+.admin-floating-save {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.6rem;
+  background: var(--bg-leather);
+  border: 1px solid var(--brass-deep);
+  box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.8);
+  z-index: 40;
+}
+
+.admin-floating-save .restraint {
+  color: var(--brass-light);
+}
+
+/* Field hint — small caption under input/textarea */
+
+.admin-field-hint {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  color: var(--ash);
+  text-transform: uppercase;
+  margin-top: 0.1rem;
+}
+
+/* Italic input/textarea — visually flags fields the public site renders italic
+   (truth.turn, founder.paragraphs, finalScreen.begin, footer.restraint,
+   application question subtitle). Keeps editor-view in sync with site-view. */
+
+.admin-input-italic { font-style: italic; }
+
+/* Markdown field — toolbar + preview */
+
+.admin-field-md {
+  /* same flex column as admin-field; layered with toolbar */
+}
+
+.md-toolbar {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.35rem 0.4rem;
+  background: rgba(10, 9, 8, 0.4);
+  border: 1px solid var(--iron);
+  border-bottom: none;
+}
+
+.md-toolbtn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--ash);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  transition: color 180ms var(--ease-order), background 180ms var(--ease-order);
+}
+.md-toolbtn:hover { color: var(--brass-light); background: rgba(166, 136, 74, 0.08); }
+.md-toolbtn.active,
+.md-toggle.active {
+  color: var(--brass);
+  border-color: var(--brass-deep);
+}
+.md-toggle { margin-left: auto; }
+
+.md-preview {
+  border: 1px solid var(--iron);
+  padding: 1.4rem 1.6rem;
+  background: var(--bg-deep);
+  min-height: 80px;
+  color: var(--parchment);
+  position: relative;
+}
+.md-preview-inner > p { margin: 0 0 0.9em; }
+.md-preview-inner > p:last-child { margin-bottom: 0; }
+.md-preview a { color: var(--brass-light); text-decoration: underline; }
+.md-preview strong { color: var(--parchment); }
+.md-preview em { color: var(--parchment); }
+
+/* Tiny "this is a preview" tag so the editor never lies about what it is */
+.md-preview::before {
+  content: 'PREVIEW';
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  color: var(--ash);
+  opacity: 0.6;
+}
+
+/* Section-flavored backgrounds for the preview wrap so it FEELS like the section
+   it'll render in. Subtle radial tints — same colour palette the real sections use. */
+.md-preview.section-truth-preview {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(166, 136, 74, 0.06), transparent 60%),
+    var(--bg-deep);
+}
+.md-preview.section-founder-preview {
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(95, 30, 28, 0.10), transparent 65%),
+    var(--bg-leather);
+}
+.md-preview.section-faq-preview {
+  background: var(--bg-surface);
+}
+
+/* Truth paragraphs are centered on the live site — wider min-height so preview
+   doesn't collapse weirdly when content is short. */
+.md-preview.section-truth-preview { min-height: 120px; }
+.md-preview.section-truth-preview .md-preview-inner { text-align: center; }
+
+/* Restore banner — appears below topbar on first load if a draft was found */
+
+.admin-restore-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+  background: rgba(166, 136, 74, 0.12);
+  border-bottom: 1px solid var(--brass-deep);
+  color: var(--parchment);
+  font-size: 0.88rem;
+}
+.admin-restore-banner strong { color: var(--brass-light); }
+.admin-restore-actions { display: flex; gap: 0.6rem; }
+
+/* Session-expiry banner — fixed top stripe, above topbar */
+
+.admin-expiry-banner {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  padding: 0.7rem 1.5rem;
+  background: var(--cordovan, #6f1d1b);
+  color: var(--parchment);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* Deploy status badge in topbar */
+
+.admin-deploy-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--iron);
+  background: rgba(10, 9, 8, 0.6);
+}
+.admin-deploy-ready    { color: var(--brass); border-color: var(--brass-deep); }
+.admin-deploy-building { color: var(--brass-light); }
+.admin-deploy-error    { color: var(--cordovan-light); border-color: var(--cordovan, #6f1d1b); }
+
+/* Image library — grid + cards */
+
+.library-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.2rem;
+}
+
+.library-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.library-card.is-used { border-color: var(--brass-deep); }
+
+.library-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--bg-leather);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  display: block;
+}
+.library-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 280ms var(--ease-order);
+}
+.library-thumb:hover img { transform: scale(1.03); }
+
+.library-meta {
+  padding: 0.7rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.library-meta-line {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--ash);
+}
+.library-used { color: var(--brass-light); }
+.library-unused { color: var(--ash); }
+.library-copied { color: var(--brass); }
+.library-delete { padding: 0.4rem 0.7rem; font-size: 0.7rem; }
+
+/* Library groups — the shared library is shown in named groups (website /
+   presentation paintings / photos / uploads) in the tab and in pickers. */
+.library-actions { display: flex; gap: 0.6rem; flex-shrink: 0; align-items: center; }
+.library-group { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.6rem; }
+.library-group:first-of-type { margin-top: 0; }
+.library-group-title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ash);
+  border-bottom: 1px solid var(--iron);
+  padding-bottom: 0.4rem;
+}
+.library-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--parchment-mute);
+}
+
+/* Picker modal items: thumb + caption */
+.library-pick-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--iron);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 180ms var(--ease-order);
+}
+.library-pick-item:hover { border-color: var(--brass); }
+.library-pick-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  color: var(--ash);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Library modal — picker invoked from an image slot */
+
+.library-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.library-modal {
+  width: min(900px, 100%);
+  max-height: 86vh;
+  background: var(--bg-deep);
+  border: 1px solid var(--brass-deep);
+  padding: 1.4rem 1.6rem;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.library-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.library-grid-modal { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+/* ── Testimonials tab ────────────────────────────────────────────────────── */
+
+/* Clip / written-quote switch on each card */
+.tm-type { display: flex; gap: 0; }
+.tm-type-btn {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ash);
+  background: transparent;
+  border: 1px solid var(--iron);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: color 180ms var(--ease-order), border-color 180ms var(--ease-order);
+}
+.tm-type-btn + .tm-type-btn { border-left: none; }
+.tm-type-btn:hover { color: var(--parchment); }
+.tm-type-btn.is-active {
+  color: var(--brass-light);
+  border-color: var(--brass-deep);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Preview beside the fields; stacks under 900px (see the mobile block). */
+.tm-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.4rem;
+  align-items: start;
+}
+
+.tm-preview {
+  background: var(--bg-leather);
+  border: 1px solid var(--iron);
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+/* contain, not cover: clips arrive portrait AND landscape */
+.tm-preview video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+
+.tm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+.tm-actions .btn { padding: 0.55rem 0.9rem; font-size: 0.7rem; }
+
+.tm-poster-thumb {
+  width: 84px;
+  height: 56px;
+  flex: 0 0 auto;
+  background: var(--bg-leather);
+  border: 1px solid var(--iron);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.tm-poster-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.admin-image-src-input {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.tm-progress {
+  height: 3px;
+  background: var(--iron);
+  overflow: hidden;
+}
+.tm-progress span {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+  transition: width 200ms linear;
+}
+
+.tm-note { color: var(--brass-light); }
+.tm-warn { color: #c86; }
+
+/* Clip picker tiles */
+.tm-pick-thumb {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: #000;
+  display: block;
+  overflow: hidden;
+}
+.tm-pick-thumb video { width: 100%; height: 100%; object-fit: cover; }
+.tm-pick-upload { display: flex; flex-direction: column; gap: 0.35rem; }
+.tm-pick-upload .library-meta-line { padding: 0 0.2rem; align-items: center; }
+
+/* Mobile */
+
+@media (max-width: 720px) {
+  .admin-topbar {
+    flex-wrap: wrap;
+    padding: 0.8rem 1rem;
+    gap: 0.6rem;
+  }
+  .admin-topbar-left,
+  .admin-topbar-right {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .admin-brand { font-size: 0.78rem; letter-spacing: 0.2em; }
+  .admin-tabs {
+    padding: 0.6rem 1rem 0;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-tab {
+    flex: 0 0 auto;
+    padding: 0.7rem 1rem;
+    font-size: 0.68rem;
+  }
+  .admin-tab-body { padding: 1.3rem 1rem 7rem; }
+  .admin-section-block { padding: 1.1rem 1.1rem; }
+  .admin-image-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .admin-image-thumb { width: 100%; height: 140px; }
+  .admin-image-actions { flex-direction: row; flex-wrap: wrap; }
+  .admin-option-row { grid-template-columns: 1fr; }
+  .admin-option-row-managed { grid-template-columns: 1fr auto; }
+  .admin-floating-save {
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    padding: 0.8rem 1rem;
+  }
+  .admin-restore-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 0.8rem 1rem;
+  }
+  .admin-restore-actions { justify-content: center; }
+  .library-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.8rem; }
+  .library-modal { padding: 1rem; }
+  .tm-body { grid-template-columns: 1fr; }
+  .tm-preview { aspect-ratio: 4 / 3; }
+  .md-toolbar { flex-wrap: wrap; }
+  .admin-save-btn { padding: 0.6rem 1rem; }
+  .admin-logout   { padding: 0.6rem 0.9rem; }
+}
+
+/* ============================================================
+   DESIGN v2 — SPLIT-ALIGNED LAYOUT  (served at /2 or ?v=2)
+   Five sections pull the painting to one side (faded at its inner
+   edge) and move the text into the opposite half, to calm the page.
+   Reuses the .section-side-image-left/right system; every rule below
+   only bites when those classes / .design-split render, which happens
+   solely in v2 — so the centred v1 design stays untouched.
+   ============================================================ */
+
+/* --- Grade parity: side images get the same warm oil lift + brightness as the
+   full-bleed paintings (the base .section-side-image carried no grade). --- */
+.section-side-image {
+  filter: sepia(0.08) saturate(1.08) contrast(0.97) brightness(1.36);
+}
+/* mirror the per-painting grades used by the full-bleed versions */
+.section-code .section-side-image {
+  filter: sepia(0.08) saturate(1.0) brightness(1.3) contrast(0.98);
+}
+.section-become .section-side-image {
+  filter: sepia(0.1) saturate(1.05) contrast(1.0) brightness(1.22);
+}
+
+/* --- Per-image crops: keep each painting's focal subject in the outer
+   (un-faded) half of its slot. First-pass values, tunable by eye. --- */
+.section-code .section-side-image-right  { background-position: 70% 42%; }   /* knight + banner, centre-right */
+.section-become .section-side-image-left { background-position: 32% 50%; }   /* white gown + kneeling knight */
+.section-faq .section-side-image-right   { background-position: center 48%; } /* St George, centred portrait */
+.section-how .section-side-image-left    { background-position: 58% 52%; }   /* lead horse's nose + lance, fading into the text */
+
+/* --- Default (and mobile): no plate. On mobile the layout un-splits to a
+   centred column over a faded full-bleed painting, so a plate would just hide
+   the picture. The desktop split adds its plate inside the min-width:901px
+   block below, where text actually overlays one half of the painting. --- */
+.design-split .shell::before,
+.design-split .shell-narrow::before,
+.design-split .code-inner::before {
+  background: none;
+}
+
+/* --- Testimonials (v2-only): keep the individual testimonial cards (the boxes
+   that show where each quote will go), but drop the section's overall
+   translucent plate so the whole block doesn't read as one big box. --- */
+.design-v2 .section-evidence .shell::before { background: none; }
+
+/* ----- Desktop: the actual split. Below 900px the existing side-image rule
+   collapses each image to a soft full-bleed vignette, so we keep v1's stacked,
+   centred reading there (see the max-width:900px reset below). ----- */
+@media (min-width: 901px) {
+  /* Desktop split: NO plate behind the text — it rides directly on the dark
+     ground so the painting's blurred inner edge stays visible right up to the
+     words. (The mobile plate lives in the max-width:900 block below.) The base
+     ::before plates are zeroed for split sections by the .design-split rule
+     above; nothing re-adds them here. */
+
+  /* Text column rides in the half opposite the image, centred within that half.
+     img-right → text left; img-left → text right. */
+  .design-split.img-right > .shell,
+  .design-split.img-right > .shell-narrow {
+    margin-left: clamp(1.5rem, 4vw, 4rem);
+    margin-right: auto;
+    max-width: min(var(--reading-w), 42vw);
+  }
+  .design-split.img-left > .shell,
+  .design-split.img-left > .shell-narrow {
+    margin-right: clamp(1.5rem, 4vw, 4rem);
+    margin-left: auto;
+    max-width: min(var(--reading-w), 42vw);
+  }
+
+  /* ---- Hero, split: horseman pulled right, wordmark + CTA in the left half ---- */
+  .hero--split .hero-film {
+    left: auto;
+    right: 0;
+    width: 56%;
+    -webkit-mask-image: linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%);
+    mask-image: linear-gradient(to left, #000 40%, rgba(0, 0, 0, 0.4) 76%, transparent 100%);
+  }
+  .hero--split .hero-film img {
+    object-position: center 42%; /* keep the rearing horse + rider in frame */
+  }
+  .hero--split .hero-content {
+    left: 0;
+    right: auto;
+    width: 50%;
+    top: 0;
+    /* Reserve the bottom strip for the scroll cue so the centred group (incl.
+       the CTA and its glow) never overlaps it — the content centres in the
+       space ABOVE this line, the cue lives below it. */
+    bottom: clamp(6rem, 12vh, 9rem);
+    justify-content: center;
+    gap: clamp(1rem, 2.4vh, 1.6rem);
+    padding-top: 0;
+    padding-bottom: clamp(0.3rem, 1vh, 0.8rem);
+    padding-left: clamp(1.5rem, 5vw, 5rem);
+    padding-right: 1.5rem;
+  }
+  .hero--split .hero-foot {
+    left: 0;
+    right: auto;
+    width: 50%;
+    /* sit low, inside the strip reserved above, clear of the CTA's glow */
+    bottom: 2rem;
+    /* match hero-content's padding so the scroll cue centres on the same
+       vertical axis as the logo, headline, verse and CTA */
+    padding-left: clamp(1.5rem, 5vw, 5rem);
+    padding-right: 1.5rem;
+  }
+}
+
+/* Short viewports: the big hero logo + headline + verse + CTA need the full
+   height, so drop the decorative scroll cue rather than let it crowd the CTA. */
+@media (min-width: 901px) and (max-height: 720px) {
+  .hero--split .hero-fold-cue { display: none; }
+  .hero--split .hero-headline { font-size: clamp(2.4rem, 6vw, 4.2rem); }
+}
+
+/* ----- Mobile: un-split. Restore v1's centred shells so the page stacks
+   exactly like the default design (the image softens to a full-bleed vignette,
+   and the hero overrides above simply don't apply). ----- */
+@media (max-width: 900px) {
+  .design-split > .shell        { max-width: var(--max-w);     margin: 0 auto; }
+  .design-split > .shell-narrow { max-width: var(--reading-w); margin: 0 auto; }
+
+  /* Moderate feathered plate behind the centred text so the brighter, busier
+     paintings (e.g. How We Operate's papers) stay readable — lighter than the
+     desktop split plate, and it fades to nothing at the edges so the full-bleed
+     painting still shows through above and below the words. */
+  .design-split .shell::before,
+  .design-split .shell-narrow::before,
+  .design-split .code-inner::before {
+    background: radial-gradient(ellipse 116% 116% at 50% 50%,
+      rgba(8, 7, 6, 0.72) 0%,
+      rgba(8, 7, 6, 0.5) 55%,
+      rgba(8, 7, 6, 0) 100%);
+  }
+
+  /* "We're Offering You" full-bleed crop on mobile: shift right off the bright
+     white gown so the kneeling knight is the visible figure, not the woman. */
+  .section-become .section-side-image { background-position: 60% 50%; }
+}
+
+/* ============================================================
+   TEXT PLATES — fully transparent (most sections).
+   Each painted section used to carry a translucent dark plate behind
+   its text (a soft radial scrim). Per request, those read as fully
+   transparent now: the words ride directly on the painting with only
+   their relief text-shadow — no visible box. The ::before pseudo-
+   elements stay (positioning intact) but paint nothing.
+
+   EXCEPTIONS — The Principles and Who Am I (Founder) keep their plates:
+   both lay light text over the brightest paintings (the gold library
+   ceiling, the sunset seascape) and wash out without the scrim, so they
+   are deliberately left OUT of this list. To bring another section's
+   plate back, drop its selector here; to drop one, add it.
+   This sits last so it wins over every earlier plate rule.
+   ============================================================ */
+.truth-provocation::before,
+.section-code .code-inner::before,
+.section-become .shell::before,
+.section-evidence .shell::before,
+.section-faq .shell-narrow::before,
+.section-how .shell-narrow::before,
+.section-closing .shell-narrow::before,
+.design-split .shell::before,
+.design-split .shell-narrow::before,
+.design-split .code-inner::before {
+  background: none;
+}
