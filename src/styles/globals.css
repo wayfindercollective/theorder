@@ -19,14 +19,11 @@
   --brass: #a6884a;
   --brass-light: #c4a45f;
   --brass-deep: #7d6635;
-  --brass-text: #c4a45f;
-  --error-text: #e59a90;
 
   /* text */
   --parchment: #e8e0d0;
   --parchment-mute: #c2b9a6;
   --ash: #7a7468;
-  --text-muted-readable: #a49b8b;
   --steel: #3a3a3a;
   --iron: #4a443c;
 
@@ -906,8 +903,7 @@ button {
 }
 
 .input-field::placeholder {
-  color: var(--text-muted-readable);
-  opacity: 1;
+  color: var(--ash);
   font-style: italic;
 }
 
@@ -1661,7 +1657,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 .qs-error {
   font-family: var(--font-mono);
   font-size: 0.74rem;
-  color: var(--error-text);
+  color: var(--cordovan-light);
   letter-spacing: 0.1em;
 }
 
@@ -1807,7 +1803,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   font-size: clamp(1.25rem, 2.8vw, 1.7rem);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1838,7 +1834,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   max-width: 20ch;
   margin-left: auto;
   margin-right: auto;
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2031,7 +2027,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   letter-spacing: 0.1em;
   line-height: 1.18;
   text-transform: uppercase;
-  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 100%);
+  background: linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 55%, var(--brass-deep) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2532,7 +2528,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   top: 67%;
   bottom: auto;
   margin: 0;
-  padding: 0.35rem 0.9rem;
+  padding: 0 0.9rem;
   /* always sits above the play ring and the video's own controls so the
      name/role stays visible at all times, including while a clip is playing.
      translateZ(0) forces its own compositing layer so iOS Safari paints it
@@ -2545,8 +2541,7 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   font-style: italic;
   font-size: 0.95rem;
   line-height: 1.3;
-  /* Keep names readable even when a playing video cuts to a white frame. */
-  background: rgba(8, 7, 6, 0.78);
+  /* legible over the video without a dark fade on the tile's bottom edge */
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.85);
   /* let clicks pass through to the video controls underneath */
   pointer-events: none;
@@ -3231,13 +3226,15 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
 }
 
-/* Keep the citations in the warm gold palette, legible on the dark painting. */
+/* Mark 12:30 / 12:31 citations — plain black, no glow, but at the same prominence
+   as the white version had: matched size + a heavier 700 weight so the black reads
+   just as bold without a halo carrying it. */
 .section-closing .closing-ref {
   font-size: clamp(1rem, 1.6vw, 1.2rem);
   font-weight: 700;
   letter-spacing: 0.3em;
-  color: var(--brass-text);
-  text-shadow: 0 1px 3px rgba(8, 7, 6, 0.9);
+  color: #0a0806;
+  text-shadow: none;
 }
 
 .section-evidence .section-heading,
@@ -4489,147 +4486,124 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 
 /* ============================================================
-   TEXT CONTRAST — shade the reading area, retaining the paintings.
-   A light, continuously fading veil keeps the artwork visible without
-   a solid-looking panel. Desktop split columns sit on the dark ground; only
-   restore their shading when the painting moves behind them on mobile.
+   TEXT PLATES — fully transparent (most sections).
+   Each painted section used to carry a translucent dark plate behind
+   its text (a soft radial scrim). Per request, those read as fully
+   transparent now: the words ride directly on the painting with only
+   their relief text-shadow — no visible box. The ::before pseudo-
+   elements stay (positioning intact) but paint nothing.
+
+   EXCEPTIONS — The Principles, Who Am I (Founder), How We Operate and the
+   Closing keep their plates: all four lay light text over the brightest or
+   busiest paintings (the gold library ceiling, the sunset seascape, the
+   battle oil, the gold ceiling fresco) and wash out without the scrim, so
+   they are deliberately left OUT of this list. To bring another section's
+   plate back, drop its selector here; to drop one, add it.
+   This sits last so it wins over every earlier plate rule.
    ============================================================ */
 .truth-provocation::before,
-.section-principles .shell::before,
-.section-founder .founder-text::before,
+.section-code .code-inner::before,
+.section-become .shell::before,
+.section-evidence .shell::before,
+.section-faq .shell-narrow::before,
+.design-split .shell::before,
+.design-split .shell-narrow::before,
+.design-split .code-inner::before {
+  background: none;
+}
+
+/* ============================================================
+   READABILITY — How We Operate (VII) and the Closing verses.
+   Nico's note on both: "let's make these texts darker" — darker meaning
+   *more obvious*, not darker ink. Both sections set light copy over the
+   two hardest paintings in the set: the battle oil, whose highlights run
+   straight through the longest body copy on the page, and the gold
+   ceiling fresco, which is bright almost edge to edge. Both had their
+   plates switched off in the block above, so the words dissolved into
+   the brushwork.
+
+   The letters do most of the work here, not the plate. Weight and a
+   tight relief shadow give each glyph its own edge; the plate comes back
+   only far enough to take the glare off the paint behind the words. It
+   is deliberately lighter than the Principles/Founder plates — those
+   sections hide their painting, and the whole point of these two is that
+   the painting still reads. Feathered over many stops, house style, so
+   there is no perceptible boundary.
+
+   Scoped to these two sections; the rest of the gallery is untouched.
+   Sits after the transparent-plate block so it wins, and after the
+   .design-split rules so it holds if either section is ever switched to
+   a split layout.
+   ============================================================ */
+.section-how .shell-narrow::before,
 .section-closing .shell-narrow::before {
-  filter: blur(32px);
-  background: radial-gradient(ellipse at center,
-    rgba(8, 7, 6, 0.7) 0%,
-    rgba(8, 7, 6, 0.56) 65%,
-    transparent 100%);
+  /* `closest-side`, not the default `farthest-corner`. With farthest-corner
+     the ellipse only reaches zero out at the corners, so on a narrow column
+     the left and right edges of the box are still tinted and the plate shows
+     as a rectangle — clearly visible down the side of the text on desktop.
+     closest-side lands the zero stop exactly on all four edge midpoints, so
+     the plate fades out inside its own box and leaves no seam. */
+  inset: -2.6rem -3rem;
+  background: radial-gradient(ellipse closest-side at center,
+    rgba(6, 5, 4, 0.68) 0%,
+    rgba(6, 5, 4, 0.56) 42%,
+    rgba(6, 5, 4, 0.34) 66%,
+    rgba(6, 5, 4, 0.12) 85%,
+    rgba(6, 5, 4, 0) 100%);
+}
+/* The fresco is the brightest painting on the page and the verses sit right on
+   its hottest gold, so its plate carries a little more than VII's. */
+.section-closing .shell-narrow::before {
+  background: radial-gradient(ellipse closest-side at center,
+    rgba(6, 5, 4, 0.74) 0%,
+    rgba(6, 5, 4, 0.62) 42%,
+    rgba(6, 5, 4, 0.38) 66%,
+    rgba(6, 5, 4, 0.13) 85%,
+    rgba(6, 5, 4, 0) 100%);
 }
 
-/* Let the letters carry contrast instead of covering the painting. */
-.section-founder .founder-p,
-.section-truth .truth-line,
+/* Body copy: off the muted tone, onto full parchment with real weight. */
 .section-how .how-para {
-  text-shadow: 0 1px 2px #080706, 0 0 5px rgba(8, 7, 6, 0.95);
-}
-.section-founder .founder-signature,
-.section-principles .value-word.engraved {
-  text-shadow: 0 1px 2px #080706, 0 0 5px #080706;
+  color: var(--parchment);
+  font-weight: 500;
+  text-shadow: 0 1px 2px #080706, 0 0 6px rgba(8, 7, 6, 0.95);
 }
 
-/* Small labels need the same contrast as prose, including over artwork. */
-.section .eyebrow,
-.section .sq-num { color: var(--brass-text); }
-.section-principles .eyebrow { color: var(--parchment); }
-.section:has(.section-bg-image) .restraint { color: var(--parchment-mute); }
-.footer-copyright,
-.footer-privacy,
-.qs-sub { color: var(--text-muted-readable); }
-
-@media (max-width: 900px) {
-  .design-split .shell::before,
-  .design-split .shell-narrow::before,
-  .design-split .code-inner::before {
-    filter: blur(32px);
-    background: radial-gradient(ellipse at center,
-      rgba(8, 7, 6, 0.5) 0%,
-      rgba(8, 7, 6, 0.34) 65%,
-      transparent 100%);
-  }
-
+/* The two gold lines in VII ("AND YOU START HERE:", "If it's not a fuck yes…").
+   These sat at the section's lightest colour over its lightest brushwork and
+   were the first thing to disappear. */
+.section-how .how-pullquote {
+  font-weight: 600;
+  text-shadow: 0 1px 2px #080706, 0 0 10px rgba(8, 7, 6, 0.95);
 }
 
-/* Public-site reading scale. Keep the palette and typefaces, but give the
-   copy more size, weight and breathing room; private tools keep their scale. */
-html:has(main.design-v2) { font-size: 18px; }
-main.design-v2,
-.site-header,
-.site-footer { font-weight: 500; }
-
-.design-v2 :is(h1, h2, h3, h4, .display) { font-weight: 600; }
-.design-v2 :is(.eyebrow, .restraint, .qs-label, .qs-error) { font-weight: 500; }
-.design-v2 .eyebrow { font-size: 0.82rem; }
-.design-v2 .section-principles .eyebrow:not(.eyebrow--numeral) {
-  font-size: clamp(1rem, 2.2vw, 1.5rem);
-}
-.design-v2 :is(.btn, .qs-label, .qs-error, .booking-sms-note) { font-size: 0.85rem; }
-.design-v2 .btn { font-weight: 600; }
-.design-v2 :is(.how-para, .faq-a p, .faq-a li, .evidence-quote, .qs-sub) {
-  font-size: 1.15rem;
-  line-height: 1.7;
-}
-.design-v2 .values-intro p,
-.design-v2 .founder-p {
-  font-size: clamp(1.25rem, 1.7vw, 1.5rem);
-  line-height: 1.75;
-  font-style: normal;
-}
-/* The founder's letter needs a dependable dark reading surface over the sunset,
-   like the dark ground behind Who We Are. Keep the painting visible outside it. */
-.design-v2 .founder-text {
-  padding: clamp(1.1rem, 2.4vw, 2rem);
-  background: rgba(10, 9, 8, 0.78);
-}
-.design-v2 .founder-text::before { background: none; }
-.design-v2 .sq-text { font-size: clamp(1.1rem, 1.8vw, 1.3rem); line-height: 1.5; }
-.design-v2 .offerings-grid--defined .offering-desc {
-  font-size: max(1.08rem, var(--offering-desc));
-  line-height: 1.6;
-  opacity: 1;
-}
-.design-v2 .offerings-grid--defined .offering-term {
-  font-size: max(1.2rem, var(--offering-term));
-}
-.design-v2 .values-wall {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.25rem 0;
-}
-.design-v2 .value-word {
-  width: auto;
-  min-width: 0;
-  max-width: none;
-  font-size: clamp(1rem, 1.4vw, 1.12rem);
-  letter-spacing: 0.03em;
-  line-height: 1.45;
-  overflow-wrap: anywhere;
-}
-@media (max-width: 1100px) {
-  .design-v2 .values-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-@media (max-width: 700px) {
-  .design-v2 .values-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 480px) {
-  /* Keep two aligned columns, giving long names room without splitting them. */
-  .design-v2 .section-principles > .shell { padding-inline: 0.75rem; }
-  .design-v2 .value-word {
-    font-size: clamp(0.8rem, 4.2vw, 1rem);
-    letter-spacing: 0;
-    padding-inline: 0.1rem;
-  }
-}
-.design-v2 .evidence-video-title { font-size: 1rem; font-weight: 500; }
-.design-v2 .application-card {
-  background: linear-gradient(180deg, #12100f, #211914);
-}
-.design-v2 .hero-verse { font-size: clamp(1.1rem, 1.8vw, 1.28rem); }
-.design-v2 .hero-restraint { font-size: 0.85rem; }
-.design-v2 .hero-scroll { font-size: 0.7rem; }
-
-@media (max-width: 900px) {
-  /* Let the taller text determine the hero height instead of clipping its CTA. */
-  .design-v2 .hero { height: auto; }
-  .design-v2 .hero-sticky { min-height: 100svh; }
-  .design-v2 .hero-content { position: relative; padding-bottom: 8rem; }
+.section-how .section-heading,
+.section-how .eyebrow {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(0, 0, 0, 0.8);
 }
 
-@media (max-width: 400px) {
-  .design-v2 .application-eyebrow .brass-rule { width: 20px; margin: 0 0.4rem; }
-  .design-v2 .qs-nav { flex-wrap: wrap; }
-  .design-v2 .qs-nav .btn {
-    flex: 1 0 auto;
-    padding-inline: 0.8rem;
-    letter-spacing: 0.18em;
-    white-space: nowrap;
-  }
+/* Closing verses — italic Cinzel over that fresco. */
+.section-closing .closing-verse-text {
+  font-weight: 500;
+  text-shadow: 0 1px 2px #080706, 0 0 8px rgba(8, 7, 6, 0.95);
+}
+
+/* Mark 12:30 / 12:31. These were set plain black to read against bare gold,
+   and on the bright half of the fresco they vanished into the shadow of the
+   brushwork. Brass at the same size and weight, with a shadow to hold them
+   off the paint, reads on both halves. */
+.section-closing .closing-ref {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--brass-light);
+  text-shadow: 0 1px 2px #080706, 0 0 8px rgba(8, 7, 6, 0.95);
+}
+
+/* The wordmark sits above the plate's reach, on open gold. */
+.section-closing .closing-wordmark {
+  text-shadow:
+    0 -1px 0 rgba(196, 164, 95, 0.22),
+    0 2px 4px rgba(0, 0, 0, 0.8),
+    0 6px 30px rgba(0, 0, 0, 0.88);
 }
