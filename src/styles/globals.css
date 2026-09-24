@@ -4513,79 +4513,189 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
 }
 
 /* ============================================================
-   READABILITY — How We Operate (VII) and the Closing verses.
-   Nico's note on both: "let's make these texts darker" — darker meaning
-   *more obvious*, not darker ink. Both sections set light copy over the
-   two hardest paintings in the set: the battle oil, whose highlights run
-   straight through the longest body copy on the page, and the gold
-   ceiling fresco, which is bright almost edge to edge. Both had their
-   plates switched off in the block above, so the words dissolved into
-   the brushwork.
+   READABILITY PASS — every piece of copy on the page.
 
-   The letters do most of the work here, not the plate. Weight and a
-   tight relief shadow give each glyph its own edge; the plate comes back
-   only far enough to take the glare off the paint behind the words. It
-   is deliberately lighter than the Principles/Founder plates — those
-   sections hide their painting, and the whole point of these two is that
-   the painting still reads. Feathered over many stops, house style, so
-   there is no perceptible boundary.
+   Nico's note, first against VII and the closing verses and then
+   against the whole page: "let's make these texts darker." Darker
+   meaning *more obvious*, not darker ink — nearly all of this copy is
+   light type laid straight onto an oil painting, so darkening the
+   letters would bury them.
 
-   Scoped to these two sections; the rest of the gallery is untouched.
-   Sits after the transparent-plate block so it wins, and after the
-   .design-split rules so it holds if either section is ever switched to
-   a split layout.
+   The whole page had been run with its text plates switched off (the
+   block above) so the paintings would show through. That reads
+   beautifully on the dark canvases and falls apart on the bright ones:
+   the burning city behind The Truth, the sunburst behind Who Am I, the
+   white horse behind the questions, the gold fresco behind the verses.
+   Copy set in --parchment-mute or --ash over those simply vanishes.
+
+   Three moves, applied the same way everywhere so the page reads as one
+   thing rather than a set of local patches:
+
+     1. every painted section gets its plate back, from one shared
+        recipe with a single strength knob (--plate) tuned per section
+        to how bright its painting is. Feathered over five stops and
+        sized `closest-side` so it fades out inside its own box — the
+        default `farthest-corner` only reaches zero at the corners,
+        which on a narrow column leaves a visible rectangle down the
+        side of the text;
+     2. body copy comes off the muted tones onto full parchment at
+        weight 500, with a tight relief shadow that gives each glyph its
+        own edge where a highlight sits directly behind it;
+     3. the small labels — eyebrows, numerals, attributions, the footer
+        — come off --ash, which was never readable over paint.
+
+   The plates stay deliberately lighter than the Principles' (the one
+   section that genuinely hides its painting): the letters are meant to
+   carry this, not the scrim. Checked at 393px and 1440px.
    ============================================================ */
-.section-how .shell-narrow::before,
-.section-closing .shell-narrow::before {
-  /* `closest-side`, not the default `farthest-corner`. With farthest-corner
-     the ellipse only reaches zero out at the corners, so on a narrow column
-     the left and right edges of the box are still tinted and the plate shows
-     as a rectangle — clearly visible down the side of the text on desktop.
-     closest-side lands the zero stop exactly on all four edge midpoints, so
-     the plate fades out inside its own box and leaves no seam. */
-  inset: -2.6rem -3rem;
-  background: radial-gradient(ellipse closest-side at center,
-    rgba(6, 5, 4, 0.68) 0%,
-    rgba(6, 5, 4, 0.56) 42%,
-    rgba(6, 5, 4, 0.34) 66%,
-    rgba(6, 5, 4, 0.12) 85%,
-    rgba(6, 5, 4, 0) 100%);
-}
-/* The fresco is the brightest painting on the page and the verses sit right on
-   its hottest gold, so its plate carries a little more than VII's. */
-.section-closing .shell-narrow::before {
-  background: radial-gradient(ellipse closest-side at center,
-    rgba(6, 5, 4, 0.74) 0%,
-    rgba(6, 5, 4, 0.62) 42%,
-    rgba(6, 5, 4, 0.38) 66%,
-    rgba(6, 5, 4, 0.13) 85%,
-    rgba(6, 5, 4, 0) 100%);
+
+/* Two tones the palette was missing: a brass that survives being laid on
+   gold paint, and a muted grey that is still muted but actually legible. */
+:root {
+  --brass-read: #d2b06a;
+  --ash-read: #a79c8a;
 }
 
-/* Body copy: off the muted tone, onto full parchment with real weight. */
-.section-how .how-para {
+/* --- 1. PLATES -------------------------------------------------------
+   One recipe, one knob. --plate is set on the element that owns the
+   ::before and inherited by it. This block is last in the file, so it
+   also overrides the .design-split plate removals above — every split
+   section on the page (Who We Are, We're Offering You, VII, the
+   questions) is one that needs its plate. */
+.truth-provocation::before,
+.section-code .code-inner::before,
+.section-evidence .shell::before,
+.section-founder .founder-text::before,
+.section-become .shell::before,
+.section-how .shell-narrow::before,
+.section-faq .shell-narrow::before,
+.section-closing .shell-narrow::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse closest-side at center,
+    rgb(6 5 4 / var(--plate)) 0%,
+    rgb(6 5 4 / calc(var(--plate) * 0.82)) 42%,
+    rgb(6 5 4 / calc(var(--plate) * 0.5)) 66%,
+    rgb(6 5 4 / calc(var(--plate) * 0.18)) 85%,
+    rgb(6 5 4 / 0) 100%);
+}
+
+/* Plate strength, roughly in order of how bright the painting behind it is.
+   The Truth and Who We Are sit on dark canvases and need very little; the
+   fresco behind the verses is bright almost edge to edge. */
+.truth-provocation             { --plate: 0.46; }
+.section-code .code-inner      { --plate: 0.58; }
+.section-evidence .shell       { --plate: 0.5; }
+.section-become .shell         { --plate: 0.66; }
+.section-how .shell-narrow     { --plate: 0.68; }
+.section-faq .shell-narrow     { --plate: 0.7; }
+.section-founder .founder-text { --plate: 0.78; }
+.section-closing .shell-narrow { --plate: 0.74; }
+
+/* Plate geometry. The Truth, Who We Are and Who Am I already carry insets
+   tuned to their own layouts, so only the sections running on the shared
+   base inset are widened — closest-side needs room outside the text to
+   fade in, and the base -1.2rem is not enough. */
+.section-evidence .shell::before,
+.section-become .shell::before,
+.section-how .shell-narrow::before,
+.section-faq .shell-narrow::before,
+.section-closing .shell-narrow::before {
+  inset: -2.6rem -3rem;
+}
+
+/* --- 2. BODY COPY ----------------------------------------------------
+   Off --parchment-mute, onto full parchment at weight 500, with a two-part
+   shadow: a 1px offset that reads as relief, and a tight glow that keeps
+   the counters clean over brushwork. */
+.section-truth .truth-line,
+.section-code .values-intro p,
+.section-evidence .evidence-quote,
+.section-founder .founder-p,
+.section-how .how-para,
+.section-faq .sq-text,
+.section-closing .closing-verse-text {
   color: var(--parchment);
   font-weight: 500;
   text-shadow: 0 1px 2px #080706, 0 0 6px rgba(8, 7, 6, 0.95);
 }
 
-/* The two gold lines in VII ("AND YOU START HERE:", "If it's not a fuck yes…").
-   These sat at the section's lightest colour over its lightest brushwork and
-   were the first thing to disappear. */
-.section-how .how-pullquote {
+/* The Truth's emphasised words are already the loudest thing in the frame;
+   they only need the shadow deepened to match their size. */
+.section-truth .truth-line strong {
+  text-shadow: 0 1px 2px #080706, 0 0 10px rgba(8, 7, 6, 0.95);
+}
+
+/* Who Am I is set in italic by design — keep the italic, take the wash off. */
+.section-founder .founder-p { font-style: italic; }
+
+/* The offering descriptions were held back with opacity to sit under their
+   brass terms. Over the gold dress in that painting the 12% was the
+   difference between readable and not; the size gap already does the job. */
+.section-become .offering-desc {
+  color: var(--parchment);
+  opacity: 1;
+  font-weight: 500;
+  text-shadow: 0 1px 2px #080706, 0 0 6px rgba(8, 7, 6, 0.95);
+}
+
+/* --- 3. DISPLAY LINES IN GOLD ----------------------------------------
+   Brass on gold paint is the worst pairing on the page. Weight plus a hard
+   dark edge, rather than a lighter gold, so the palette is unchanged. */
+.section-become .offering-term,
+.section-become .offering-closing,
+.section-how .how-pullquote,
+.section-principles .value-word {
   font-weight: 600;
   text-shadow: 0 1px 2px #080706, 0 0 10px rgba(8, 7, 6, 0.95);
 }
 
-.section-how .section-heading,
-.section-how .eyebrow {
+.hero .hero-verse {
+  font-weight: 600;
+  text-shadow: 0 1px 2px #080706, 0 2px 10px rgba(8, 7, 6, 0.9), 0 0 24px rgba(8, 7, 6, 0.7);
+}
+
+/* Headings and the closing wordmark sit above most of the plates' reach. */
+.section .section-heading,
+.section-become .become-heading,
+.section-closing .closing-wordmark {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(0, 0, 0, 0.8);
 }
 
-/* Closing verses — italic Cinzel over that fresco. */
-.section-closing .closing-verse-text {
+/* --- 4. SMALL LABELS -------------------------------------------------
+   Scoped to the public page: .eyebrow and .restraint are shared with
+   /admin and /presentations, which sit on flat panels and must not change. */
+.section .eyebrow,
+.hero .hero-eyebrow {
+  color: var(--brass-read);
+  /* The numerals are single thin glyphs at 0.72rem — "I" over the burning sky
+     had nothing to hold on to. Weight does more for them than colour. */
   font-weight: 500;
-  text-shadow: 0 1px 2px #080706, 0 0 8px rgba(8, 7, 6, 0.95);
+}
+.section .eyebrow,
+.hero .hero-eyebrow,
+.section .brass-rule {
+  text-shadow: 0 1px 2px #080706, 0 0 8px rgba(8, 7, 6, 0.9);
+}
+/* The Principles sets its eyebrow in parchment on purpose — leave the colour,
+   take the shadow. */
+.section-principles .eyebrow { color: var(--parchment); }
+
+.section .restraint,
+.section-faq .sq-num,
+.section-evidence .evidence-intro,
+.section-evidence .evidence-attr,
+.site-footer .footer-copyright,
+.site-footer .footer-privacy {
+  color: var(--ash-read);
+}
+.section .restraint,
+.section-faq .sq-num,
+.section-evidence .evidence-intro,
+.section-evidence .evidence-attr {
+  text-shadow: 0 1px 2px #080706, 0 0 8px rgba(8, 7, 6, 0.9);
 }
 
 /* Mark 12:30 / 12:31. These were set plain black to read against bare gold,
@@ -4600,10 +4710,61 @@ select.rt-size option:checked { background: var(--brass); color: var(--bg-deep);
   text-shadow: 0 1px 2px #080706, 0 0 8px rgba(8, 7, 6, 0.95);
 }
 
-/* The wordmark sits above the plate's reach, on open gold. */
-.section-closing .closing-wordmark {
-  text-shadow:
-    0 -1px 0 rgba(196, 164, 95, 0.22),
-    0 2px 4px rgba(0, 0, 0, 0.8),
-    0 6px 30px rgba(0, 0, 0, 0.88);
+/* Engraved type — the brass-gradient fill used by the question numerals and
+   the testimonial quote marks. It is painted with -webkit-text-fill-color, so
+   `color` cannot reach it and the numerals stayed invisible when everything
+   around them was lifted. Brighten the gradient itself and give it a real
+   edge; the shadow is kept tight because on transparent-filled glyphs a wide
+   blur reads as a smudge rather than a shadow. The Principles opt out of the
+   gradient entirely further up, so they are unaffected. */
+.section .engraved {
+  /* background-image, NOT the `background` shorthand: the shorthand resets
+     background-clip, which is what makes this text-shaped in the first place,
+     and the numerals render as solid gold bars across the column. */
+  background-image: linear-gradient(180deg, #e8cd92 0%, var(--brass-read) 52%, var(--brass) 100%);
+  text-shadow: 0 1px 1px rgba(8, 7, 6, 0.9);
+}
+
+/* The question numerals are 0.82rem mono. At that size a vertical gradient
+   spends half of every glyph in its darkest stop, which is why they read as
+   ghosts however bright the top of the ramp is. They drop the gradient for a
+   flat brass, the same way the Principles' words do — the decorative quote
+   mark in Testimonials is 3.5rem and keeps its metal. */
+.section-faq .sq-num {
+  background-image: none;
+  -webkit-text-fill-color: var(--brass-read);
+  color: var(--brass-read);
+  text-shadow: 0 1px 2px #080706, 0 0 8px rgba(8, 7, 6, 0.9);
+}
+
+/* Nico's sign-off sits on the brightest part of the sunset. */
+.section-founder .founder-signature {
+  font-weight: 600;
+  text-shadow: 0 1px 2px #080706, 0 0 10px rgba(8, 7, 6, 0.95);
+}
+
+/* Testimonial captions. These are the one piece of copy on the page that sits
+   over something nobody controls — a video frame, which for two of the three
+   clips is a bright white wall. A shadow alone cannot hold a name against
+   that. The rule above deliberately avoided darkening the tile's bottom edge,
+   so this does not: the scrim is a feathered ellipse behind the caption block
+   itself, the same treatment the sections get, and the rest of the frame is
+   left alone. It lives inside the caption's own stacking context (the
+   translateZ layer), so it stays above the video and below the words. */
+.section-evidence .evidence-video-title {
+  font-weight: 500;
+  text-shadow: 0 1px 2px #080706, 0 0 8px rgba(8, 7, 6, 0.95);
+}
+.section-evidence .evidence-video-title::before {
+  content: '';
+  position: absolute;
+  inset: -0.7rem -0.4rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse closest-side at center,
+    rgb(6 5 4 / 0.66) 0%,
+    rgb(6 5 4 / 0.54) 42%,
+    rgb(6 5 4 / 0.33) 66%,
+    rgb(6 5 4 / 0.12) 85%,
+    rgb(6 5 4 / 0) 100%);
 }
