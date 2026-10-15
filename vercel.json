@@ -27,6 +27,8 @@
   ],
   "rewrites": [
     { "source": "/zoom", "destination": "/zoom.html" },
+    { "source": "/ZOOM", "destination": "/zoom.html" },
+    { "source": "/Zoom", "destination": "/zoom.html" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
