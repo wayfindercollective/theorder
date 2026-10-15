@@ -26,6 +26,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/zoom", "destination": "/zoom.html" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

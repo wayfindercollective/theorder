@@ -41,6 +41,8 @@ export const SYSTEM_PATHS = [
   // Retired comparison URL. The design it previewed is now the live site, so
   // /old simply renders the main page — kept reserved so no page can claim it.
   'old',
+  // Branded link to Nico's Zoom room (public/zoom.html, routed in vercel.json).
+  'zoom',
 ]
 
 // "Primal & Adventure" -> "primal-adventure"
