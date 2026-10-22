@@ -150,8 +150,8 @@
         "attribution": ""
       },
       {
-        "video": "/testimonials/Tony.mp4",
-        "poster": "/testimonials/Tony-poster.jpg",
+        "video": "/testimonials/tony-litster-2026.mp4",
+        "poster": "/testimonials/tony-litster-2026-poster.jpg",
         "title": "Tony Litster — Entrepreneur, HNW Coach and Real Estate Developer",
         "quote": "",
         "attribution": ""
@@ -167,6 +167,22 @@
         "video": "/testimonials/testimonial-3.mp4",
         "poster": "/testimonials/testimonial-3-poster.jpg",
         "title": "Callum Nosworthy — Executive Director of Watchtower Capital Group",
+        "quote": "",
+        "attribution": ""
+      },
+      {
+        "type": "video",
+        "video": "/testimonials/brian-comstock.mp4",
+        "poster": "/testimonials/brian-comstock-poster.jpg",
+        "title": "Brian Comstock",
+        "quote": "",
+        "attribution": ""
+      },
+      {
+        "type": "video",
+        "video": "/testimonials/benjamin-duffy.mp4",
+        "poster": "/testimonials/benjamin-duffy-poster.jpg",
+        "title": "Benjamin Duffy",
         "quote": "",
         "attribution": ""
       }

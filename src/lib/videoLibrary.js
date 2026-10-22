@@ -26,6 +26,9 @@ function captionName(title) {
 
 export const BUNDLED_CLIPS = [
   { src: '/testimonials/Tony.mp4',           poster: '/testimonials/Tony-poster.jpg',           label: 'Tony Litster' },
+  { src: '/testimonials/tony-litster-2026.mp4', poster: '/testimonials/tony-litster-2026-poster.jpg', label: 'Tony Litster (2026)' },
+  { src: '/testimonials/brian-comstock.mp4', poster: '/testimonials/brian-comstock-poster.jpg', label: 'Brian Comstock' },
+  { src: '/testimonials/benjamin-duffy.mp4', poster: '/testimonials/benjamin-duffy-poster.jpg', label: 'Benjamin Duffy' },
   { src: '/testimonials/testimonial-2.mp4',  poster: '/testimonials/testimonial-2-poster.jpg',  label: 'Alexander Merutka' },
   { src: '/testimonials/testimonial-3.mp4',  poster: '/testimonials/testimonial-3-poster.jpg',  label: 'Callum Nosworthy' },
   { src: '/testimonials/testimonial-4.mp4',  poster: '/testimonials/testimonial-4-poster.jpg',  label: 'Tommy Johnstone' },
