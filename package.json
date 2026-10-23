@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-testimonial-feed.mjs && vite build",
     "preview": "vite preview",
     "test:video-upload": "node --test src/admin/mp4Duration.test.js",
     "crop:saturday": "node scripts/crop-saturday.mjs",

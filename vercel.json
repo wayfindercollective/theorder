@@ -23,12 +23,37 @@
           "value": "public, max-age=604800, stale-while-revalidate=2592000"
         }
       ]
+    },
+    {
+      "source": "/testimonials/cards.json",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300"
+        }
+      ]
     }
   ],
   "rewrites": [
-    { "source": "/zoom", "destination": "/zoom.html" },
-    { "source": "/ZOOM", "destination": "/zoom.html" },
-    { "source": "/Zoom", "destination": "/zoom.html" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/zoom",
+      "destination": "/zoom.html"
+    },
+    {
+      "source": "/ZOOM",
+      "destination": "/zoom.html"
+    },
+    {
+      "source": "/Zoom",
+      "destination": "/zoom.html"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
   ]
 }
